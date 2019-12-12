@@ -2,7 +2,6 @@
 <v-app>
   <v-content>
     <v-container
-      class="fill-height"
       fluid
     >
       <v-row
@@ -70,7 +69,7 @@ export default {
         password: this.password
       })
         .then(response => {
-          this.$router.push('/about')
+          this.$router.push({ name: 'main' })
         })
     }
   }
