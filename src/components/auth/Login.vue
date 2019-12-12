@@ -19,13 +19,13 @@
               dark
               flat
             >
-              <v-toolbar-title>Virtual Logic Inc.</v-toolbar-title>
+              <v-toolbar-title>Login to VLI System</v-toolbar-title>
               <v-spacer />
             </v-toolbar>
             <v-card-text>
               <v-form @submit.prevent="login" id="login">
                 <v-text-field
-                  label="Login"
+                  label="ID"
                   name="login"
                   prepend-icon="person"
                   type="text"

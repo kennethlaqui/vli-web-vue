@@ -7,10 +7,10 @@
     <v-toolbar-title>Virtual Logic Inc.</v-toolbar-title>
     <v-spacer></v-spacer>
     <v-toolbar-items>
-      <v-btn to="/home" text>Home</v-btn>
+      <v-btn to="/" text>Home</v-btn>
       <v-btn to="/about" text>About</v-btn>
       <v-btn v-if="!loggedIn" to="/login" text>Login</v-btn>
-      <v-btn v-if="loggedIn" to="/logout" text>Logout</v-btn>
+      <v-btn v-if="loggedIn" to="/main" text>Dashboard</v-btn>
     </v-toolbar-items>
   </v-app-bar>
 
@@ -19,9 +19,6 @@
 
     <!-- Provides the application the proper gutter -->
     <v-container fluid>
-
-      <!-- <Master v-if="!loggedIn"></Master>
-      <Dashboard v-if="loggedIn"></Dashboard> -->
       <!-- If using vue-router -->
       <router-view></router-view>
     </v-container>

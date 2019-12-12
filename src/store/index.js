@@ -8,11 +8,19 @@ axios.defaults.baseURL = process.env.VUE_APP_URL
 
 export default new Vuex.Store({
   state: {
-    token: localStorage.getItem('access_token') || null
+    token: localStorage.getItem('access_token') || null,
+    user: {},
+    username: null
   },
   getters: {
     loggedIn (state) {
       return state.token !== null
+    },
+    UserID (state) {
+      return state.username
+    },
+    user (state) {
+      return state.user
     }
   },
   mutations: {
@@ -21,9 +29,33 @@ export default new Vuex.Store({
     },
     destroyToken (state) {
       state.token = null
+    },
+    UserID (state, username) {
+      state.username = username
+    },
+    user (state, user) {
+      state.user = user
     }
   },
   actions: {
+    retrieveUser (context) {
+      axios.defaults.headers.common['Authorization'] = 'Bearer ' + context.state.token
+
+      if (context.getters.loggedIn) {
+        return new Promise((resolve, reject) => {
+          axios.get('/user')
+            .then(response => {
+              this.user = response.data
+              context.commit('user', this.user)
+              resolve(response)
+            })
+            .catch(error => {
+              console.log(error)
+              reject(error)
+            })
+        })
+      }
+    },
     // -- logout
     destroyToken (context) {
       axios.defaults.headers.common['Authorization'] = 'Bearer ' + context.state.token
@@ -43,7 +75,6 @@ export default new Vuex.Store({
             })
         })
       }
-      console.log('asd')
     },
     // -- login
     retrieveToken (context, credentials) {
@@ -54,9 +85,9 @@ export default new Vuex.Store({
         })
           .then(response => {
             this.token = response.data.access_token
-
             localStorage.setItem('access_token', this.token)
             context.commit('retrieveToken', this.token)
+            context.commit('UserID', credentials.username)
             resolve(response)
           })
           .catch(error => {
