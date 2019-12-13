@@ -9,7 +9,8 @@
     <v-toolbar-items>
       <v-btn to="/" text>Home</v-btn>
       <v-btn to="/about" text>About</v-btn>
-      <v-btn v-if="!loggedIn" to="/login" text>Login</v-btn>
+      <v-btn v-if="!loggedIn" :to="{ name: 'userLogin' }" text>Login</v-btn>
+      <v-btn v-if="!loggedIn" :to="{ name: 'clientRegister' }" text>Register</v-btn>
       <v-btn v-if="loggedIn" to="/main" text>Dashboard</v-btn>
     </v-toolbar-items>
   </v-app-bar>

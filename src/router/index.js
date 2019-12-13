@@ -3,9 +3,10 @@ import VueRouter from 'vue-router'
 import Home from '../views/Home.vue'
 import About from '../views/About.vue'
 // import Dashboard from '../components/layouts/Dashboard.vue'
-import Login from '../components/auth/Login.vue'
+import UserLogin from '../components/auth/Login.vue'
 import Logout from '../components/auth/Logout.vue'
 import Main from '../components/Main.vue'
+import ClientRegister from '../components/client/Register.vue'
 
 Vue.use(VueRouter)
 
@@ -26,16 +27,22 @@ const routes = [
   },
   {
     path: '/login',
-    name: 'login',
-    component: Login,
+    name: 'userLogin',
+    component: UserLogin,
     meta: {
       requiresVisitor: true
     }
   },
   {
     path: '/logout',
-    name: 'logout',
+    name: 'userLogout',
     component: Logout
+  },
+  {
+    path: '/register',
+    name: 'clientRegister',
+    component: ClientRegister,
+    meta: { layout: 'default' }
   },
   {
     path: '/main',

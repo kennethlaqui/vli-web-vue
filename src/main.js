@@ -1,13 +1,15 @@
 import 'material-design-icons-iconfont/dist/material-design-icons.css'
 import Vue from 'vue'
 import App from './App.vue'
-import NoSideBar from './components/layouts/Master.vue'
+import HomepPage from './components/layouts/Home.vue'
 import Dashboard from './components/layouts/Dashboard.vue'
 import './registerServiceWorker'
 import router from './router'
 import store from './store'
 import vuetify from './plugins/vuetify'
+import Vuelidate from 'vuelidate'
 
+Vue.use(Vuelidate)
 Vue.config.productionTip = false
 
 router.beforeEach((to, from, next) => {
@@ -16,7 +18,7 @@ router.beforeEach((to, from, next) => {
     // if not, redirect to login page.
     if (!store.getters.loggedIn) {
       next({
-        name: 'login'
+        name: 'userLogin'
       })
     } else {
       next()
@@ -36,7 +38,7 @@ router.beforeEach((to, from, next) => {
   }
 })
 
-Vue.component('default-layout', NoSideBar)
+Vue.component('default-layout', HomepPage)
 Vue.component('dashboard-layout', Dashboard)
 
 new Vue({

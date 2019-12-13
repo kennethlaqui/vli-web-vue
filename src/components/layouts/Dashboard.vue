@@ -144,7 +144,7 @@
 
       <template v-slot:append>
         <div class="pa-2">
-          <v-btn v-if="loggedIn" :to="{ name: 'logout' }" block>Logout</v-btn>
+          <v-btn v-if="loggedIn" :to="{ name: 'userLogout' }" block>Logout</v-btn>
         </div>
       </template>
 
