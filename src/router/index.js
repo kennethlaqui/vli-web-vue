@@ -2,11 +2,12 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Home from '../views/Home.vue'
 import About from '../views/About.vue'
-// import Dashboard from '../components/layouts/Dashboard.vue'
 import UserLogin from '../components/auth/Login.vue'
+import UserAssignedCompany from '../components/auth/Companies.vue'
 import Logout from '../components/auth/Logout.vue'
-import Main from '../components/Main.vue'
+import Dashboard from '../components/dashboard/Dashboard.vue'
 import ClientRegister from '../components/client/Register.vue'
+import EncodeDtr from '../views/personnel/EncodeDtr.vue'
 
 Vue.use(VueRouter)
 
@@ -34,6 +35,14 @@ const routes = [
     }
   },
   {
+    path: '/login/company',
+    name: 'UserAssignedCompany',
+    component: UserAssignedCompany,
+    meta: {
+      requiresAuth: true
+    }
+  },
+  {
     path: '/logout',
     name: 'userLogout',
     component: Logout
@@ -45,12 +54,22 @@ const routes = [
     meta: { layout: 'default' }
   },
   {
-    path: '/main',
-    name: 'main',
-    component: Main,
+    path: '/dashboard',
+    name: 'userDashboard',
+    component: Dashboard,
+    meta: {
+      requiresPrimekey: true,
+      layout: 'dashboard'
+    }
+  },
+  {
+    path: '/personnel/encode',
+    name: 'encodeDtr',
+    component: EncodeDtr,
     meta: {
       requiresAuth: true,
-      layout: 'dashboard' }
+      layout: 'dashboard'
+    }
   }
 ]
 

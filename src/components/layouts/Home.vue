@@ -11,7 +11,7 @@
       <v-btn to="/about" text>About</v-btn>
       <v-btn v-if="!loggedIn" :to="{ name: 'userLogin' }" text>Login</v-btn>
       <v-btn v-if="!loggedIn" :to="{ name: 'clientRegister' }" text>Register</v-btn>
-      <v-btn v-if="loggedIn" to="/main" text>Dashboard</v-btn>
+      <v-btn v-if="loggedIn" :to="{ name: 'userDashboard' }" text>Dashboard</v-btn>
     </v-toolbar-items>
   </v-app-bar>
 
@@ -31,15 +31,7 @@
 </v-app>
 </template>
 <script>
-// import Master from '@/components/layouts/Master.vue'
-// import Dashboard from '@/components/layouts/Dashboard.vue'
-
 export default {
-//   components: {
-//     Master,
-//     Dashboard
-//   },
-
   data: () => ({
     drawers: ['Default (no property)', 'Permanent', 'Temporary'],
     primaryDrawer: {

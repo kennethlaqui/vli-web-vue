@@ -46,8 +46,8 @@
             <img src="https://randomuser.me/api/portraits/men/1.jpg">
           </v-list-item-avatar>
           <v-list-item-content>
-            <v-list-item-title>{{ userInfo.user_nme }}</v-list-item-title>
-            <v-list-item-subtitle>{{ userInfo.user_id_ }}</v-list-item-subtitle>
+            <!-- <v-list-item-title>{{ userInfo.user_nme }}</v-list-item-title>
+            <v-list-item-subtitle>{{ userInfo.user_id_ }}</v-list-item-subtitle> -->
         </v-list-item-content>
       </template>
       <v-list-group
@@ -75,7 +75,10 @@
 
     <v-list dense>
 
-      <v-list-item link>
+      <v-list-item
+        :to="{ name: 'userDashboard' }"
+        link
+      >
         <v-list-item-action>
           <v-icon>mdi-view-dashboard</v-icon>
         </v-list-item-action>
@@ -84,6 +87,7 @@
         </v-list-item-content>
       </v-list-item>
       <v-divider></v-divider>
+
       <v-list-group
         v-for="item in items"
         :key="item.title"
@@ -100,6 +104,7 @@
         <v-list-item
           v-for="subItem in item.items"
           :key="subItem.title"
+          :to="subItem.url"
           link
         >
           <v-list-item-icon>
@@ -156,46 +161,13 @@
       temporary
     />
 
+    <!-- Sizes your content based upon application components -->
     <v-content>
-      <v-container
-        class="fill-height"
-        fluid
-      >
-        <v-row
-          justify="center"
-          align="center"
-        >
-          <v-col class="shrink">
-            <v-tooltip right>
-              <template v-slot:activator="{ on }">
-                <v-btn
-                  :href="source"
-                  icon
-                  large
-                  target="_blank"
-                  v-on="on"
-                >
-                  <v-icon large>mdi-code-tags</v-icon>
-                </v-btn>
-              </template>
-              <span>Source</span>
-            </v-tooltip>
-            <v-tooltip right>
-              <template v-slot:activator="{ on }">
-                <v-btn
-                  icon
-                  large
-                  href="https://codepen.io/johnjleider/pen/QewYYx"
-                  target="_blank"
-                  v-on="on"
-                >
-                  <v-icon large>mdi-codepen</v-icon>
-                </v-btn>
-              </template>
-              <span>Codepen</span>
-            </v-tooltip>
-          </v-col>
-        </v-row>
+
+      <!-- Provides the application the proper gutter -->
+      <v-container fluid>
+        <!-- If using vue-router -->
+        <router-view></router-view>
       </v-container>
     </v-content>
 
@@ -232,8 +204,8 @@ export default {
           title: 'Personnel',
           active: true,
           items: [
-            { action: 'mdi-calendar-plus', title: 'Encode DTR' },
-            { action: 'mdi-timetable', title: 'Manpower' }
+            { action: 'mdi-calendar-plus', title: 'Encode DTR', url: 'personnel/encode' },
+            { action: 'mdi-timetable', title: 'Manpower', url: 'about' }
           ]
         },
         {
@@ -241,8 +213,8 @@ export default {
           title: 'Payroll',
           active: false,
           items: [
-            { action: 'mdi-cached', title: 'Compute Payroll' },
-            { action: 'mdi-coin', title: 'Salaries' }
+            { action: 'mdi-cached', title: 'Compute Payroll', url: 'about' },
+            { action: 'mdi-coin', title: 'Salaries', url: 'about' }
           ]
         },
         {
@@ -250,8 +222,8 @@ export default {
           title: 'Reports',
           active: false,
           items: [
-            { action: 'mdi-beach', title: 'Leave Summary' },
-            { action: 'mdi-coin', title: 'Salaries' }
+            { action: 'mdi-beach', title: 'Leave Summary', url: 'about' },
+            { action: 'mdi-coin', title: 'Salaries', url: 'about' }
           ]
         },
         {
@@ -259,8 +231,8 @@ export default {
           title: 'Maintenance',
           active: false,
           items: [
-            { action: 'mdi-account-multiple-outline', title: 'Masterfile' },
-            { action: 'mdi-animation', title: 'Reference File' }
+            { action: 'mdi-account-multiple-outline', title: 'Masterfile', url: 'about' },
+            { action: 'mdi-animation', title: 'Reference File', url: 'about' }
           ]
         }
       ],
@@ -269,7 +241,7 @@ export default {
         ['Settings', 'settings']
       ],
       username: 'Kenneth Laqui',
-      userInfo: {}
+      userData: {}
     }
   },
   computed: {
@@ -278,15 +250,15 @@ export default {
     }
   },
   methods: {
-    user () {
-      this.$store.dispatch('retrieveUser')
-        .then(response => {
-          this.userInfo = this.$store.getters.user
-        })
-    }
+    // user () {
+    //   this.$store.dispatch('retrieveUser')
+    //     .then(response => {
+    //       this.userData = this.$store.getters.userData
+    //     })
+    // }
   },
   created () {
-    this.user()
+    // this.user()
   },
   props: {
     source: String
