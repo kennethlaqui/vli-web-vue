@@ -10,9 +10,9 @@ export default new Vuex.Store({
   state: {
     token: localStorage.getItem('access_token') || null,
     companies: [],
-    userData: [],
+    user: '',
     username: null,
-    primekey: null
+    primekey: ''
   },
   getters: {
     loggedIn (state) {
@@ -22,12 +22,12 @@ export default new Vuex.Store({
       return state.username
     },
     retrieveUser (state) {
-      return state.userData
+      return state.user
     },
-    retrieveUserPrimekey (state) {
+    retrievePrimekey (state) {
       return state.primekey
     },
-    retrieveUserAssignedCompany (state) {
+    retrieveCompany (state) {
       return state.companies
     }
   },
@@ -41,14 +41,14 @@ export default new Vuex.Store({
     UserID (state, username) {
       state.username = username
     },
-    retrieveUser (state, userData) {
-      state.userData = userData
+    retrieveUser (state, payload) {
+      state.user = payload
     },
-    retrieveUserPrimekey (state, primekey) {
-      state.primekey = primekey
+    retrievePrimekey (state, payload) {
+      state.primekey = payload
     },
-    retrieveUserAssignedCompany (state, companies) {
-      state.companies = companies
+    retrieveCompany (state, payload) {
+      state.companies = payload
     }
   },
   actions: {
@@ -73,71 +73,72 @@ export default new Vuex.Store({
         })
       }
     },
-    retrieveUserAssignedCompany (context, primekey) {
-      axios.defaults.headers.common['Authorization'] = 'Bearer ' + context.state.token
-
-      console.log(primekey)
-      if (context.getters.loggedIn) {
-        return new Promise((resolve, reject) => {
-          axios.post('u/login/company/assigned', {
-            primekey: 0
+    async retrieveCompany (context, payload) {
+      console.log(payload.primekey)
+      try {
+        axios.defaults.headers.common['Authorization'] = 'Bearer ' + context.state.token
+        if (context.getters.loggedIn) {
+          await new Promise((resolve, reject) => {
+            axios.get('/u/login/primekey/company/', {
+              params: {
+                primekey: payload.primekey
+              }
+            })
+              .then(response => {
+                this.companies = response.data
+                context.commit('retrieveCompany', this.companies)
+                resolve(response)
+              })
+              .catch(error => {
+                console.log(error)
+                reject(error)
+              })
           })
-            .then(response => {
-              this.companies = response.data
-              context.commit('retrieveUserAssignedCompany', this.companies)
-              resolve(response)
-            })
-            .catch(error => {
-              console.log(error)
-              reject(error)
-            })
-        })
+        }
+      } catch (error) {
+        console.log(error)
       }
     },
-    retrieveUserPrimekey (context, retrieveUser) {
-      axios.defaults.headers.common['Authorization'] = 'Bearer ' + context.state.token
-
-      if (context.getters.loggedIn) {
-        return new Promise((resolve, reject) => {
-          axios.post('u/login/assigned', {
-            vli_subs: retrieveUser.vli_subs,
-            user_num: retrieveUser.user_num
+    async retrievePrimekey (context, payload) {
+      try {
+        axios.defaults.headers.common['Authorization'] = 'Bearer ' + context.state.token
+        if (context.getters.loggedIn) {
+          await new Promise((resolve, reject) => {
+            axios.get('u/login/primekey/' + payload.vli_subs + '/' + payload.user_num)
+              .then(response => {
+                this.primekey = response.data.primekey
+                context.commit('retrievePrimekey', this.primekey)
+                resolve(response)
+              })
+              .catch(error => {
+                console.log(error)
+                reject(error)
+              })
           })
-            .then(response => {
-              // this.primekey = Object.keys(response.data).map((key) => {
-              //   return response.data[key]
-              // })
-              this.primekey = response.data
-              context.commit('retrieveUserPrimekey', this.primekey)
-              resolve(response)
-            })
-            .catch(error => {
-              console.log(error)
-              reject(error)
-            })
-        })
+        }
+      } catch (error) {
+        console.log(error)
       }
     },
-    retrieveUser (context) {
-      axios.defaults.headers.common['Authorization'] = 'Bearer ' + context.state.token
-
-      if (context.getters.loggedIn) {
-        return new Promise((resolve, reject) => {
-          axios.get('/user')
-            .then(response => {
-              // response is object then covert to array
-              // this.userData = Object.keys(response.data).map((key) => {
-              //   return response.data[key]
-              // })
-              this.userData = response.data
-              context.commit('retrieveUser', this.userData)
-              resolve(response)
-            })
-            .catch(error => {
-              console.log(error)
-              reject(error)
-            })
-        })
+    async retrieveUser (context) {
+      try {
+        axios.defaults.headers.common['Authorization'] = 'Bearer ' + context.state.token
+        if (context.getters.loggedIn) {
+          await new Promise((resolve, reject) => {
+            axios.get('u/user')
+              .then(response => {
+                this.user = response.data
+                context.commit('retrieveUser', this.user)
+                resolve(response)
+              })
+              .catch(error => {
+                console.log(error)
+                reject(error)
+              })
+          })
+        }
+      } catch (error) {
+        console.log(error)
       }
     },
     // -- logout
@@ -149,6 +150,7 @@ export default new Vuex.Store({
           axios.post('u/logout')
             .then(response => {
               localStorage.removeItem('access_token')
+              localStorage.removeItem('primekey')
               context.commit('destroyToken')
               resolve(response)
             })

@@ -58,6 +58,7 @@ const routes = [
     name: 'userDashboard',
     component: Dashboard,
     meta: {
+      requiresAuth: true,
       requiresPrimekey: true,
       layout: 'dashboard'
     }

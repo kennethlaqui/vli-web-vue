@@ -46,8 +46,8 @@
             <img src="https://randomuser.me/api/portraits/men/1.jpg">
           </v-list-item-avatar>
           <v-list-item-content>
-            <!-- <v-list-item-title>{{ userInfo.user_nme }}</v-list-item-title>
-            <v-list-item-subtitle>{{ userInfo.user_id_ }}</v-list-item-subtitle> -->
+            <v-list-item-title>{{ user_nme }}</v-list-item-title>
+            <v-list-item-subtitle>{{ user_id_ }}</v-list-item-subtitle>
         </v-list-item-content>
       </template>
       <v-list-group
@@ -241,7 +241,12 @@ export default {
         ['Settings', 'settings']
       ],
       username: 'Kenneth Laqui',
-      userData: {}
+      userData: {},
+      primekey: localStorage.getItem('primekey'),
+      vli_subs: localStorage.getItem('vli_subs'),
+      user_num: localStorage.getItem('user_num'),
+      user_id_: localStorage.getItem('user_id_'),
+      user_nme: localStorage.getItem('user_nme')
     }
   },
   computed: {
