@@ -6,64 +6,259 @@
     :single-select="singleSelect"
     item-key="empl_cde"
     show-select
-    sort-desc
     class="elevation-1"
   >
     <template v-slot:top>
       <v-toolbar flat color="white">
         <v-switch v-model="singleSelect" label="Single select" class="pa-3"></v-switch>
         <v-spacer></v-spacer>
-        <v-dialog v-model="dialog" max-width="500px">
+        <v-dialog v-model="dialog" fullscreen hide-overlay transition="dialog-bottom-transition">
           <template v-slot:activator="{ on }">
               <v-btn color="primary" dark class="mb-2" v-on="on">Create Employee</v-btn>
             </template>
             <v-card>
-              <v-card-title>
-                <span class="headline">{{ formTitle }}</span>
-              </v-card-title>
-
-              <v-card-text>
-                <v-container>
-                  <v-row>
-                    <v-col cols="12" sm="6" md="4">
-                      <v-text-field v-model="editedItem.name" label="Dessert name"></v-text-field>
-                    </v-col>
-                    <v-col cols="12" sm="6" md="4">
-                      <v-text-field v-model="editedItem.calories" label="Calories"></v-text-field>
-                    </v-col>
-                    <v-col cols="12" sm="6" md="4">
-                      <v-text-field v-model="editedItem.fat" label="Fat (g)"></v-text-field>
-                    </v-col>
-                    <v-col cols="12" sm="6" md="4">
-                      <v-text-field v-model="editedItem.carbs" label="Carbs (g)"></v-text-field>
-                    </v-col>
-                    <v-col cols="12" sm="6" md="4">
-                      <v-text-field v-model="editedItem.protein" label="Protein (g)"></v-text-field>
-                    </v-col>
-                  </v-row>
-                </v-container>
-              </v-card-text>
-
-              <v-card-actions>
+              <v-toolbar dark color="primary">
+                <v-btn icon dark @click="close">
+                  <v-icon>mdi-close</v-icon>
+                </v-btn>
+                <v-toolbar-title>{{ formTitle }}</v-toolbar-title>
                 <v-spacer></v-spacer>
-                <v-btn color="blue darken-1" text @click="close">Cancel</v-btn>
-                <v-btn color="blue darken-1" text @click="save">Save</v-btn>
-              </v-card-actions>
+                <v-toolbar-items>
+                  <v-btn dark text @click="save">Save</v-btn>
+                </v-toolbar-items>
+              </v-toolbar>
+              <v-tabs vertical>
+                <v-tab>
+                  <v-icon left>mdi-account</v-icon>
+                  Personal
+                </v-tab>
+                <v-tab>
+                  <v-icon left>mdi-lock</v-icon>
+                  General
+                </v-tab>
+                <v-tab>
+                  <v-icon left>mdi-access-point</v-icon>
+                  Government
+                </v-tab>
+
+                <v-tab-item>
+                  <v-card flat>
+                    <v-card-text>
+                      <v-container>
+                        <v-row>
+                          <!-- 4 text field -->
+                          <v-col cols="12" sm="6" md="3">
+                            <v-text-field v-model="editedItem.empl_cde" label="Employee ID" disabled></v-text-field>
+                          </v-col>
+                          <v-col cols="12" sm="6" md="3">
+                            <v-text-field v-model="editedItem.asso_cde" label="Alternative ID"></v-text-field>
+                          </v-col>
+                          <v-col cols="12" sm="6" md="3">
+                            <v-text-field v-model="editedItem.empl_cd2" label="Other ID"></v-text-field>
+                          </v-col>
+                          <v-col cols="12" sm="6" md="3">
+                            <v-text-field v-model="editedItem.chro_num" label="Biometrics ID"></v-text-field>
+                          </v-col>
+                          <v-col cols="12" sm="6" md="4">
+                            <v-text-field v-model="editedItem.last_nme" label="Last Name"></v-text-field>
+                          </v-col>
+                          <v-col cols="12" sm="6" md="4">
+                            <v-text-field v-model="editedItem.frst_nme" label="First Name"></v-text-field>
+                          </v-col>
+                          <v-col cols="12" sm="6" md="2">
+                            <v-text-field v-model="editedItem.midl_nme" label="Middle Name"></v-text-field>
+                          </v-col>
+                          <v-col cols="12" sm="6" md="2">
+                            <v-text-field v-model="editedItem.midl_ini" label="Middle Initial"></v-text-field>
+                          </v-col>
+                          <v-col cols="12" sm="6" md="4">
+                            <v-text-field v-model="editedItem.nickname" label="Nickname"></v-text-field>
+                          </v-col>
+                          <!-- date picker for birthday -->
+                          <v-col cols="12" sm="6" md="4">
+                            <v-dialog
+                              ref="dialog"
+                              v-model="ModalBirthday"
+                              :return-value.sync="date"
+                              persistent
+                              width="290px"
+                            >
+                              <template v-slot:activator="{ on }">
+                                <v-text-field
+                                  v-model="editedItem.birthday"
+                                  label="Birthday"
+                                  prepend-icon="event"
+                                  readonly
+                                  v-on="on"
+                                ></v-text-field>
+                              </template>
+                              <v-date-picker v-model="editedItem.birthday" scrollable>
+                                <v-spacer></v-spacer>
+                                <v-btn text color="primary" @click="ModalBirthday = false">Cancel</v-btn>
+                                <v-btn text color="primary" @click="$refs.dialog.save(editedItem.birthday)">OK</v-btn>
+                              </v-date-picker>
+                            </v-dialog>
+                          </v-col>
+                          <v-col cols="12" sm="6" md="2">
+                            <v-select
+                              :items="gender"
+                              item-text="description"
+                              item-value="id"
+                              label="Sex"
+                              v-model="editedItem.sex_____"
+                              @change="getGender"
+                            ></v-select>
+                          </v-col>
+                          <v-col cols="12" sm="6" md="2">
+                            <v-select
+                              :items="cvilstat"
+                              item-text="description"
+                              item-value="id"
+                              v-model="editedItem.cvilstat"
+                              label="Civil Status"
+                              @change="getCvilStat"
+                            ></v-select>
+                          </v-col>
+                          <v-col cols="12" sm="6" md="4">
+                            <v-text-field v-model="editedItem.address1" label="Address"></v-text-field>
+                          </v-col>
+                          <v-col cols="12" sm="6" md="4">
+                            <v-text-field v-model="editedItem.address2" label="Address 2"></v-text-field>
+                          </v-col>
+                          <v-col cols="12" sm="6" md="4">
+                            <v-text-field v-model="editedItem.address3" label="Address 3"></v-text-field>
+                          </v-col>
+                          <v-col cols="12" sm="6" md="4">
+                            <v-text-field v-model="editedItem.cel_numb" label="Mobile Number"></v-text-field>
+                          </v-col>
+                        </v-row>
+                      </v-container>
+                    </v-card-text>
+                  </v-card>
+                </v-tab-item>
+                <v-tab-item>
+                  <v-card flat>
+                    <v-card-text>
+                      <v-container>
+                        <v-row>
+                          <!-- date picker for date hired -->
+                          <v-col cols="12" sm="6" md="4">
+                            <v-dialog
+                              ref="dialog"
+                              v-model="modalDateHired"
+                              :return-value.sync="date"
+                              persistent
+                              width="290px"
+                            >
+                              <template v-slot:activator="{ on }">
+                                <v-text-field
+                                  v-model="editedItem.dte_hire"
+                                  label="Date Hired"
+                                  prepend-icon="event"
+                                  readonly
+                                  v-on="on"
+                                ></v-text-field>
+                              </template>
+                              <v-date-picker v-model="editedItem.dte_hire" scrollable>
+                                <v-spacer></v-spacer>
+                                <v-btn text color="primary" @click="modalDateHired = false">Cancel</v-btn>
+                                <v-btn text color="primary" @click="$refs.dialog.save(editedItem.dte_hire)">OK</v-btn>
+                              </v-date-picker>
+                            </v-dialog>
+                          </v-col>
+                          <!-- date picker for date regular -->
+                          <v-col cols="12" sm="6" md="4">
+                            <v-dialog
+                              ref="dialog"
+                              v-model="modalDateRglr"
+                              :return-value.sync="date"
+                              persistent
+                              width="290px"
+                            >
+                              <template v-slot:activator="{ on }">
+                                <v-text-field
+                                  v-model="editedItem.dte_rglr"
+                                  label="Date Regular"
+                                  prepend-icon="event"
+                                  readonly
+                                  v-on="on"
+                                ></v-text-field>
+                              </template>
+                              <v-date-picker v-model="editedItem.dte_rglr" scrollable>
+                                <v-spacer></v-spacer>
+                                <v-btn text color="primary" @click="modalDateRglr = false">Cancel</v-btn>
+                                <v-btn text color="primary" @click="$refs.dialog.save(editedItem.dte_rglr)">OK</v-btn>
+                              </v-date-picker>
+                            </v-dialog>
+                          </v-col>
+                          <!-- date picker for date regular -->
+                          <v-col cols="12" sm="6" md="4">
+                            <v-dialog
+                              ref="dialog"
+                              v-model="modalDateRsgn"
+                              :return-value.sync="date"
+                              persistent
+                              width="290px"
+                            >
+                              <template v-slot:activator="{ on }">
+                                <v-text-field
+                                  v-model="editedItem.dte_rsgn"
+                                  label="Date Resign"
+                                  prepend-icon="event"
+                                  readonly
+                                  v-on="on"
+                                ></v-text-field>
+                              </template>
+                              <v-date-picker v-model="editedItem.dte_rsgn" scrollable>
+                                <v-spacer></v-spacer>
+                                <v-btn text color="primary" @click="modalDateRsgn = false">Cancel</v-btn>
+                                <v-btn text color="primary" @click="$refs.dialog.save(editedItem.dte_rsgn)">OK</v-btn>
+                              </v-date-picker>
+                            </v-dialog>
+                          </v-col>
+                          <!-- positions -->
+                          <v-col cols="12" sm="6" md="4">
+                            <v-select
+                              :items="positions"
+                              item-text="descript"
+                              item-value="pos_code"
+                              label="Positions"
+                              v-model="editedItem.pos_code"
+                              @change="getGender"
+                          ></v-select>
+                          </v-col>
+                          <!-- employment status -->
+                          <v-col cols="12" sm="6" md="4">
+                            <v-select
+                              :items="emplstat"
+                              item-text="descript"
+                              item-value="cntrl_no"
+                              label="Employment Status"
+                              v-model="editedItem.emp_stat"
+                              @change="getEmplStat"
+                          ></v-select>
+                          </v-col>
+                        </v-row>
+                      </v-container>
+                    </v-card-text>
+                  </v-card>
+                </v-tab-item>
+              </v-tabs>
             </v-card>
           </v-dialog>
       </v-toolbar>
     </template>
-    <template v-slot:item.action="{ items }">
+    <template v-slot:item.action="{ item }">
       <v-icon
         small
         class="mr-2"
-        @click="editItem(items)"
+        @click="editItem(item)"
       >
         edit
       </v-icon>
       <v-icon
         small
-        @click="deleteItem(items)"
+        @click="deleteItem(item)"
       >
         delete
       </v-icon>
@@ -80,6 +275,13 @@ import axios from 'axios'
 export default {
   data () {
     return {
+      sex_____: 'M',
+      date: new Date().toISOString().substr(0, 10),
+      menu: false,
+      ModalBirthday: false,
+      modalDateHired: false,
+      modalDateRglr: false,
+      modalDateRsgn: false,
       bol: true,
       dialog: false,
       primekey: localStorage.getItem('primekey'),
@@ -88,26 +290,32 @@ export default {
       singleSelect: false,
       selected: [],
       headers: [
-        {
-          text: 'Employee #',
-          align: 'left',
-          sortable: false,
-          value: 'empl_cde'
-        },
+        { text: 'Employee #', value: 'empl_cde', align: 'left', sortable: false },
         { text: 'Last Name', value: 'last_nme' },
         { text: 'First Name', value: 'frst_nme' },
         { text: 'Middle Name', value: 'midl_nme' },
-        { text: 'Gender', value: 'sex_____' },
         { text: 'Work Status', value: 'workstat' },
         { text: 'Actions', value: 'action', sortable: false }
       ],
       editedIndex: -1,
       editedItem: {
-        name: '',
-        calories: 0,
-        fat: 0,
-        carbs: 0,
-        protein: 0
+        empl_cde: '',
+        empl_cd2: '',
+        asso_cde: '',
+        chro_num: '',
+        last_nme: '',
+        birthday: '',
+        sex_____: '',
+        cvilstat: '',
+        address1: '',
+        address2: '',
+        address3: '',
+        cel_numb: '',
+        dte_hire: '',
+        dte_rglr: '',
+        dte_rsgn: '',
+        pos_code: '',
+        emp_stat: ''
       },
       defaultItem: {
         name: '',
@@ -115,7 +323,29 @@ export default {
         fat: 0,
         carbs: 0,
         protein: 0
-      }
+      },
+      gender: [
+        {
+          id: 'M',
+          description: 'Male'
+        },
+        {
+          id: 'F',
+          description: 'Female'
+        }
+      ],
+      cvilstat: [
+        {
+          id: 'S',
+          description: 'Single'
+        },
+        {
+          id: 'M',
+          description: 'Married'
+        }
+      ],
+      positions: [],
+      emplstat: []
     }
   },
   computed: {
@@ -153,13 +383,13 @@ export default {
       }
     },
     editItem (item) {
-      this.editedIndex = this.desserts.indexOf(item)
+      this.editedIndex = this.masterfile.indexOf(item)
       this.editedItem = Object.assign({}, item)
       this.dialog = true
     },
     deleteItem (item) {
-      const index = this.desserts.indexOf(item)
-      confirm('Are you sure you want to delete this item?') && this.desserts.splice(index, 1)
+      const index = this.masterfile.indexOf(item)
+      confirm('Are you sure you want to delete this item?') && this.masterfile.splice(index, 1)
     },
     close () {
       this.dialog = false
@@ -170,15 +400,37 @@ export default {
     },
     save () {
       if (this.editedIndex > -1) {
-        Object.assign(this.desserts[this.editedIndex], this.editedItem)
+        Object.assign(this.masterfile[this.editedIndex], this.editedItem)
       } else {
-        this.desserts.push(this.editedItem)
+        this.masterfile.push(this.editedItem)
       }
       this.close()
+    },
+    getGender (id) {
+      console.log(id)
+    },
+    getCvilStat (id) {
+      console.log(id)
+    },
+    getPositions () {
+      this.$store.dispatch('retrievePositions', {
+        primekey: localStorage.getItem('primekey')
+      })
+        .then(response => {
+          this.positions = this.$store.getters.retrievePositions
+        })
+    },
+    getEmplStat () {
+      this.$store.dispatch('retrieveEmplStat')
+        .then(response => {
+          this.emplstat = this.$store.getters.retrieveEmplStat
+        })
     }
   },
   created () {
     this.initialize()
+    this.getPositions()
+    this.getEmplStat()
   },
   watch: {
     dialog (val) {

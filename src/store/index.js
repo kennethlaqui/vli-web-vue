@@ -12,8 +12,9 @@ export default new Vuex.Store({
     companies: [],
     user: '',
     username: null,
-    primekey: ''
-    // primekey: localStorage.getItem('primekey') || null
+    primekey: '',
+    positions: [],
+    emplstat: []
   },
   getters: {
     loggedIn (state) {
@@ -30,6 +31,12 @@ export default new Vuex.Store({
     },
     retrieveCompany (state) {
       return state.companies
+    },
+    retrievePositions (state) {
+      return state.positions
+    },
+    retrieveEmplStat (state) {
+      return state.emplstat
     }
   },
   mutations: {
@@ -50,9 +57,61 @@ export default new Vuex.Store({
     },
     retrieveCompany (state, payload) {
       state.companies = payload
+    },
+    retrievePositions (state, payload) {
+      state.positions = payload
+    },
+    retrieveEmplStat (state, payload) {
+      state.emplstat = payload
     }
   },
   actions: {
+    async retrievePositions (context, payload) {
+      try {
+        axios.defaults.headers.common['Authorization'] = 'Bearer ' + context.state.token
+        if (context.getters.loggedIn) {
+          await new Promise((resolve, reject) => {
+            axios.get('l/helper/positions/', {
+              params: {
+                primekey: payload.primekey
+              }
+            })
+              .then(response => {
+                this.positions = response.data
+                context.commit('retrievePositions', this.positions)
+                resolve(response)
+              })
+              .catch(error => {
+                console.log(error)
+                reject(error)
+              })
+          })
+        }
+      } catch (error) {
+        console.log(error)
+      }
+    },
+    async retrieveEmplStat (context, payload) {
+      try {
+        axios.defaults.headers.common['Authorization'] = 'Bearer ' + context.state.token
+        if (context.getters.loggedIn) {
+          await new Promise((resolve, reject) => {
+            axios.get('l/helper/emplstat')
+              .then(response => {
+                this.emplstat = response.data
+                context.commit('retrieveEmplStat', this.emplstat)
+                resolve(response)
+              })
+              .catch(error => {
+                console.log(error)
+                reject(error)
+              })
+          })
+        }
+      } catch (error) {
+        console.log(error)
+      }
+    },
     clientRegister (context, payload) {
       if (!context.getters.loggedIn) {
         return new Promise((resolve, reject) => {
