@@ -32,16 +32,12 @@
         <span class="caption grey--text font-weight-light">last registration 26 minutes ago</span>
       </v-card-text>
     </v-card>
-    <tablex></tablex>
   </div>
 </template>
 <script>
-import tablex from '@/components/personnel/Table.vue'
+// import tablex from '@/components/personnel/Table.vue'
 
 export default {
-  components: {
-    tablex
-  },
   data: () => ({
     labels: [
       '12am',

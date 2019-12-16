@@ -231,7 +231,7 @@ export default {
           title: 'Maintenance',
           active: false,
           items: [
-            { action: 'mdi-account-multiple-outline', title: 'Masterfile', url: 'about' },
+            { action: 'mdi-account-multiple-outline', title: 'Masterfile', url: 'maintenance/masterfile' },
             { action: 'mdi-animation', title: 'Reference File', url: 'about' }
           ]
         }
@@ -243,10 +243,10 @@ export default {
       username: 'Kenneth Laqui',
       userData: {},
       primekey: localStorage.getItem('primekey'),
-      vli_subs: localStorage.getItem('vli_subs'),
-      user_num: localStorage.getItem('user_num'),
-      user_id_: localStorage.getItem('user_id_'),
-      user_nme: localStorage.getItem('user_nme')
+      vli_subs: '',
+      user_num: '',
+      user_id_: '',
+      user_nme: ''
     }
   },
   computed: {
@@ -255,15 +255,22 @@ export default {
     }
   },
   methods: {
-    // user () {
-    //   this.$store.dispatch('retrieveUser')
-    //     .then(response => {
-    //       this.userData = this.$store.getters.userData
-    //     })
-    // }
+    getCurrentUser () {
+      this.$store.dispatch('retrieveUser')
+        .then(Response => {
+          this.vli_subs = this.$store.getters.retrieveUser.vli_subs
+          this.user_num = this.$store.getters.retrieveUser.user_num
+          this.user_id_ = this.$store.getters.retrieveUser.user_id_
+          this.user_nme = this.$store.getters.retrieveUser.user_nme
+          console.log('this is vli_subs', this.vli_subs)
+          console.log('this is vli_subs', this.user_num)
+          console.log('this is vli_subs', this.user_id_)
+          console.log('this is vli_subs', this.user_nme)
+        })
+    }
   },
   created () {
-    // this.user()
+    this.getCurrentUser()
   },
   props: {
     source: String

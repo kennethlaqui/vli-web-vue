@@ -8,6 +8,7 @@ import Logout from '../components/auth/Logout.vue'
 import Dashboard from '../components/dashboard/Dashboard.vue'
 import ClientRegister from '../components/client/Register.vue'
 import EncodeDtr from '../views/personnel/EncodeDtr.vue'
+import UserMasterfile from '../views/maintenance/Masterfile.vue'
 
 Vue.use(VueRouter)
 
@@ -67,6 +68,15 @@ const routes = [
     path: '/personnel/encode',
     name: 'encodeDtr',
     component: EncodeDtr,
+    meta: {
+      requiresAuth: true,
+      layout: 'dashboard'
+    }
+  },
+  {
+    path: '/maintenance/masterfile',
+    name: 'UserMasterfile',
+    component: UserMasterfile,
     meta: {
       requiresAuth: true,
       layout: 'dashboard'

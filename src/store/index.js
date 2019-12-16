@@ -13,6 +13,7 @@ export default new Vuex.Store({
     user: '',
     username: null,
     primekey: ''
+    // primekey: localStorage.getItem('primekey') || null
   },
   getters: {
     loggedIn (state) {

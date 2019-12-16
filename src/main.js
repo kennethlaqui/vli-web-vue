@@ -35,7 +35,7 @@ router.beforeEach((to, from, next) => {
     }
   } else if (to.matched.some(record => record.meta.requiresPrimekey)) {
     // this route requires primekey, check if not exist
-    if (store.getters.primekey) {
+    if (!store.getters.retrievePrimekey) {
       next({
         name: 'home'
       })

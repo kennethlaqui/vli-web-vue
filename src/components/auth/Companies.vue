@@ -68,10 +68,6 @@ export default {
             user_num: this.$store.getters.retrieveUser.user_num
           })
             .then(response => {
-              this.vli_subs = this.$store.getters.retrieveUser.vli_subs
-              this.user_num = this.$store.getters.retrieveUser.user_num
-              this.user_id_ = this.$store.getters.retrieveUser.user_id_
-              this.user_nme = this.$store.getters.retrieveUser.user_nme
               // retrieve company associate with primekey
               this.$store.dispatch('retrieveCompany', {
                 primekey: this.$store.getters.retrievePrimekey
@@ -83,13 +79,8 @@ export default {
         })
     },
     getSelectedValue (primekey) {
-      console.log(primekey)
       this.primekey = primekey
       localStorage.setItem('primekey', this.primekey)
-      localStorage.setItem('vli_subs', this.vli_subs)
-      localStorage.setItem('user_num', this.user_num)
-      localStorage.setItem('user_id_', this.user_id_)
-      localStorage.setItem('user_nme', this.user_nme)
     },
     proceedToDashboard () {
       this.$router.push({ name: 'userDashboard' })
