@@ -5,7 +5,7 @@
   </div>
 </template>
 <script>
-import masterfile from '@/components/personnel/Masterfile.vue'
+import masterfile from '@/components/maintenance/Masterfile.vue'
 import about from '@/views/About.vue'
 
 export default {

@@ -29,18 +29,43 @@
               </v-toolbar>
               <v-tabs vertical>
                 <v-tab>
-                  <v-icon left>mdi-account</v-icon>
+                  <!-- <v-icon left>mdi-account</v-icon> -->
                   Personal
                 </v-tab>
                 <v-tab>
-                  <v-icon left>mdi-lock</v-icon>
+                  <!-- <v-icon left>mdi-lock</v-icon> -->
                   General
                 </v-tab>
                 <v-tab>
-                  <v-icon left>mdi-access-point</v-icon>
+                  <!-- <v-icon left>mdi-access-point</v-icon> -->
                   Government
                 </v-tab>
-
+                <v-tab>
+                  <!-- <v-icon left>mdi-family</v-icon> -->
+                  Family
+                </v-tab>
+                <v-tab>
+                  <!-- <v-icon left>mdi-access-point</v-icon> -->
+                  Education
+                </v-tab>
+                <v-tab>
+                  <!-- <v-icon left>mdi-access-point</v-icon> -->
+                  Training/Seminar
+                </v-tab>
+                <v-tab>
+                  <!-- <v-icon left>mdi-access-point</v-icon> -->
+                  Employment
+                </v-tab>
+                <v-divider></v-divider>
+                <v-tab>
+                  <v-icon left>mdi-download</v-icon>
+                  Export This Data
+                </v-tab>
+                <v-tab>
+                  <v-icon left>mdi-download</v-icon>
+                  Print This Data
+                </v-tab>
+                <v-divider></v-divider>
                 <v-tab-item>
                   <v-card flat>
                     <v-card-text>
@@ -77,7 +102,7 @@
                           <!-- date picker for birthday -->
                           <v-col cols="12" sm="6" md="4">
                             <v-dialog
-                              ref="dialog"
+                              ref="dialogBirthday"
                               v-model="ModalBirthday"
                               :return-value.sync="date"
                               persistent
@@ -95,7 +120,7 @@
                               <v-date-picker v-model="editedItem.birthday" scrollable>
                                 <v-spacer></v-spacer>
                                 <v-btn text color="primary" @click="ModalBirthday = false">Cancel</v-btn>
-                                <v-btn text color="primary" @click="$refs.dialog.save(editedItem.birthday)">OK</v-btn>
+                                <v-btn text color="primary" @click="$refs.dialogBirthday.save(editedItem.birthday)">OK</v-btn>
                               </v-date-picker>
                             </v-dialog>
                           </v-col>
@@ -106,7 +131,7 @@
                               item-value="id"
                               label="Sex"
                               v-model="editedItem.sex_____"
-                              @change="getGender"
+                              @change="selectGender"
                             ></v-select>
                           </v-col>
                           <v-col cols="12" sm="6" md="2">
@@ -116,7 +141,7 @@
                               item-value="id"
                               v-model="editedItem.cvilstat"
                               label="Civil Status"
-                              @change="getCvilStat"
+                              @change="selectCvlStat"
                             ></v-select>
                           </v-col>
                           <v-col cols="12" sm="6" md="4">
@@ -144,7 +169,7 @@
                           <!-- date picker for date hired -->
                           <v-col cols="12" sm="6" md="4">
                             <v-dialog
-                              ref="dialog"
+                              ref="dialogDateHired"
                               v-model="modalDateHired"
                               :return-value.sync="date"
                               persistent
@@ -162,14 +187,14 @@
                               <v-date-picker v-model="editedItem.dte_hire" scrollable>
                                 <v-spacer></v-spacer>
                                 <v-btn text color="primary" @click="modalDateHired = false">Cancel</v-btn>
-                                <v-btn text color="primary" @click="$refs.dialog.save(editedItem.dte_hire)">OK</v-btn>
+                                <v-btn text color="primary" @click="$refs.dialogDateHired.save(editedItem.dte_hire)">OK</v-btn>
                               </v-date-picker>
                             </v-dialog>
                           </v-col>
                           <!-- date picker for date regular -->
                           <v-col cols="12" sm="6" md="4">
                             <v-dialog
-                              ref="dialog"
+                              ref="dialogDateRglr"
                               v-model="modalDateRglr"
                               :return-value.sync="date"
                               persistent
@@ -187,14 +212,14 @@
                               <v-date-picker v-model="editedItem.dte_rglr" scrollable>
                                 <v-spacer></v-spacer>
                                 <v-btn text color="primary" @click="modalDateRglr = false">Cancel</v-btn>
-                                <v-btn text color="primary" @click="$refs.dialog.save(editedItem.dte_rglr)">OK</v-btn>
+                                <v-btn text color="primary" @click="$refs.dialogDateRglr.save(editedItem.dte_rglr)">OK</v-btn>
                               </v-date-picker>
                             </v-dialog>
                           </v-col>
                           <!-- date picker for date regular -->
                           <v-col cols="12" sm="6" md="4">
                             <v-dialog
-                              ref="dialog"
+                              ref="dialogDateRsgn"
                               v-model="modalDateRsgn"
                               :return-value.sync="date"
                               persistent
@@ -212,31 +237,108 @@
                               <v-date-picker v-model="editedItem.dte_rsgn" scrollable>
                                 <v-spacer></v-spacer>
                                 <v-btn text color="primary" @click="modalDateRsgn = false">Cancel</v-btn>
-                                <v-btn text color="primary" @click="$refs.dialog.save(editedItem.dte_rsgn)">OK</v-btn>
+                                <v-btn text color="primary" @click="$refs.dialogDateRsgn.save(editedItem.dte_rsgn)">OK</v-btn>
                               </v-date-picker>
                             </v-dialog>
                           </v-col>
-                          <!-- positions -->
-                          <v-col cols="12" sm="6" md="4">
-                            <v-select
-                              :items="positions"
-                              item-text="descript"
-                              item-value="pos_code"
-                              label="Positions"
-                              v-model="editedItem.pos_code"
-                              @change="getGender"
-                          ></v-select>
-                          </v-col>
                           <!-- employment status -->
-                          <v-col cols="12" sm="6" md="4">
+                          <v-col cols="12" sm="6" md="3">
                             <v-select
                               :items="emplstat"
                               item-text="descript"
                               item-value="cntrl_no"
                               label="Employment Status"
                               v-model="editedItem.emp_stat"
-                              @change="getEmplStat"
+                              @change="selectEmplStat"
                           ></v-select>
+                          </v-col>
+                          <!-- work status -->
+                          <v-col cols="12" sm="6" md="3">
+                            <v-select
+                              :items="workstat"
+                              item-text="descript"
+                              item-value="cntrl_no"
+                              label="Work Status"
+                              v-model="editedItem.workstat"
+                              @change="selectWorkStat"
+                          ></v-select>
+                          </v-col>
+                          <!-- work area -->
+                          <v-col cols="12" sm="6" md="3">
+                            <v-select
+                              :items="workarea"
+                              item-text="descript"
+                              item-value="cntrl_no"
+                              label="Work Area"
+                              v-model="editedItem.workarea"
+                              @change="selectWorkArea"
+                          ></v-select>
+                          </v-col>
+                          <!-- positions -->
+                          <v-col cols="12" sm="6" md="3">
+                            <v-select
+                              :items="positions"
+                              item-text="descript"
+                              item-value="pos_code"
+                              label="Positions"
+                              v-model="editedItem.pos_code"
+                              @change="selectPosition"
+                          ></v-select>
+                          </v-col>
+                          <!-- divisions -->
+                          <v-col cols="12" sm="6" md="4">
+                            <v-select
+                              :items="division"
+                              item-text="descript"
+                              item-value="pos_code"
+                              label="Division"
+                              v-model="editedItem.grp_lvl1"
+                              @change="selectDivision"
+                          ></v-select>
+                          </v-col>
+                          <!-- department  -->
+                          <v-col cols="12" sm="6" md="4">
+                            <v-select
+                              :items="department"
+                              item-text="descript"
+                              item-value="pos_code"
+                              label="Department"
+                              v-model="editedItem.grp_lvl2"
+                              @change="selectDepartment"
+                          ></v-select>
+                          </v-col>
+                          <!-- section -->
+                          <v-col cols="12" sm="6" md="4">
+                            <v-select
+                              :items="section"
+                              item-text="descript"
+                              item-value="pos_code"
+                              label="Section"
+                              v-model="editedItem.grp_lvl3"
+                              @change="selectSection"
+                          ></v-select>
+                          </v-col>
+                        </v-row>
+                      </v-container>
+                    </v-card-text>
+                  </v-card>
+                </v-tab-item>
+                <v-tab-item>
+                  <v-card flat>
+                    <v-card-text>
+                      <v-container>
+                        <v-row>
+                          <v-col cols="12" sm="6" md="4">
+                            <v-text-field v-model="editedItem.tax_numb" label="TIN Number"></v-text-field>
+                          </v-col>
+                          <v-col cols="12" sm="6" md="4">
+                            <v-text-field v-model="editedItem.sss_numb" label="SSS Number"></v-text-field>
+                          </v-col>
+                          <v-col cols="12" sm="6" md="4">
+                            <v-text-field v-model="editedItem.pag_ibig" label="Pag-ibig Number"></v-text-field>
+                          </v-col>
+                          <v-col cols="12" sm="6" md="4">
+                            <v-text-field v-model="editedItem.philhlth" label="Philhealth Number"></v-text-field>
                           </v-col>
                         </v-row>
                       </v-container>
@@ -315,7 +417,16 @@ export default {
         dte_rglr: '',
         dte_rsgn: '',
         pos_code: '',
-        emp_stat: ''
+        emp_stat: '',
+        workstat: '',
+        workarea: '',
+        grp_lvl1: '',
+        grp_lvl2: '',
+        grp_lvl3: '',
+        tax_numb: '',
+        sss_numb: '',
+        pag_ibig: '',
+        philhlth: ''
       },
       defaultItem: {
         name: '',
@@ -345,7 +456,12 @@ export default {
         }
       ],
       positions: [],
-      emplstat: []
+      emplstat: [],
+      workstat: [],
+      workarea: [],
+      division: [],
+      department: [],
+      section: []
     }
   },
   computed: {
@@ -354,9 +470,6 @@ export default {
     }
   },
   methods: {
-    initialize () {
-      this.retrieveMasterFile()
-    },
     async retrieveMasterFile () {
       try {
         axios.defaults.headers.common['Authorization'] = 'Bearer ' + this.token
@@ -406,11 +519,40 @@ export default {
       }
       this.close()
     },
-    getGender (id) {
+    selectGender (id) {
       console.log(id)
     },
-    getCvilStat (id) {
+    selectCvlStat (id) {
       console.log(id)
+    },
+    selectEmplStat (descript) {
+      console.log(descript)
+    },
+    selectWorkStat (descript) {
+      console.log(descript)
+    },
+    selectWorkArea (descript) {
+      console.log(descript)
+    },
+    selectDivision (descript) {
+      console.log(descript)
+    },
+    selectDepartment (descript) {
+      console.log(descript)
+    },
+    selectSection (descript) {
+      console.log(descript)
+    },
+    selectPosition (descript) {
+      console.log(descript)
+    },
+    getWorkStat () {
+      this.$store.dispatch('retrieveWorkStat', {
+        primekey: localStorage.getItem('primekey')
+      })
+        .then(response => {
+          this.workstat = this.$store.getters.retrieveWorkStat
+        })
     },
     getPositions () {
       this.$store.dispatch('retrievePositions', {
@@ -425,12 +567,49 @@ export default {
         .then(response => {
           this.emplstat = this.$store.getters.retrieveEmplStat
         })
+    },
+    getWorkArea () {
+      this.$store.dispatch('retrieveWorkArea', {
+        primekey: localStorage.getItem('primekey')
+      })
+        .then(response => {
+          this.workarea = this.$store.getters.retrieveWorkArea
+        })
+    },
+    getDivision () {
+      this.$store.dispatch('retrieveDivision', {
+        primekey: localStorage.getItem('primekey')
+      })
+        .then(response => {
+          this.division = this.$store.getters.retrieveDivision
+        })
+    },
+    getDepartment () {
+      this.$store.dispatch('retrieveDepartment', {
+        primekey: localStorage.getItem('primekey')
+      })
+        .then(response => {
+          this.department = this.$store.getters.retrieveDepartment
+        })
+    },
+    getSection () {
+      this.$store.dispatch('retrieveSection', {
+        primekey: localStorage.getItem('primekey')
+      })
+        .then(response => {
+          this.section = this.$store.getters.retrieveSection
+        })
     }
   },
   created () {
-    this.initialize()
+    this.retrieveMasterFile()
     this.getPositions()
     this.getEmplStat()
+    this.getWorkStat()
+    this.getWorkArea()
+    this.getDivision()
+    this.getDepartment()
+    this.getSection()
   },
   watch: {
     dialog (val) {
