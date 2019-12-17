@@ -6,16 +6,24 @@
       clipped
       right
     >
-      <v-list dense>
-        <v-list-item @click.stop="right = !right">
-          <v-list-item-action>
-            <v-icon>mdi-exit-to-app</v-icon>
-          </v-list-item-action>
+    <v-list shaped dense>
+      <v-subheader>Easy Navigation</v-subheader>
+      <v-list-item-group v-model="sideItem" color="primary">
+        <v-list-item
+          v-for="(sideItem, i) in sideItems"
+          :key="i"
+          :to="sideItem.url"
+        >
+          <v-list-item-icon>
+            <v-icon v-text="sideItem.icon"></v-icon>
+          </v-list-item-icon>
           <v-list-item-content>
-            <v-list-item-title>Open Temporary Drawer</v-list-item-title>
+            <v-list-item-title v-text="sideItem.text"></v-list-item-title>
           </v-list-item-content>
         </v-list-item>
-      </v-list>
+      </v-list-item-group>
+      <v-btn @click="showCreateEmployee = !showCreateEmployee" text>Create New Employee</v-btn>
+    </v-list>
     </v-navigation-drawer>
 
     <v-app-bar
@@ -166,6 +174,9 @@
 
       <!-- Provides the application the proper gutter -->
       <v-container fluid>
+        <div v-if="showCreateEmployee">
+          <MasterFile></MasterFile>
+        </div>
         <!-- If using vue-router -->
         <router-view></router-view>
       </v-container>
@@ -194,6 +205,7 @@
 export default {
   data () {
     return {
+      showCreateEmployee: false,
       drawer: null,
       drawerRight: null,
       right: false,
@@ -204,8 +216,8 @@ export default {
           title: 'Personnel',
           active: true,
           items: [
-            { action: 'mdi-calendar-plus', title: 'Encode DTR', url: 'personnel/encode' },
-            { action: 'mdi-timetable', title: 'Manpower', url: 'about' }
+            { action: 'mdi-calendar-plus', title: 'Encode DTR', url: { name: 'encodeDtr' } },
+            { action: 'mdi-timetable', title: 'Manpower', url: '' }
           ]
         },
         {
@@ -231,7 +243,7 @@ export default {
           title: 'Maintenance',
           active: false,
           items: [
-            { action: 'mdi-account-multiple-outline', title: 'Masterfile', url: 'maintenance/masterfile' },
+            { action: 'mdi-account-multiple-outline', title: 'Masterfile', url: { name: 'UserMasterfile' } },
             { action: 'mdi-animation', title: 'Reference File', url: 'about' }
           ]
         }
@@ -239,6 +251,12 @@ export default {
       admins: [
         ['Management', 'people_outline'],
         ['Settings', 'settings']
+      ],
+      sideItem: 1,
+      sideItems: [
+        { text: 'Create Directory', icon: 'mdi-folder' },
+        { text: 'Create New Employee', icon: 'mdi-account', url: { name: 'easyCreateEmployee' } },
+        { text: 'Conversions', icon: 'mdi-flag' }
       ],
       username: 'Kenneth Laqui',
       userData: {},
@@ -274,6 +292,9 @@ export default {
   },
   props: {
     source: String
+  },
+  components: {
+    MasterFile: () => import('@/components/controller/dialog/masterfile/NewEmployee.vue')
   }
 }
 </script>

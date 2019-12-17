@@ -1,15 +1,15 @@
 <template>
   <div>
-    <about></about>
+    <Encode></Encode>
   </div>
 </template>
 <script>
-import about from '@/views/About.vue'
+import Encode from '@/components/personnel/Encode.vue'
 
 export default {
   name: 'EncodeDtr',
   components: {
-    about
+    Encode
   }
 }
 </script>

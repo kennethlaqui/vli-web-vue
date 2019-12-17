@@ -13,6 +13,7 @@ export default new Vuex.Store({
     user: '',
     username: null,
     primekey: '',
+    maxemployee: '',
     positions: [],
     emplstat: [],
     workstat: [],
@@ -40,6 +41,9 @@ export default new Vuex.Store({
     },
     retrieveCompany (state) {
       return state.companies
+    },
+    retrieveEmployeeCode (state) {
+      return state.maxemployee
     },
     retrievePositions (state) {
       return state.positions
@@ -84,6 +88,9 @@ export default new Vuex.Store({
     },
     retrieveCompany (state, payload) {
       state.companies = payload
+    },
+    retrieveEmployeeCode (state, payload) {
+      state.maxemployee = payload
     },
     retrievePositions (state, payload) {
       state.positions = payload
@@ -296,6 +303,31 @@ export default new Vuex.Store({
               .then(response => {
                 this.emplstat = response.data
                 context.commit('retrieveEmplStat', this.emplstat)
+                resolve(response)
+              })
+              .catch(error => {
+                console.log(error)
+                reject(error)
+              })
+          })
+        }
+      } catch (error) {
+        console.log(error)
+      }
+    },
+    async retrieveEmployeeCode (context, payload) {
+      try {
+        axios.defaults.headers.common['Authorization'] = 'Bearer ' + context.state.token
+        if (context.getters.loggedIn) {
+          await new Promise((resolve, reject) => {
+            axios.get('l/helper/employee/maxid/', {
+              params: {
+                primekey: payload.primekey
+              }
+            })
+              .then(response => {
+                this.maxemployee = response.data
+                context.commit('retrieveEmployeeCode', this.maxemployee)
                 resolve(response)
               })
               .catch(error => {

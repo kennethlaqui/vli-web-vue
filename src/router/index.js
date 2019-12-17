@@ -9,6 +9,7 @@ import Dashboard from '../components/dashboard/Dashboard.vue'
 import ClientRegister from '../components/client/Register.vue'
 import EncodeDtr from '../views/personnel/EncodeDtr.vue'
 import UserMasterfile from '../views/maintenance/Masterfile.vue'
+// import EasyCreateEmployee from '../components/controller/dialog/CreateEmployee.vue'
 
 Vue.use(VueRouter)
 
@@ -55,7 +56,7 @@ const routes = [
     meta: { layout: 'default' }
   },
   {
-    path: '/dashboard',
+    path: '/user/dashboard',
     name: 'userDashboard',
     component: Dashboard,
     meta: {
@@ -77,6 +78,15 @@ const routes = [
     path: '/maintenance/masterfile',
     name: 'UserMasterfile',
     component: UserMasterfile,
+    meta: {
+      requiresAuth: true,
+      layout: 'dashboard'
+    }
+  },
+  {
+    path: '/create/employee',
+    name: 'easyCreateEmployee',
+    component: () => import(/* webpackChunckName: "easyCreateEmployee" */'../components/controller/dialog/masterfile/NewEmployee.vue'),
     meta: {
       requiresAuth: true,
       layout: 'dashboard'

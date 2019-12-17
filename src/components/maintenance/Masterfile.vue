@@ -1,4 +1,5 @@
 <template>
+<v-card>
   <v-data-table
     v-model="selected"
     :headers="headers"
@@ -7,13 +8,22 @@
     item-key="empl_cde"
     show-select
     class="elevation-1"
+    :loading="loading"
+    :search="search"
   >
     <template v-slot:top>
       <v-toolbar flat color="white">
-        <v-switch v-model="singleSelect" label="Single select" class="pa-3"></v-switch>
+        <v-text-field
+          v-model="search"
+          append-icon="search"
+          label="Search"
+          single-line
+          hide-details
+        ></v-text-field>
+        <!-- <v-switch v-model="singleSelect" label="Single select" class="pa-3"></v-switch> -->
         <v-spacer></v-spacer>
         <v-dialog v-model="dialog" fullscreen hide-overlay transition="dialog-bottom-transition">
-          <template v-slot:activator="{ on }">
+            <template v-slot:activator="{ on }">
               <v-btn color="primary" dark class="mb-2" v-on="on">Create Employee</v-btn>
             </template>
             <v-card>
@@ -73,7 +83,8 @@
                         <v-row>
                           <!-- 4 text field -->
                           <v-col cols="12" sm="6" md="3">
-                            <v-text-field v-model="editedItem.empl_cde" label="Employee ID" disabled></v-text-field>
+                            <v-text-field v-if="editedIndex !== -1" v-model="editedItem.empl_cde" label="Employee ID" disabled></v-text-field>
+                            <v-text-field v-else-if="editedIndex == -1" v-model="empl_cde" label="Employee ID"></v-text-field>
                           </v-col>
                           <v-col cols="12" sm="6" md="3">
                             <v-text-field v-model="editedItem.asso_cde" label="Alternative ID"></v-text-field>
@@ -91,7 +102,7 @@
                             <v-text-field v-model="editedItem.frst_nme" label="First Name"></v-text-field>
                           </v-col>
                           <v-col cols="12" sm="6" md="2">
-                            <v-text-field v-model="editedItem.midl_nme" label="Middle Name"></v-text-field>
+                            <v-text-field v-model="editedItem.midl_nme" label="Middle Name" ></v-text-field>
                           </v-col>
                           <v-col cols="12" sm="6" md="2">
                             <v-text-field v-model="editedItem.midl_ini" label="Middle Initial"></v-text-field>
@@ -329,16 +340,16 @@
                       <v-container>
                         <v-row>
                           <v-col cols="12" sm="6" md="4">
-                            <v-text-field v-model="editedItem.tax_numb" label="TIN Number"></v-text-field>
+                            <v-text-field v-model="editedItem.tax_numb" v-mask="maskTin" label="TIN Number"></v-text-field>
                           </v-col>
                           <v-col cols="12" sm="6" md="4">
-                            <v-text-field v-model="editedItem.sss_numb" label="SSS Number"></v-text-field>
+                            <v-text-field v-model="editedItem.sss_numb" v-mask="maskSSS" label="SSS Number"></v-text-field>
                           </v-col>
                           <v-col cols="12" sm="6" md="4">
-                            <v-text-field v-model="editedItem.pag_ibig" label="Pag-ibig Number"></v-text-field>
+                            <v-text-field v-model="editedItem.pag_ibig" v-mask="maskPagIbig" label="Pag-ibig Number"></v-text-field>
                           </v-col>
                           <v-col cols="12" sm="6" md="4">
-                            <v-text-field v-model="editedItem.philhlth" label="Philhealth Number"></v-text-field>
+                            <v-text-field v-model="editedItem.philhlth" v-mask="maskPhic" label="Philhealth Number"></v-text-field>
                           </v-col>
                         </v-row>
                       </v-container>
@@ -366,18 +377,21 @@
       </v-icon>
     </template>
     <template v-slot:no-data>
-      <v-btn color="primary" @click="retrieveMasterFile">Reset</v-btn>
+      No data to retrieve
     </template>
   </v-data-table>
+</v-card>
 </template>
-
 <script>
 import axios from 'axios'
+import { mask } from 'vue-the-mask'
 
 export default {
+  props: ['visible'],
   data () {
     return {
-      sex_____: 'M',
+      loading: false,
+      search: '',
       date: new Date().toISOString().substr(0, 10),
       menu: false,
       ModalBirthday: false,
@@ -389,6 +403,10 @@ export default {
       primekey: localStorage.getItem('primekey'),
       token: localStorage.getItem('access_token'),
       masterfile: [],
+      maskTin: '###-###-###',
+      maskSSS: '##-#######-#',
+      maskPagIbig: '####-####-####',
+      maskPhic: '##-#########-#',
       singleSelect: false,
       selected: [],
       headers: [
@@ -396,7 +414,6 @@ export default {
         { text: 'Last Name', value: 'last_nme' },
         { text: 'First Name', value: 'frst_nme' },
         { text: 'Middle Name', value: 'midl_nme' },
-        { text: 'Work Status', value: 'workstat' },
         { text: 'Actions', value: 'action', sortable: false }
       ],
       editedIndex: -1,
@@ -455,6 +472,7 @@ export default {
           description: 'Married'
         }
       ],
+      empl_cde: '',
       positions: [],
       emplstat: [],
       workstat: [],
@@ -467,10 +485,21 @@ export default {
   computed: {
     formTitle () {
       return this.editedIndex === -1 ? 'New Item' : 'Edit Item'
+    },
+    computedDialog: {
+      get () {
+        return this.visible
+      },
+      set (value) {
+        if (!value) {
+          this.$emit('close')
+        }
+      }
     }
   },
   methods: {
     async retrieveMasterFile () {
+      this.loading = true
       try {
         axios.defaults.headers.common['Authorization'] = 'Bearer ' + this.token
         if (this.bol) {
@@ -482,11 +511,12 @@ export default {
             })
               .then(response => {
                 this.masterfile = response.data
-                console.log(this.masterfile)
+                this.loading = false
                 resolve(response)
               })
               .catch(errors => {
                 console.log(errors)
+                this.loading = true
                 reject(errors)
               })
           })
@@ -545,6 +575,14 @@ export default {
     },
     selectPosition (descript) {
       console.log(descript)
+    },
+    getMaxEmployeeCode () {
+      this.$store.dispatch('retrieveEmployeeCode', {
+        primekey: localStorage.getItem('primekey')
+      })
+        .then(response => {
+          this.empl_cde = this.$store.getters.retrieveEmployeeCode
+        })
     },
     getWorkStat () {
       this.$store.dispatch('retrieveWorkStat', {
@@ -610,11 +648,15 @@ export default {
     this.getDivision()
     this.getDepartment()
     this.getSection()
+    this.getMaxEmployeeCode()
   },
   watch: {
     dialog (val) {
       val || this.close()
     }
+  },
+  directives: {
+    mask
   }
 }
 </script>

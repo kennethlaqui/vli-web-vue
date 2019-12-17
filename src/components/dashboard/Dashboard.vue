@@ -32,13 +32,17 @@
         <span class="caption grey--text font-weight-light">last registration 26 minutes ago</span>
       </v-card-text>
     </v-card>
+    <v-btn @click="showCreateEmployee = !showCreateEmployee">Create New Employee</v-btn>
+    <div v-if="showCreateEmployee">
+      <!-- <MasterFile></MasterFile> -->
+    </div>
   </div>
 </template>
 <script>
-// import tablex from '@/components/personnel/Table.vue'
 
 export default {
   data: () => ({
+    showCreateEmployee: false,
     labels: [
       '12am',
       '3am',
@@ -59,7 +63,10 @@ export default {
       250,
       240
     ]
-  })
+  }),
+  components: {
+    // MasterFile: () => import('@/components/controller/dialog/masterfile/NewEmployee.vue')
+  }
 }
 </script>
 <style>
