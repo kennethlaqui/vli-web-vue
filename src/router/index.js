@@ -91,6 +91,24 @@ const routes = [
       requiresAuth: true,
       layout: 'dashboard'
     }
+  },
+  {
+    path: '/events',
+    name: 'easyEvents',
+    component: () => import(/* webpackChunckName: "easyCreateEmployee" */'../components/easynav/Events.vue'),
+    meta: {
+      requiresAuth: true,
+      layout: 'dashboard'
+    }
+  },
+  {
+    path: '/create/directory',
+    name: 'easyCreateDirectory',
+    component: () => import(/* webpackChunckName: "easyCreateEmployee" */'../components/easynav/EasyCreateDirectory.vue'),
+    meta: {
+      requiresAuth: true,
+      layout: 'dashboard'
+    }
   }
 ]
 

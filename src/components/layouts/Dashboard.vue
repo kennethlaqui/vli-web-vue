@@ -22,7 +22,7 @@
           </v-list-item-content>
         </v-list-item>
       </v-list-item-group>
-      <v-btn @click="showCreateEmployee = !showCreateEmployee" text>Create New Employee</v-btn>
+      <!-- <v-btn @click="showCreateEmployee = !showCreateEmployee" text>Create New Employee</v-btn> -->
     </v-list>
     </v-navigation-drawer>
 
@@ -174,9 +174,9 @@
 
       <!-- Provides the application the proper gutter -->
       <v-container fluid>
-        <div v-if="showCreateEmployee">
+        <!-- <div v-if="showCreateEmployee">
           <MasterFile></MasterFile>
-        </div>
+        </div> -->
         <!-- If using vue-router -->
         <router-view></router-view>
       </v-container>
@@ -254,9 +254,9 @@ export default {
       ],
       sideItem: 1,
       sideItems: [
-        { text: 'Create Directory', icon: 'mdi-folder' },
+        { text: 'Create Directory', icon: 'mdi-folder', url: { name: 'easyCreateDirectory' } },
         { text: 'Create New Employee', icon: 'mdi-account', url: { name: 'easyCreateEmployee' } },
-        { text: 'Conversions', icon: 'mdi-flag' }
+        { text: 'Events', icon: 'mdi-flag', url: { name: 'easyEvents' } }
       ],
       username: 'Kenneth Laqui',
       userData: {},
@@ -294,7 +294,7 @@ export default {
     source: String
   },
   components: {
-    MasterFile: () => import('@/components/controller/dialog/masterfile/NewEmployee.vue')
+    // MasterFile: () => import('@/components/controller/dialog/masterfile/NewEmployee.vue')
   }
 }
 </script>

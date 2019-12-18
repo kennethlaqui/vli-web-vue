@@ -64,11 +64,11 @@
         <v-row>
           <v-col
             v-for="item in props.items"
-            :key="item.name"
+            :key="item.cntrl_no"
             cols="12"
             sm="6"
             md="4"
-            lg="3"
+            lg="6"
           >
             <v-card>
               <v-card-title class="subheading font-weight-bold">{{ item.name }}</v-card-title>
@@ -84,6 +84,11 @@
                   <v-list-item-content class="align-end" :class="{ 'blue--text': sortBy === key }">{{ item[key.toLowerCase()] }}</v-list-item-content>
                 </v-list-item>
               </v-list>
+              <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn v-if="createDtr" color="blue darken-1" text>Create DTR</v-btn>
+                <v-btn v-else-if="!createDtr" color="blue darken-1" text>Upload DTR</v-btn>
+              </v-card-actions>
             </v-card>
           </v-col>
         </v-row>
@@ -148,10 +153,14 @@
   </v-container>
 </template>
 <script>
+var moment = require('moment')
 export default {
   data () {
     return {
-      itemsPerPageArray: [4, 8, 12],
+      jsonDirectories: [],
+      directories: [],
+      createDtr: true,
+      itemsPerPageArray: [4, 8, 1000],
       search: '',
       filter: {},
       sortDesc: false,
@@ -166,88 +175,7 @@ export default {
         'Group',
         'Status'
       ],
-      items: [
-        {
-          name: '1 - January 2019',
-          id: 80,
-          coverage: '01/01/2019 - 01/15/2019',
-          description: 'January 25, 2019',
-          group: 'Regular',
-          status: 'Payroll Sent to Bank'
-        },
-        {
-          name: '2 - January 2019',
-          id: 81,
-          coverage: '01/16/2019 - 01/30/2019',
-          description: 'February 5, 2019',
-          group: 'Regular',
-          status: 'Payroll Sent to Bank'
-        },
-        {
-          name: '1 - Febuary 2019',
-          id: 82,
-          coverage: '02/01/2019 - 02/15/2019',
-          description: 'February 25, 2019',
-          group: 'Regular',
-          status: 'Payroll Sent to Bank'
-        },
-        {
-          name: '2 - Febuary 2019',
-          id: 83,
-          coverage: '02/16/2019 - 02/30/2019',
-          description: 'March 5, 2019',
-          group: 'Regular',
-          status: 'Payroll Sent to Bank'
-        },
-        {
-          name: '1 - March 2019',
-          id: 84,
-          coverage: '03/01/2019 - 03/15/2019',
-          description: 'March 25, 2019',
-          group: 'Regular',
-          status: 'Payroll Sent to Bank'
-        },
-        {
-          name: '2 - March 2019',
-          id: 85,
-          coverage: '03/16/2019 - 03/30/2019',
-          description: 'April 5, 2019',
-          group: 'Regular',
-          status: 'Payroll Sent to Bank'
-        },
-        {
-          name: '1 - April 2019',
-          id: 85,
-          coverage: '04/01/2019 - 04/15/2019',
-          description: 'April 25, 2019',
-          group: 'Regular',
-          status: 'Payroll Sent to Bank'
-        },
-        {
-          name: '2 - April 2019',
-          id: 86,
-          coverage: '04/16/2019 - 04/30/2019',
-          description: 'May 5, 2019',
-          group: 'Regular',
-          status: 'Payroll Sent to Bank'
-        },
-        {
-          name: '1 - May 2019',
-          id: 87,
-          coverage: '05/01/2019 - 05/15/2019',
-          description: 'May 25, 2019',
-          group: 'Regular',
-          status: 'Payroll Sent to Bank'
-        },
-        {
-          name: '2 - May 2019',
-          id: 88,
-          coverage: '05/16/2019 - 05/30/2019',
-          description: 'May 25, 2019',
-          group: 'Regular',
-          status: 'Payroll Sent to Bank'
-        }
-      ]
+      items: []
     }
   },
   computed: {
@@ -267,7 +195,27 @@ export default {
     },
     updateItemsPerPage (number) {
       this.itemsPerPage = number
+    },
+    getDirectories () {
+      this.$store.dispatch('retrieveDirectories', {
+        primekey: localStorage.getItem('primekey')
+      })
+        .then(response => {
+          this.jsonDirectories = this.$store.getters.retrieveDirectories
+          this.directories = this.jsonDirectories.map(e => ({
+            id: e.cntrl_no,
+            name: `${e.part____} - ${moment(e.month___, 'MM').format('MMMM')} ${e.year____}`,
+            coverage: `${moment(e.strt_dte).format('MM/DD/YYYY')} - ${moment(e.last_dte).format('MM/DD/YYYY')}`,
+            description: e.remarks_,
+            group: e.group_no,
+            status: e.seqn_num
+          }))
+          this.items = this.directories
+        })
     }
+  },
+  created () {
+    this.getDirectories()
   }
 }
 </script>

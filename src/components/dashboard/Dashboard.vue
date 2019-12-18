@@ -32,7 +32,7 @@
         <span class="caption grey--text font-weight-light">last registration 26 minutes ago</span>
       </v-card-text>
     </v-card>
-    <v-btn @click="showCreateEmployee = !showCreateEmployee">Create New Employee</v-btn>
+    <!-- <v-btn @click="showCreateEmployee = !showCreateEmployee">Create New Employee</v-btn> -->
     <div v-if="showCreateEmployee">
       <!-- <MasterFile></MasterFile> -->
     </div>

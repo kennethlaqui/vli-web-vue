@@ -21,10 +21,7 @@ export default new Vuex.Store({
     division: [],
     department: [],
     section: [],
-    tin: '',
-    sss: '',
-    phic: '',
-    hdmf: ''
+    directories: []
   },
   getters: {
     loggedIn (state) {
@@ -66,8 +63,8 @@ export default new Vuex.Store({
     retrieveSection (state) {
       return state.section
     },
-    retrieveTinNumber (state) {
-      return state.tin
+    retrieveDirectories (state) {
+      return state.directories
     }
   },
   mutations: {
@@ -113,25 +110,25 @@ export default new Vuex.Store({
     retrieveSection (state, payload) {
       state.section = payload
     },
-    retrieveTinNumber (state, payload) {
-      state.tin = payload
+    retrieveDirectories (state, payload) {
+      state.directories = payload
     }
   },
   actions: {
-    async retrieveTinNumber (context, payload) {
+    async retrieveDirectories (context, payload) {
       try {
         axios.defaults.headers.common['Authorization'] = 'Bearer ' + context.state.token
         if (context.getters.loggedIn) {
           await new Promise((resolve, reject) => {
-            axios.get('l/helper/government/tin/', {
+            axios.get('u/personnel/encode/directory/list/', {
               params: {
-                primekey: payload.primekey,
-                empl_cde: payload.empl_cde
+                primekey: payload.primekey
               }
             })
               .then(response => {
-                this.tin = response.data
-                context.commit('retrieveSection', this.tin)
+                this.directories = response.data
+                console.log(this.directories)
+                context.commit('retrieveDirectories', this.directories)
                 resolve(response)
               })
               .catch(error => {
