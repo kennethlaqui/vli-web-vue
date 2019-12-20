@@ -14,6 +14,7 @@
           dark
           color="blue darken-3"
           class="mb-1"
+          dense
         >
           <v-text-field
             v-model="search"
@@ -23,25 +24,28 @@
             hide-details
             prepend-inner-icon="search"
             label="Search"
+            dense
           ></v-text-field>
           <template v-if="$vuetify.breakpoint.mdAndUp">
             <v-spacer></v-spacer>
             <v-select
               v-model="sortBy"
+              clearable
               flat
               solo-inverted
               hide-details
               :items="keys"
               prepend-inner-icon="search"
               label="Sort by"
+              dense
             ></v-select>
             <v-spacer></v-spacer>
             <v-btn-toggle
               v-model="sortDesc"
               mandatory
+              dense
             >
               <v-btn
-                large
                 depressed
                 color="blue"
                 :value="false"
@@ -49,7 +53,6 @@
                 <v-icon>mdi-arrow-up</v-icon>
               </v-btn>
               <v-btn
-                large
                 depressed
                 color="blue"
                 :value="true"
@@ -68,28 +71,33 @@
             cols="12"
             sm="6"
             md="4"
-            lg="6"
+            lg="3"
           >
-            <v-card>
-              <v-card-title class="subheading font-weight-bold">{{ item.name }}</v-card-title>
-
+          <v-hover v-slot:default="{ hover }">
+            <v-card
+              class="mx-auto"
+              max-width="400"
+              :elevation="hover ? 12 : 2"
+            >
+              <v-card-title class="subheading font-weight-bold">{{ item.name }} <v-icon dense class="mt-1 ml-7">mdi-marker-check</v-icon></v-card-title>
+              <v-card-subtitle class="subheading black--text"><v-icon dense>mdi-calendar</v-icon> {{ item.coverage }}</v-card-subtitle>
               <v-divider></v-divider>
-
               <v-list dense>
                 <v-list-item
                   v-for="(key, index) in filteredKeys"
                   :key="index"
                 >
-                  <v-list-item-content :class="{ 'blue--text': sortBy === key }">{{ key }}:</v-list-item-content>
-                  <v-list-item-content class="align-end" :class="{ 'blue--text': sortBy === key }">{{ item[key.toLowerCase()] }}</v-list-item-content>
+                  <v-list-item-content class="align-end" :class="{ 'blue--text': sortBy === key }">{{ key }}: {{ item[key.toLowerCase().replace(/\s/g, '')] }}</v-list-item-content>
                 </v-list-item>
               </v-list>
               <v-card-actions>
                 <v-spacer></v-spacer>
+                <v-btn :disabled="disabled" color="blue darken-1" text>Edit Directory</v-btn>
                 <v-btn v-if="createDtr" color="blue darken-1" text>Create DTR</v-btn>
                 <v-btn v-else-if="!createDtr" color="blue darken-1" text>Upload DTR</v-btn>
               </v-card-actions>
             </v-card>
+          </v-hover>
           </v-col>
         </v-row>
       </template>
@@ -153,29 +161,34 @@
   </v-container>
 </template>
 <script>
+// import { PayrollStatus } from '../../mixins/common/common'
 var moment = require('moment')
+
 export default {
+  // mixins: [PayrollStatus],
   data () {
     return {
       jsonDirectories: [],
       directories: [],
       createDtr: true,
+      disabled: false,
       itemsPerPageArray: [4, 8, 1000],
       search: '',
       filter: {},
       sortDesc: false,
       page: 1,
-      itemsPerPage: 4,
+      itemsPerPage: 10,
       sortBy: 'coverage',
+      items: [],
       keys: [
         'Name',
-        'ID',
-        'Coverage',
+        'Folder',
         'Description',
-        'Group',
+        'Payroll Group',
+        'W2 Year',
+        'SSS Period',
         'Status'
-      ],
-      items: []
+      ]
     }
   },
   computed: {
@@ -197,21 +210,49 @@ export default {
       this.itemsPerPage = number
     },
     getDirectories () {
+      // this function must be equal to data `keys`. List items remove any space in between by using replace(/\s/g, '') and lowercase the string
+      // this function map the json file then concatenate or mapping the object
       this.$store.dispatch('retrieveDirectories', {
         primekey: localStorage.getItem('primekey')
       })
         .then(response => {
           this.jsonDirectories = this.$store.getters.retrieveDirectories
           this.directories = this.jsonDirectories.map(e => ({
-            id: e.cntrl_no,
-            name: `${e.part____} - ${moment(e.month___, 'MM').format('MMMM')} ${e.year____}`,
+            folder: e.cntrl_no,
+            name: `${moment(e.month___, 'MM').format('MMMM')} ${e.year____} ( Part ${e.part____} )`,
             coverage: `${moment(e.strt_dte).format('MM/DD/YYYY')} - ${moment(e.last_dte).format('MM/DD/YYYY')}`,
             description: e.remarks_,
-            group: e.group_no,
-            status: e.seqn_num
+            payrollgroup: e.descript,
+            w2year: e.w2_year_,
+            sssperiod: e.appl_prd,
+            status: `${this.payrollStatus(e.status__)}`
           }))
           this.items = this.directories
+          if (this.items.status !== 0) {
+            this.disabled = true
+          }
         })
+    },
+    payrollStatus (status) {
+      switch (status) {
+        case '0':
+          return 'Initial Value'
+
+        case '1':
+          return 'Copied DTR / Bonus Searched / Merged'
+
+        case '2':
+          return 'Payroll Computed'
+
+        case '3':
+          return 'Payroll Sent To Bank'
+
+        case 'A':
+          return 'Last Pay Computed'
+
+        case 'B':
+          return '13th Month Computed'
+      }
     }
   },
   created () {
@@ -219,3 +260,11 @@ export default {
   }
 }
 </script>
+<style>
+  .v-list {
+    font-size: 0.9em;
+  }
+  .v-list-item {
+    align-items: 'right';
+  }
+</style>

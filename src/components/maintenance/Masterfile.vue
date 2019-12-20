@@ -11,6 +11,14 @@
     :loading="loading"
     :search="search"
   >
+    <template v-slot:item.avatar__="{ item }">
+      <v-avatar size="36">
+        <img
+          :src="item.avatar__"
+          alt="John"
+        >
+      </v-avatar>
+    </template>
     <template v-slot:top>
       <v-toolbar flat color="white">
         <v-text-field
@@ -24,10 +32,10 @@
         <v-spacer></v-spacer>
         <v-dialog v-model="dialog" fullscreen hide-overlay transition="dialog-bottom-transition">
             <template v-slot:activator="{ on }">
-              <v-btn color="primary" dark class="mb-2" v-on="on">Create Employee</v-btn>
+              <v-btn color="primary" dark class="mb-2" v-on="on" small>Create Employee</v-btn>
             </template>
             <v-card>
-              <v-toolbar dark color="primary">
+              <v-toolbar dark color="primary" dense>
                 <v-btn icon dark @click="close">
                   <v-icon>mdi-close</v-icon>
                 </v-btn>
@@ -37,7 +45,7 @@
                   <v-btn dark text @click="save">Save</v-btn>
                 </v-toolbar-items>
               </v-toolbar>
-              <v-tabs vertical>
+              <v-tabs fixed-tabs>
                 <v-tab>
                   <!-- <v-icon left>mdi-account</v-icon> -->
                   Personal
@@ -410,6 +418,7 @@ export default {
       singleSelect: false,
       selected: [],
       headers: [
+        { text: 'Image', value: 'avatar__', align: 'center', sortable: false },
         { text: 'Employee #', value: 'empl_cde', align: 'left', sortable: false },
         { text: 'Last Name', value: 'last_nme' },
         { text: 'First Name', value: 'frst_nme' },
@@ -484,7 +493,7 @@ export default {
   },
   computed: {
     formTitle () {
-      return this.editedIndex === -1 ? 'New Item' : 'Edit Item'
+      return this.editedIndex === -1 ? 'New Employee' : "Edit Employee's Information"
     },
     computedDialog: {
       get () {

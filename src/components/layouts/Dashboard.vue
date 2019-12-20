@@ -31,10 +31,28 @@
       clipped-right
       color="blue darken-3"
       dark
+      dense
     >
       <v-app-bar-nav-icon @click.stop="drawer = !drawer" />
       <v-toolbar-title>Dashboard</v-toolbar-title>
       <v-spacer />
+          <v-btn icon>
+          <v-icon>mdi-apps</v-icon>
+        </v-btn>
+        <v-btn icon>
+          <v-badge
+            v-model="show"
+            color="purple"
+            overlap
+            right
+          >
+          <template v-slot:badge>
+            <span>6</span>
+          </template>
+          <v-icon>mdi-email</v-icon>
+          </v-badge>
+        </v-btn>
+
       <v-app-bar-nav-icon @click.stop="drawerRight = !drawerRight" />
     </v-app-bar>
 
@@ -157,7 +175,7 @@
 
       <template v-slot:append>
         <div class="pa-2">
-          <v-btn v-if="loggedIn" :to="{ name: 'userLogout' }" block>Logout</v-btn>
+          <v-btn v-if="loggedIn" :to="{ name: 'userLogout' }" block small>Logout</v-btn>
         </div>
       </template>
 
