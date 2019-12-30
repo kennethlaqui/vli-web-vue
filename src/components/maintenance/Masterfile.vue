@@ -524,14 +524,12 @@ export default {
                 resolve(response)
               })
               .catch(errors => {
-                console.log(errors)
                 this.loading = true
                 reject(errors)
               })
           })
         }
       } catch (error) {
-        console.log(error)
       }
     },
     editItem (item) {
@@ -559,31 +557,31 @@ export default {
       this.close()
     },
     selectGender (id) {
-      console.log(id)
+
     },
     selectCvlStat (id) {
-      console.log(id)
+
     },
     selectEmplStat (descript) {
-      console.log(descript)
+
     },
     selectWorkStat (descript) {
-      console.log(descript)
+
     },
     selectWorkArea (descript) {
-      console.log(descript)
+
     },
     selectDivision (descript) {
-      console.log(descript)
+
     },
     selectDepartment (descript) {
-      console.log(descript)
+
     },
     selectSection (descript) {
-      console.log(descript)
+
     },
     selectPosition (descript) {
-      console.log(descript)
+
     },
     getMaxEmployeeCode () {
       this.$store.dispatch('retrieveEmployeeCode', {

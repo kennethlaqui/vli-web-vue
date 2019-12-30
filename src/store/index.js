@@ -148,18 +148,15 @@ export default new Vuex.Store({
             })
               .then(response => {
                 this.directories = response.data
-                console.log(this.directories)
                 context.commit('retrieveDirectories', this.directories)
                 resolve(response)
               })
               .catch(error => {
-                console.log(error)
                 reject(error)
               })
           })
         }
       } catch (error) {
-        console.log(error)
       }
     },
     async retrieveSection (context, payload) {
@@ -178,13 +175,11 @@ export default new Vuex.Store({
                 resolve(response)
               })
               .catch(error => {
-                console.log(error)
                 reject(error)
               })
           })
         }
       } catch (error) {
-        console.log(error)
       }
     },
     async retrieveDepartment (context, payload) {
@@ -203,13 +198,11 @@ export default new Vuex.Store({
                 resolve(response)
               })
               .catch(error => {
-                console.log(error)
                 reject(error)
               })
           })
         }
       } catch (error) {
-        console.log(error)
       }
     },
     async retrieveDivision (context, payload) {
@@ -228,13 +221,11 @@ export default new Vuex.Store({
                 resolve(response)
               })
               .catch(error => {
-                console.log(error)
                 reject(error)
               })
           })
         }
       } catch (error) {
-        console.log(error)
       }
     },
     async retrievePositions (context, payload) {
@@ -253,13 +244,11 @@ export default new Vuex.Store({
                 resolve(response)
               })
               .catch(error => {
-                console.log(error)
                 reject(error)
               })
           })
         }
       } catch (error) {
-        console.log(error)
       }
     },
     async retrieveWorkArea (context, payload) {
@@ -278,13 +267,11 @@ export default new Vuex.Store({
                 resolve(response)
               })
               .catch(error => {
-                console.log(error)
                 reject(error)
               })
           })
         }
       } catch (error) {
-        console.log(error)
       }
     },
     async retrieveWorkStat (context, payload) {
@@ -303,13 +290,11 @@ export default new Vuex.Store({
                 resolve(response)
               })
               .catch(error => {
-                console.log(error)
                 reject(error)
               })
           })
         }
       } catch (error) {
-        console.log(error)
       }
     },
     async retrieveEmplStat (context, payload) {
@@ -324,13 +309,11 @@ export default new Vuex.Store({
                 resolve(response)
               })
               .catch(error => {
-                console.log(error)
                 reject(error)
               })
           })
         }
       } catch (error) {
-        console.log(error)
       }
     },
     async retrieveEmployeeCode (context, payload) {
@@ -349,13 +332,11 @@ export default new Vuex.Store({
                 resolve(response)
               })
               .catch(error => {
-                console.log(error)
                 reject(error)
               })
           })
         }
       } catch (error) {
-        console.log(error)
       }
     },
     clientRegister (context, payload) {
@@ -373,14 +354,12 @@ export default new Vuex.Store({
               resolve(response)
             })
             .catch(error => {
-              console.log(error)
               reject(error)
             })
         })
       }
     },
     async retrieveCompany (context, payload) {
-      console.log(payload.primekey)
       try {
         axios.defaults.headers.common['Authorization'] = 'Bearer ' + context.state.token
         if (context.getters.loggedIn) {
@@ -396,13 +375,11 @@ export default new Vuex.Store({
                 resolve(response)
               })
               .catch(error => {
-                console.log(error)
                 reject(error)
               })
           })
         }
       } catch (error) {
-        console.log(error)
       }
     },
     async retrievePrimekey (context, payload) {
@@ -417,13 +394,11 @@ export default new Vuex.Store({
                 resolve(response)
               })
               .catch(error => {
-                console.log(error)
                 reject(error)
               })
           })
         }
       } catch (error) {
-        console.log(error)
       }
     },
     async retrieveUser (context) {
@@ -438,13 +413,11 @@ export default new Vuex.Store({
                 resolve(response)
               })
               .catch(error => {
-                console.log(error)
                 reject(error)
               })
           })
         }
       } catch (error) {
-        console.log(error)
       }
     },
     // -- logout
@@ -482,7 +455,6 @@ export default new Vuex.Store({
             resolve(response)
           })
           .catch(error => {
-            console.log(error)
             reject(error)
           })
       })

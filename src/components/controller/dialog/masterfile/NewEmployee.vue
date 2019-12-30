@@ -469,31 +469,31 @@ export default {
       this.close()
     },
     selectGender (id) {
-      console.log(id)
+
     },
     selectCvlStat (id) {
-      console.log(id)
+
     },
     selectEmplStat (descript) {
-      console.log(descript)
+
     },
     selectWorkStat (descript) {
-      console.log(descript)
+
     },
     selectWorkArea (descript) {
-      console.log(descript)
+
     },
     selectDivision (descript) {
-      console.log(descript)
+
     },
     selectDepartment (descript) {
-      console.log(descript)
+
     },
     selectSection (descript) {
-      console.log(descript)
+
     },
     selectPosition (descript) {
-      console.log(descript)
+
     },
     getMaxEmployeeCode () {
       this.pending = true

@@ -298,10 +298,6 @@ export default {
           this.user_num = this.$store.getters.retrieveUser.user_num
           this.user_id_ = this.$store.getters.retrieveUser.user_id_
           this.user_nme = this.$store.getters.retrieveUser.user_nme
-          console.log('this is vli_subs', this.vli_subs)
-          console.log('this is vli_subs', this.user_num)
-          console.log('this is vli_subs', this.user_id_)
-          console.log('this is vli_subs', this.user_nme)
         })
     }
   },

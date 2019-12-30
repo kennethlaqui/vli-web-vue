@@ -79,7 +79,7 @@
               max-width="400"
               :elevation="hover ? 12 : 2"
             >
-              <v-card-title class="subheading font-weight-bold">{{ item.name }} <v-icon dense class="mt-1 ml-7">mdi-marker-check</v-icon></v-card-title>
+              <v-card-title class="subheading font-weight-bold">{{ item.name }}</v-card-title>
               <v-card-subtitle class="subheading black--text"><v-icon dense>mdi-calendar</v-icon> {{ item.coverage }}</v-card-subtitle>
               <v-divider></v-divider>
               <v-list dense>
@@ -93,8 +93,8 @@
               <v-card-actions>
                 <v-spacer></v-spacer>
                 <v-btn :disabled="disabled" color="blue darken-1" text>Edit Directory</v-btn>
-                <v-btn v-if="createDtr" color="blue darken-1" text>Create DTR</v-btn>
-                <v-btn v-else-if="!createDtr" color="blue darken-1" text>Upload DTR</v-btn>
+                <v-btn @click="createDtr(item)" color="blue darken-1" text>Create DTR</v-btn>
+                <!-- <v-btn v-else-if="!createDtr" color="blue darken-1" text>Upload DTR</v-btn> -->
               </v-card-actions>
             </v-card>
           </v-hover>
@@ -168,9 +168,10 @@ export default {
   // mixins: [PayrollStatus],
   data () {
     return {
+      dateArray: [],
+      dtrDate: [],
       jsonDirectories: [],
       directories: [],
-      createDtr: true,
       disabled: false,
       itemsPerPageArray: [4, 8, 1000],
       search: '',
@@ -232,6 +233,17 @@ export default {
             this.disabled = true
           }
         })
+    },
+    createDtr (item) {
+      var startDate = new Date(item.coverage.substring(0, 10))
+      var endDate = new Date(item.coverage.substring(13, 24))
+
+      var currentDate = moment(startDate)
+      var stopDate = moment(endDate)
+      while (currentDate <= stopDate) {
+        this.dateArray.push(moment(currentDate).format('YYYY-MM-DD'))
+        currentDate = moment(currentDate).add(1, 'days')
+      }
     },
     payrollStatus (status) {
       switch (status) {
