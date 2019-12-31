@@ -93,7 +93,7 @@
               <v-card-actions>
                 <v-spacer></v-spacer>
                 <v-btn :disabled="disabled" color="blue darken-1" text>Edit Directory</v-btn>
-                <v-btn @click="createDtr(item)" color="blue darken-1" text>Create DTR</v-btn>
+                <v-btn @click="createDtrFolder(item)" color="blue darken-1" text>Create DTR</v-btn>
                 <!-- <v-btn v-else-if="!createDtr" color="blue darken-1" text>Upload DTR</v-btn> -->
               </v-card-actions>
             </v-card>
@@ -161,6 +161,7 @@
   </v-container>
 </template>
 <script>
+import axios from 'axios'
 // import { PayrollStatus } from '../../mixins/common/common'
 var moment = require('moment')
 
@@ -169,7 +170,6 @@ export default {
   data () {
     return {
       dateArray: [],
-      dtrDate: [],
       jsonDirectories: [],
       directories: [],
       disabled: false,
@@ -234,16 +234,29 @@ export default {
           }
         })
     },
-    createDtr (item) {
+    createDtrFolder (item) {
       var startDate = new Date(item.coverage.substring(0, 10))
       var endDate = new Date(item.coverage.substring(13, 24))
-
+      console.log(item.folder)
       var currentDate = moment(startDate)
       var stopDate = moment(endDate)
       while (currentDate <= stopDate) {
         this.dateArray.push(moment(currentDate).format('YYYY-MM-DD'))
         currentDate = moment(currentDate).add(1, 'days')
       }
+      return new Promise((resolve, reject) => {
+        axios.post('u/personnel/encode/create/dtr/folder', {
+          dateArray: this.dateArray,
+          primekey: localStorage.getItem('primekey'),
+          cntrl_no: item.folder
+        })
+          .then(response => {
+            console.log(response)
+          })
+          .catch(error => {
+            reject(error)
+          })
+      })
     },
     payrollStatus (status) {
       switch (status) {
