@@ -1,4 +1,5 @@
 <template>
+<!-- this module have many workaround -->
   <v-container fluid>
     <v-data-iterator
       :items="items"
@@ -92,9 +93,11 @@
               </v-list>
               <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn :disabled="disabled" color="blue darken-1" text>Edit Directory</v-btn>
-                <v-btn @click="createDtrFolder(item)" color="blue darken-1" text>Create DTR</v-btn>
-                <!-- <v-btn v-else-if="!createDtr" color="blue darken-1" text>Upload DTR</v-btn> -->
+                <div class="text-xs-center">
+                  <v-btn :disabled="item.status == 'Payroll Sent To Bank' || item.status == 'Payroll Computed' || item.status == '13th Month Computed'" color="blue darken-1" text>Modify</v-btn>
+                  <v-btn :disabled="item.status == 'Payroll Sent To Bank' || item.status == 'Payroll Computed' || item.status == '13th Month Computed'" v-if="item.havefolder == 'No'" @click="createDtrFolder(item)" color="blue darken-1" text>Create DTR</v-btn>
+                  <v-btn :disabled="item.status == 'Payroll Sent To Bank' || item.status == 'Payroll Computed' || item.status == '13th Month Computed'" v-else-if="item.havefolder == 'Yes'" :to="`/personnel/directory/folder/${item.directory}`" color="blue darken-1" text>Upload DTR</v-btn>
+                </div>
               </v-card-actions>
             </v-card>
           </v-hover>
@@ -183,12 +186,13 @@ export default {
       items: [],
       keys: [
         'Name',
-        'Folder',
+        'Directory',
         'Description',
         'Payroll Group',
         'W2 Year',
         'SSS Period',
-        'Status'
+        'Status',
+        'Have Folder'
       ]
     }
   },
@@ -211,7 +215,7 @@ export default {
       this.itemsPerPage = number
     },
     getDirectories () {
-      // this function must be equal to data `keys`. List items remove any space in between by using replace(/\s/g, '') and lowercase the string
+      // this function must be equal to data `keys`. List items will remove any space in between by using replace(/\s/g, '') and lowercase the string
       // this function map the json file then concatenate or mapping the object
       this.$store.dispatch('retrieveDirectories', {
         primekey: localStorage.getItem('primekey')
@@ -219,25 +223,23 @@ export default {
         .then(response => {
           this.jsonDirectories = this.$store.getters.retrieveDirectories
           this.directories = this.jsonDirectories.map(e => ({
-            folder: e.cntrl_no,
+            directory: e.cntrl_no,
             name: `${moment(e.month___, 'MM').format('MMMM')} ${e.year____} ( Part ${e.part____} )`,
             coverage: `${moment(e.strt_dte).format('MM/DD/YYYY')} - ${moment(e.last_dte).format('MM/DD/YYYY')}`,
             description: e.remarks_,
             payrollgroup: e.descript,
             w2year: e.w2_year_,
             sssperiod: e.appl_prd,
-            status: `${this.payrollStatus(e.status__)}`
+            status: `${this.payrollStatus(e.status__)}`,
+            havefolder: `${e.dtr_fldr === 'T' ? 'Yes' : 'No'}`
           }))
           this.items = this.directories
-          if (this.items.status !== 0) {
-            this.disabled = true
-          }
         })
     },
     createDtrFolder (item) {
+      // will generate dates between from and to dates
       var startDate = new Date(item.coverage.substring(0, 10))
       var endDate = new Date(item.coverage.substring(13, 24))
-      console.log(item.folder)
       var currentDate = moment(startDate)
       var stopDate = moment(endDate)
       while (currentDate <= stopDate) {
@@ -245,13 +247,14 @@ export default {
         currentDate = moment(currentDate).add(1, 'days')
       }
       return new Promise((resolve, reject) => {
-        axios.post('u/personnel/encode/create/dtr/folder', {
+        axios.post('u/personnel/directory/create/folder', {
           dateArray: this.dateArray,
           primekey: localStorage.getItem('primekey'),
           cntrl_no: item.folder
         })
           .then(response => {
-            console.log(response)
+            resolve(response)
+            this.$emit('getDirectories')
           })
           .catch(error => {
             reject(error)
@@ -282,6 +285,9 @@ export default {
   },
   created () {
     this.getDirectories()
+    this.$on('getDirectories', () => {
+      this.getDirectories()
+    })
   }
 }
 </script>

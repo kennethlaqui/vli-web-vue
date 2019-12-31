@@ -21,7 +21,8 @@ export default new Vuex.Store({
     division: [],
     department: [],
     section: [],
-    directories: []
+    directories: [],
+    folder: []
   },
   getters: {
     loggedIn (state) {
@@ -66,26 +67,8 @@ export default new Vuex.Store({
     retrieveDirectories (state) {
       return state.directories
     },
-    payrollStatus (status) {
-      switch (status) {
-        case '0':
-          return 'Initial Value'
-
-        case '1':
-          return 'Copied DTR / Bonus Searched / Merged'
-
-        case '2':
-          return 'Payroll Computed'
-
-        case '3':
-          return 'Payroll Sent To Bank'
-
-        case 'A':
-          return 'Last Pay Computed'
-
-        case 'B':
-          return '13th Month Computed'
-      }
+    retrieveFolder (state) {
+      return state.folder
     }
   },
   mutations: {
@@ -133,15 +116,42 @@ export default new Vuex.Store({
     },
     retrieveDirectories (state, payload) {
       state.directories = payload
+    },
+    retrieveFolder (state, payload) {
+      state.folder = payload
     }
   },
   actions: {
+    async retrieveFolder (context, payload) {
+      try {
+        axios.defaults.headers.common['Authorization'] = 'Bearer ' + context.state.token
+        if (context.getters.loggedIn) {
+          await new Promise((resolve, reject) => {
+            axios.get('u/personnel/directory/folder/', {
+              params: {
+                primekey: payload.primekey,
+                cntrl_no: payload.cntrl_no
+              }
+            })
+              .then(response => {
+                this.folder = response.data
+                context.commit('retrieveFolder', this.folder)
+                resolve(response)
+              })
+              .catch(error => {
+                reject(error)
+              })
+          })
+        }
+      } catch (error) {
+      }
+    },
     async retrieveDirectories (context, payload) {
       try {
         axios.defaults.headers.common['Authorization'] = 'Bearer ' + context.state.token
         if (context.getters.loggedIn) {
           await new Promise((resolve, reject) => {
-            axios.get('u/personnel/encode/directory/list/', {
+            axios.get('u/personnel/directory/directories/', {
               params: {
                 primekey: payload.primekey
               }

@@ -7,7 +7,8 @@ import UserAssignedCompany from '../components/auth/Companies.vue'
 import Logout from '../components/auth/Logout.vue'
 import Dashboard from '../components/dashboard/Dashboard.vue'
 import ClientRegister from '../components/client/Register.vue'
-import EncodeDtr from '../views/personnel/EncodeDtr.vue'
+import Directory from '../views/personnel/Directory.vue'
+import Folder from '../components/personnel/Folder.vue'
 import UserMasterfile from '../views/maintenance/Masterfile.vue'
 // import EasyCreateEmployee from '../components/controller/dialog/CreateEmployee.vue'
 
@@ -66,9 +67,18 @@ const routes = [
     }
   },
   {
-    path: '/personnel/encode',
-    name: 'encodeDtr',
-    component: EncodeDtr,
+    path: '/personnel/directory',
+    name: 'directory',
+    component: Directory,
+    meta: {
+      requiresAuth: true,
+      layout: 'dashboard'
+    }
+  },
+  {
+    path: '/personnel/directory/folder/:cntrl_no',
+    name: 'folder',
+    component: Folder,
     meta: {
       requiresAuth: true,
       layout: 'dashboard'

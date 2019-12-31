@@ -225,6 +225,7 @@ export default {
     return {
       showCreateEmployee: false,
       drawer: null,
+      show: false,
       drawerRight: null,
       right: false,
       left: false,
@@ -234,7 +235,7 @@ export default {
           title: 'Personnel',
           active: true,
           items: [
-            { action: 'mdi-calendar-plus', title: 'Encode DTR', url: { name: 'encodeDtr' } },
+            { action: 'mdi-calendar-plus', title: 'Encode DTR', url: { name: 'directory' } },
             { action: 'mdi-timetable', title: 'Manpower', url: '' }
           ]
         },
