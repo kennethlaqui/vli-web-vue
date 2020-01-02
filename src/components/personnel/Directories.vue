@@ -165,11 +165,9 @@
 </template>
 <script>
 import axios from 'axios'
-// import { PayrollStatus } from '../../mixins/common/common'
 var moment = require('moment')
 
 export default {
-  // mixins: [PayrollStatus],
   data () {
     return {
       dateArray: [],
@@ -247,10 +245,11 @@ export default {
         currentDate = moment(currentDate).add(1, 'days')
       }
       return new Promise((resolve, reject) => {
+        axios.defaults.headers.common['Authorization'] = 'Bearer ' + localStorage.getItem('access_token')
         axios.post('u/personnel/directory/create/folder', {
           dateArray: this.dateArray,
           primekey: localStorage.getItem('primekey'),
-          cntrl_no: item.folder
+          cntrl_no: item.directory
         })
           .then(response => {
             resolve(response)

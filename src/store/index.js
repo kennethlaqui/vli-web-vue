@@ -1,3 +1,4 @@
+// use lowecase when declaring state as standard
 import Vue from 'vue'
 import Vuex from 'vuex'
 import axios from 'axios'
@@ -22,7 +23,8 @@ export default new Vuex.Store({
     department: [],
     section: [],
     directories: [],
-    folder: []
+    folder: [],
+    daytype: []
   },
   getters: {
     loggedIn (state) {
@@ -69,6 +71,9 @@ export default new Vuex.Store({
     },
     retrieveFolder (state) {
       return state.folder
+    },
+    retrieveDayType (state) {
+      return state.daytype
     }
   },
   mutations: {
@@ -119,9 +124,35 @@ export default new Vuex.Store({
     },
     retrieveFolder (state, payload) {
       state.folder = payload
+    },
+    retrieveDayType (state, payload) {
+      state.daytype = payload
     }
   },
   actions: {
+    async retrieveDayType (context, payload) {
+      try {
+        axios.defaults.headers.common['Authorization'] = 'Bearer ' + context.state.token
+        if (context.getters.loggedIn) {
+          await new Promise((resolve, reject) => {
+            axios.get('l/helper/daytype/', {
+              params: {
+                primekey: payload.primekey
+              }
+            })
+              .then(response => {
+                this.daytype = response.data
+                context.commit('retrieveDayType', this.daytype)
+                resolve(response)
+              })
+              .catch(error => {
+                reject(error)
+              })
+          })
+        }
+      } catch (error) {
+      }
+    },
     async retrieveFolder (context, payload) {
       try {
         axios.defaults.headers.common['Authorization'] = 'Bearer ' + context.state.token
