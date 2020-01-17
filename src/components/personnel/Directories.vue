@@ -1,5 +1,4 @@
 <template>
-<!-- this module have many workaround -->
   <v-container fluid>
     <v-data-iterator
       :items="items"
@@ -80,7 +79,7 @@
               max-width="400"
               :elevation="hover ? 12 : 2"
             >
-              <v-card-title class="subheading font-weight-bold">{{ item.name }}</v-card-title>
+              <v-card-title class="subheading">{{ item.name }}</v-card-title>
               <v-card-subtitle class="subheading black--text"><v-icon dense>mdi-calendar</v-icon> {{ item.coverage }}</v-card-subtitle>
               <v-divider></v-divider>
               <v-list dense>
@@ -170,18 +169,18 @@ var moment = require('moment')
 export default {
   data () {
     return {
+      search: '',
       dateArray: [],
       jsonDirectories: [],
       directories: [],
-      disabled: false,
       itemsPerPageArray: [4, 8, 1000],
-      search: '',
-      filter: {},
-      sortDesc: false,
-      page: 1,
-      itemsPerPage: 10,
-      sortBy: 'coverage',
       items: [],
+      filter: {},
+      page: 1,
+      disabled: false,
+      itemsPerPage: 10,
+      sortDesc: true,
+      sortBy: 'directory',
       keys: [
         'Name',
         'Directory',
@@ -215,6 +214,9 @@ export default {
     getDirectories () {
       // this function must be equal to data `keys`. List items will remove any space in between by using replace(/\s/g, '') and lowercase the string
       // this function map the json file then concatenate or mapping the object
+      // if (!this.$cookies.isKey('primekey')) {
+      //   this.$router.push({ name: 'userLogout' })
+      // }
       this.$store.dispatch('retrieveDirectories', {
         primekey: localStorage.getItem('primekey')
       })
@@ -222,7 +224,7 @@ export default {
           this.jsonDirectories = this.$store.getters.retrieveDirectories
           this.directories = this.jsonDirectories.map(e => ({
             directory: e.cntrl_no,
-            name: `${moment(e.month___, 'MM').format('MMMM')} ${e.year____} ( Part ${e.part____} )`,
+            name: `${moment(e.month___, 'MM').format('MMMM')} ${e.year____} - Part ${e.part____}`,
             coverage: `${moment(e.strt_dte).format('MM/DD/YYYY')} - ${moment(e.last_dte).format('MM/DD/YYYY')}`,
             description: e.remarks_,
             payrollgroup: e.descript,

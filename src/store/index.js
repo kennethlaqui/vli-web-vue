@@ -24,7 +24,8 @@ export default new Vuex.Store({
     section: [],
     directories: [],
     folder: [],
-    daytype: []
+    daytype: [],
+    showdialog: false
   },
   getters: {
     loggedIn (state) {
@@ -74,6 +75,9 @@ export default new Vuex.Store({
     },
     retrieveDayType (state) {
       return state.daytype
+    },
+    showDialog (state) {
+      return state.showdialog
     }
   },
   mutations: {
@@ -127,6 +131,9 @@ export default new Vuex.Store({
     },
     retrieveDayType (state, payload) {
       state.daytype = payload
+    },
+    toggleDialog (state) {
+      state.showdialog = !state.showdialog
     }
   },
   actions: {
@@ -496,6 +503,7 @@ export default new Vuex.Store({
             resolve(response)
           })
           .catch(error => {
+            localStorage.removeItem('access_token')
             reject(error)
           })
       })

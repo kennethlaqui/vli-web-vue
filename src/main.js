@@ -8,8 +8,11 @@ import router from './router'
 import store from './store'
 import vuetify from './plugins/vuetify'
 import Vuelidate from 'vuelidate'
+import VueCookies from 'vue-cookies'
 
 Vue.use(Vuelidate)
+Vue.use(VueCookies)
+
 Vue.config.productionTip = false
 
 router.beforeEach((to, from, next) => {

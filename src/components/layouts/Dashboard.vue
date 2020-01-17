@@ -2,6 +2,7 @@
   <v-app id="inspire">
     <v-navigation-drawer
       v-model="drawerRight"
+      drawer="false"
       app
       clipped
       right
@@ -10,9 +11,9 @@
       <v-subheader>Easy Navigation</v-subheader>
       <v-list-item-group v-model="sideItem" color="primary">
         <v-list-item
-          v-for="(sideItem, i) in sideItems"
-          :key="i"
-          :to="sideItem.url"
+          v-for="(sideItem, item) in sideItems"
+          :key="item"
+          @click="callFunction(item)"
         >
           <v-list-item-icon>
             <v-icon v-text="sideItem.icon"></v-icon>
@@ -216,17 +217,31 @@
       <v-spacer />
       <span>&copy; 2019</span>
     </v-footer>
+  <CreateDirectoryComponent v-if="showDialog"></CreateDirectoryComponent>
   </v-app>
 </template>
 
 <script>
+import CreateDirectoryComponent from '@/components/easynav/EasyCreateDirectory.vue'
+
 export default {
+  name: 'Dashboard',
+  components: {
+    CreateDirectoryComponent
+  },
   data () {
     return {
-      showCreateEmployee: false,
+      primekey: localStorage.getItem('primekey'),
+      username: 'Kenneth Laqui',
+      vli_subs: '',
+      user_num: '',
+      user_id_: '',
+      user_nme: '',
+      userData: {},
       drawer: null,
+      drawerRight: false,
+      showCreateEmployee: false,
       show: false,
-      drawerRight: null,
       right: false,
       left: false,
       items: [
@@ -273,22 +288,18 @@ export default {
       ],
       sideItem: 1,
       sideItems: [
-        { text: 'Create Directory', icon: 'mdi-folder', url: { name: 'easyCreateDirectory' } },
-        { text: 'Create New Employee', icon: 'mdi-account', url: { name: 'easyCreateEmployee' } },
-        { text: 'Events', icon: 'mdi-flag', url: { name: 'easyEvents' } }
-      ],
-      username: 'Kenneth Laqui',
-      userData: {},
-      primekey: localStorage.getItem('primekey'),
-      vli_subs: '',
-      user_num: '',
-      user_id_: '',
-      user_nme: ''
+        { text: 'Create Directory', icon: 'mdi-folder' },
+        { text: 'Create New Employee', icon: 'mdi-account' }
+        // { text: 'Events', icon: 'mdi-flag', url: { name: 'easyEvents' } }
+      ]
     }
   },
   computed: {
     loggedIn () {
       return this.$store.getters.loggedIn
+    },
+    showDialog () {
+      return this.$store.getters.showDialog
     }
   },
   methods: {
@@ -300,16 +311,30 @@ export default {
           this.user_id_ = this.$store.getters.retrieveUser.user_id_
           this.user_nme = this.$store.getters.retrieveUser.user_nme
         })
+    },
+    easyCreateDirectory () {
+      // easynav item # 1
+      this.$store.commit('toggleDialog')
+    },
+    easyCreateNewEmployee () {
+    },
+    callFunction (item) {
+      // add case if easynav is added
+      switch (item) {
+        case 0:
+          this.easyCreateDirectory()
+          break
+        case 1:
+          this.easyCreateNewEmployee()
+          break
+      }
     }
   },
   created () {
     this.getCurrentUser()
   },
-  props: {
-    source: String
-  },
-  components: {
-    // MasterFile: () => import('@/components/controller/dialog/masterfile/NewEmployee.vue')
-  }
+  props: [
+    'item'
+  ]
 }
 </script>

@@ -57,10 +57,12 @@
 <script>
 export default {
   name: 'Login',
-  data: () => ({
-    username: '',
-    password: ''
-  }),
+  data () {
+    return {
+      username: '',
+      password: ''
+    }
+  },
   methods: {
     login () {
       // login and get acccess token

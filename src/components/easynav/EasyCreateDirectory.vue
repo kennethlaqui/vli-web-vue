@@ -20,7 +20,7 @@
               </v-col>
               <v-col cols="12" sm="6" md="6">
                 <v-select
-                  :items="['Regular Payroll 1st Part','Regular Payroll 2nd Part', '13th Month Pay']"
+                  :items="['1st Part','2nd Part', '13th Month Pay']"
                   label="Payroll Type*"
                   required
                 ></v-select>
@@ -88,7 +88,7 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="blue darken-1" text @click="dialog = false">Close</v-btn>
+          <v-btn color="blue darken-1" text @click="close()">Close</v-btn>
           <v-btn color="blue darken-1" text @click="save()">Save</v-btn>
         </v-card-actions>
       </v-card>
@@ -97,14 +97,15 @@
 </template>
 <script>
 export default {
-  data: () => ({
-    dialog: true,
-    dates: ['2019-12-01', '2019-12-02'],
-    // \date: new Date().toISOString().substr(0, 10),
-    menu: false,
-    modal: false,
-    menu2: false
-  }),
+  data () {
+    return {
+      dialog: true,
+      dates: ['2019-12-01', '2019-12-02'],
+      menu: false,
+      modal: false,
+      menu2: false
+    }
+  },
   computed: {
     dateRangeText () {
       return this.dates.join(' ~ ')
@@ -114,6 +115,10 @@ export default {
     save () {
       this.$router.push({ name: 'encodeDtr' })
       this.dialog = false
+    },
+    close () {
+      this.dialog = false
+      this.$store.commit('toggleDialog')
     }
   }
 }

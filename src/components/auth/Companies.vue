@@ -80,6 +80,7 @@ export default {
     },
     getSelectedValue (primekey) {
       this.primekey = primekey
+      // this.$cookies.set('primekey', this.primekey, '1d')
       localStorage.setItem('primekey', this.primekey)
     },
     proceedToDashboard () {
