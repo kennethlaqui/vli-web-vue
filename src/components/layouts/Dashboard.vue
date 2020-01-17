@@ -2,20 +2,29 @@
   <v-app id="inspire">
     <v-navigation-drawer
       v-model="drawerRight"
+      drawer="false"
       app
       clipped
       right
     >
-      <v-list dense>
-        <v-list-item @click.stop="right = !right">
-          <v-list-item-action>
-            <v-icon>mdi-exit-to-app</v-icon>
-          </v-list-item-action>
+    <v-list shaped dense>
+      <v-subheader>Easy Navigation</v-subheader>
+      <v-list-item-group v-model="sideItem" color="primary">
+        <v-list-item
+          v-for="(sideItem, item) in sideItems"
+          :key="item"
+          @click="callFunction(item)"
+        >
+          <v-list-item-icon>
+            <v-icon v-text="sideItem.icon"></v-icon>
+          </v-list-item-icon>
           <v-list-item-content>
-            <v-list-item-title>Open Temporary Drawer</v-list-item-title>
+            <v-list-item-title v-text="sideItem.text"></v-list-item-title>
           </v-list-item-content>
         </v-list-item>
-      </v-list>
+      </v-list-item-group>
+      <!-- <v-btn @click="showCreateEmployee = !showCreateEmployee" text>Create New Employee</v-btn> -->
+    </v-list>
     </v-navigation-drawer>
 
     <v-app-bar
@@ -23,10 +32,28 @@
       clipped-right
       color="blue darken-3"
       dark
+      dense
     >
       <v-app-bar-nav-icon @click.stop="drawer = !drawer" />
       <v-toolbar-title>Dashboard</v-toolbar-title>
       <v-spacer />
+          <v-btn icon>
+          <v-icon>mdi-apps</v-icon>
+        </v-btn>
+        <v-btn icon>
+          <v-badge
+            v-model="show"
+            color="purple"
+            overlap
+            right
+          >
+          <template v-slot:badge>
+            <span>6</span>
+          </template>
+          <v-icon>mdi-email</v-icon>
+          </v-badge>
+        </v-btn>
+
       <v-app-bar-nav-icon @click.stop="drawerRight = !drawerRight" />
     </v-app-bar>
 
@@ -46,8 +73,8 @@
             <img src="https://randomuser.me/api/portraits/men/1.jpg">
           </v-list-item-avatar>
           <v-list-item-content>
-            <v-list-item-title>{{ userInfo.user_nme }}</v-list-item-title>
-            <v-list-item-subtitle>{{ userInfo.user_id_ }}</v-list-item-subtitle>
+            <v-list-item-title>{{ user_nme }}</v-list-item-title>
+            <v-list-item-subtitle>{{ user_id_ }}</v-list-item-subtitle>
         </v-list-item-content>
       </template>
       <v-list-group
@@ -75,7 +102,10 @@
 
     <v-list dense>
 
-      <v-list-item link>
+      <v-list-item
+        :to="{ name: 'userDashboard' }"
+        link
+      >
         <v-list-item-action>
           <v-icon>mdi-view-dashboard</v-icon>
         </v-list-item-action>
@@ -84,6 +114,7 @@
         </v-list-item-content>
       </v-list-item>
       <v-divider></v-divider>
+
       <v-list-group
         v-for="item in items"
         :key="item.title"
@@ -100,6 +131,7 @@
         <v-list-item
           v-for="subItem in item.items"
           :key="subItem.title"
+          :to="subItem.url"
           link
         >
           <v-list-item-icon>
@@ -144,7 +176,7 @@
 
       <template v-slot:append>
         <div class="pa-2">
-          <v-btn v-if="loggedIn" :to="{ name: 'userLogout' }" block>Logout</v-btn>
+          <v-btn v-if="loggedIn" :to="{ name: 'userLogout' }" block small>Logout</v-btn>
         </div>
       </template>
 
@@ -156,46 +188,16 @@
       temporary
     />
 
+    <!-- Sizes your content based upon application components -->
     <v-content>
-      <v-container
-        class="fill-height"
-        fluid
-      >
-        <v-row
-          justify="center"
-          align="center"
-        >
-          <v-col class="shrink">
-            <v-tooltip right>
-              <template v-slot:activator="{ on }">
-                <v-btn
-                  :href="source"
-                  icon
-                  large
-                  target="_blank"
-                  v-on="on"
-                >
-                  <v-icon large>mdi-code-tags</v-icon>
-                </v-btn>
-              </template>
-              <span>Source</span>
-            </v-tooltip>
-            <v-tooltip right>
-              <template v-slot:activator="{ on }">
-                <v-btn
-                  icon
-                  large
-                  href="https://codepen.io/johnjleider/pen/QewYYx"
-                  target="_blank"
-                  v-on="on"
-                >
-                  <v-icon large>mdi-codepen</v-icon>
-                </v-btn>
-              </template>
-              <span>Codepen</span>
-            </v-tooltip>
-          </v-col>
-        </v-row>
+
+      <!-- Provides the application the proper gutter -->
+      <v-container fluid>
+        <!-- <div v-if="showCreateEmployee">
+          <MasterFile></MasterFile>
+        </div> -->
+        <!-- If using vue-router -->
+        <router-view></router-view>
       </v-container>
     </v-content>
 
@@ -215,15 +217,31 @@
       <v-spacer />
       <span>&copy; 2019</span>
     </v-footer>
+  <CreateDirectoryComponent v-if="showDialog"></CreateDirectoryComponent>
   </v-app>
 </template>
 
 <script>
+import CreateDirectoryComponent from '@/components/easynav/EasyCreateDirectory.vue'
+
 export default {
+  name: 'Dashboard',
+  components: {
+    CreateDirectoryComponent
+  },
   data () {
     return {
+      primekey: localStorage.getItem('primekey'),
+      username: 'Kenneth Laqui',
+      vli_subs: '',
+      user_num: '',
+      user_id_: '',
+      user_nme: '',
+      userData: {},
       drawer: null,
-      drawerRight: null,
+      drawerRight: false,
+      showCreateEmployee: false,
+      show: false,
       right: false,
       left: false,
       items: [
@@ -232,8 +250,8 @@ export default {
           title: 'Personnel',
           active: true,
           items: [
-            { action: 'mdi-calendar-plus', title: 'Encode DTR' },
-            { action: 'mdi-timetable', title: 'Manpower' }
+            { action: 'mdi-calendar-plus', title: 'Encode DTR', url: { name: 'directory' } },
+            { action: 'mdi-timetable', title: 'Manpower', url: '' }
           ]
         },
         {
@@ -241,8 +259,8 @@ export default {
           title: 'Payroll',
           active: false,
           items: [
-            { action: 'mdi-cached', title: 'Compute Payroll' },
-            { action: 'mdi-coin', title: 'Salaries' }
+            { action: 'mdi-cached', title: 'Compute Payroll', url: 'about' },
+            { action: 'mdi-coin', title: 'Salaries', url: 'about' }
           ]
         },
         {
@@ -250,8 +268,8 @@ export default {
           title: 'Reports',
           active: false,
           items: [
-            { action: 'mdi-beach', title: 'Leave Summary' },
-            { action: 'mdi-coin', title: 'Salaries' }
+            { action: 'mdi-beach', title: 'Leave Summary', url: 'about' },
+            { action: 'mdi-coin', title: 'Salaries', url: 'about' }
           ]
         },
         {
@@ -259,8 +277,8 @@ export default {
           title: 'Maintenance',
           active: false,
           items: [
-            { action: 'mdi-account-multiple-outline', title: 'Masterfile' },
-            { action: 'mdi-animation', title: 'Reference File' }
+            { action: 'mdi-account-multiple-outline', title: 'Masterfile', url: { name: 'UserMasterfile' } },
+            { action: 'mdi-animation', title: 'Reference File', url: 'about' }
           ]
         }
       ],
@@ -268,28 +286,55 @@ export default {
         ['Management', 'people_outline'],
         ['Settings', 'settings']
       ],
-      username: 'Kenneth Laqui',
-      userInfo: {}
+      sideItem: 1,
+      sideItems: [
+        { text: 'Create Directory', icon: 'mdi-folder' },
+        { text: 'Create New Employee', icon: 'mdi-account' }
+        // { text: 'Events', icon: 'mdi-flag', url: { name: 'easyEvents' } }
+      ]
     }
   },
   computed: {
     loggedIn () {
       return this.$store.getters.loggedIn
+    },
+    showDialog () {
+      return this.$store.getters.showDialog
     }
   },
   methods: {
-    user () {
+    getCurrentUser () {
       this.$store.dispatch('retrieveUser')
-        .then(response => {
-          this.userInfo = this.$store.getters.user
+        .then(Response => {
+          this.vli_subs = this.$store.getters.retrieveUser.vli_subs
+          this.user_num = this.$store.getters.retrieveUser.user_num
+          this.user_id_ = this.$store.getters.retrieveUser.user_id_
+          this.user_nme = this.$store.getters.retrieveUser.user_nme
         })
+    },
+    easyCreateDirectory () {
+      // easynav item # 1
+      this.$store.commit('toggleDialog')
+    },
+    easyCreateNewEmployee () {
+    },
+    callFunction (item) {
+      // add case if easynav is added
+      switch (item) {
+        case 0:
+          this.easyCreateDirectory()
+          break
+        case 1:
+          this.easyCreateNewEmployee()
+          break
+      }
     }
   },
   created () {
-    this.user()
+    this.getCurrentUser()
   },
-  props: {
-    source: String
-  }
+  props: [
+    'item'
+  ]
 }
 </script>

@@ -5,7 +5,7 @@
   >
   <v-card-title class="headline">Register Your Company</v-card-title>
     <v-container>
-    <form @submit.prevent="register" id="login">
+    <v-form @submit.prevent="clientRegister" id="register">
     <v-row>
       <v-col cols="12" md="12">
         <v-text-field
@@ -97,26 +97,26 @@
         @blur="$v.checkbox.$touch()"
       ></v-checkbox>
 
-      <v-btn class="mr-4" @click="submit" form="register">submit</v-btn>
+      <v-btn type="submit" class="mr-4" @click="submit">submit</v-btn>
       <v-btn @click="clear">clear</v-btn>
-    </form>
+    </v-form>
   </v-container>
 </v-card>
 </template>
 <script>
 import { validationMixin } from 'vuelidate'
-import { required, email } from 'vuelidate/lib/validators'
+import { required, maxLength, email } from 'vuelidate/lib/validators'
 
 export default {
   mixins: [validationMixin],
 
   validations: {
-    com_name: { required },
-    address_: { required },
-    frst_nme: { required },
-    last_nme: { required },
-    emailadr: { required, email },
-    cel_numb: { required },
+    com_name: { required, maxLength: maxLength(100) },
+    address_: { required, maxLength: maxLength(200) },
+    frst_nme: { required, maxLength: maxLength(30) },
+    last_nme: { required, maxLength: maxLength(30) },
+    emailadr: { required, email, maxLength: maxLength(50) },
+    cel_numb: { required, maxLength: maxLength(25) },
     select: { required },
     checkbox: {
       checked (val) {
@@ -158,30 +158,35 @@ export default {
     CompanyNameErrors () {
       const errors = []
       if (!this.$v.com_name.$dirty) return errors
+      !this.$v.com_name.maxLength && errors.push('Company name must be 100 characters long.')
       !this.$v.com_name.required && errors.push('Company Name is required.')
       return errors
     },
     AddressErrors () {
       const errors = []
       if (!this.$v.address_.$dirty) return errors
+      !this.$v.address_.maxLength && errors.push('Address must be 200 characters long.')
       !this.$v.address_.required && errors.push('Company Address is required.')
       return errors
     },
     FirstNameErrors () {
       const errors = []
       if (!this.$v.frst_nme.$dirty) return errors
+      !this.$v.frst_nme.maxLength && errors.push('First Name must be 30 characters long.')
       !this.$v.frst_nme.required && errors.push('First Name is required.')
       return errors
     },
     LastNameErrors () {
       const errors = []
       if (!this.$v.last_nme.$dirty) return errors
+      !this.$v.last_nme.maxLength && errors.push('Last Name must be 30 characters long.')
       !this.$v.last_nme.required && errors.push('Last Name is required.')
       return errors
     },
     emailadrErrors () {
       const errors = []
       if (!this.$v.emailadr.$dirty) return errors
+      !this.$v.emailadr.maxLength && errors.push('E-mail must be 50 characters long.')
       !this.$v.emailadr.email && errors.push('Must be valid e-mail')
       !this.$v.emailadr.required && errors.push('E-mail is required')
       return errors
@@ -189,11 +194,11 @@ export default {
     MobileNumberErrors () {
       const errors = []
       if (!this.$v.cel_numb.$dirty) return errors
+      !this.$v.cel_numb.maxLength && errors.push('Mobile Number must be 25 characters long.')
       !this.$v.cel_numb.required && errors.push('Mobile Number is required')
       return errors
     }
   },
-
   methods: {
     submit () {
       this.$v.$touch()
@@ -208,6 +213,19 @@ export default {
       this.cel_numb = ''
       this.select = null
       this.checkbox = false
+    },
+    clientRegister () {
+      this.$store.dispatch('clientRegister', {
+        com_name: this.com_name,
+        address_: this.address_,
+        frst_nme: this.frst_nme,
+        last_nme: this.last_nme,
+        emailadr: this.emailadr,
+        cel_numb: this.cel_numb
+      })
+        .then(response => {
+          this.$router.push({ name: 'userLogin' })
+        })
     }
   }
 }

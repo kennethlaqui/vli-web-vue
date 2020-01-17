@@ -57,19 +57,21 @@
 <script>
 export default {
   name: 'Login',
-  data: () => ({
-    username: '',
-    password: ''
-  }),
-
+  data () {
+    return {
+      username: '',
+      password: ''
+    }
+  },
   methods: {
     login () {
+      // login and get acccess token
       this.$store.dispatch('retrieveToken', {
         username: this.username,
         password: this.password
       })
         .then(response => {
-          this.$router.push({ name: 'main' })
+          this.$router.push({ name: 'UserAssignedCompany' })
         })
     }
   }

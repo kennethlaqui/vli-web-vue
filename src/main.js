@@ -8,8 +8,11 @@ import router from './router'
 import store from './store'
 import vuetify from './plugins/vuetify'
 import Vuelidate from 'vuelidate'
+import VueCookies from 'vue-cookies'
 
 Vue.use(Vuelidate)
+Vue.use(VueCookies)
+
 Vue.config.productionTip = false
 
 router.beforeEach((to, from, next) => {
@@ -28,7 +31,16 @@ router.beforeEach((to, from, next) => {
     // if not, redirect to login page.
     if (store.getters.loggedIn) {
       next({
-        name: 'main'
+        name: 'UserAssignedCompany'
+      })
+    } else {
+      next()
+    }
+  } else if (to.matched.some(record => record.meta.requiresPrimekey)) {
+    // this route requires primekey, check if not exist
+    if (!store.getters.retrievePrimekey) {
+      next({
+        name: 'home'
       })
     } else {
       next()
