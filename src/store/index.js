@@ -10,21 +10,21 @@ axios.defaults.baseURL = process.env.VUE_APP_URL
 export default new Vuex.Store({
   state: {
     token: localStorage.getItem('access_token') || null,
-    companies: [],
     user: '',
-    username: null,
-    primekey: '',
+    primekey: localStorage.getItem('primekey') || null,
+    username: '',
     maxemployee: '',
-    positions: [],
-    emplstat: [],
-    workstat: [],
-    workarea: [],
-    division: [],
-    department: [],
-    section: [],
-    directories: [],
     folder: [],
     daytype: [],
+    section: [],
+    division: [],
+    workarea: [],
+    workstat: [],
+    emplstat: [],
+    positions: [],
+    companies: [],
+    department: [],
+    directories: [],
     showdialog: false
   },
   getters: {
@@ -387,6 +387,7 @@ export default new Vuex.Store({
       } catch (error) {
       }
     },
+    // -- client registration
     clientRegister (context, payload) {
       if (!context.getters.loggedIn) {
         return new Promise((resolve, reject) => {
@@ -407,15 +408,21 @@ export default new Vuex.Store({
         })
       }
     },
+    // -- assigned company
     async retrieveCompany (context, payload) {
+      // stringify primekeys
+      let data = JSON.stringify(payload.primekey)
       try {
         axios.defaults.headers.common['Authorization'] = 'Bearer ' + context.state.token
         if (context.getters.loggedIn) {
           await new Promise((resolve, reject) => {
-            axios.get('/u/login/primekey/company/', {
-              params: {
-                primekey: payload.primekey
-              }
+            axios({
+              method: 'post',
+              url: '/u/login/primekey/company/',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              data: data
             })
               .then(response => {
                 this.companies = response.data
@@ -430,6 +437,7 @@ export default new Vuex.Store({
       } catch (error) {
       }
     },
+    // -- primekey
     async retrievePrimekey (context, payload) {
       try {
         axios.defaults.headers.common['Authorization'] = 'Bearer ' + context.state.token
@@ -437,7 +445,7 @@ export default new Vuex.Store({
           await new Promise((resolve, reject) => {
             axios.get('u/login/primekey/' + payload.vli_subs + '/' + payload.user_num)
               .then(response => {
-                this.primekey = response.data.primekey
+                this.primekey = response.data
                 context.commit('retrievePrimekey', this.primekey)
                 resolve(response)
               })
@@ -469,44 +477,51 @@ export default new Vuex.Store({
       }
     },
     // -- logout
-    destroyToken (context) {
-      axios.defaults.headers.common['Authorization'] = 'Bearer ' + context.state.token
-
-      if (context.getters.loggedIn) {
-        return new Promise((resolve, reject) => {
-          axios.post('u/logout')
+    async destroyToken (context) {
+      try {
+        axios.defaults.headers.common['Authorization'] = 'Bearer ' + context.state.token
+        if (context.getters.loggedIn) {
+          await new Promise((resolve, reject) => {
+            axios.post('u/logout')
+              .then(response => {
+                localStorage.removeItem('access_token')
+                localStorage.removeItem('primekey')
+                context.commit('destroyToken')
+                resolve(response)
+              })
+              .catch(error => {
+                localStorage.removeItem('access_token')
+                context.commit('destroyToken')
+                reject(error)
+              })
+          })
+        }
+      } catch (error) {
+        localStorage.removeItem('access_token')
+      }
+    },
+    // -- login
+    async retrieveToken (context, credentials) {
+      try {
+        await new Promise((resolve, reject) => {
+          axios.post('u/login', {
+            username: credentials.username,
+            password: credentials.password
+          })
             .then(response => {
-              localStorage.removeItem('access_token')
-              localStorage.removeItem('primekey')
-              context.commit('destroyToken')
+              this.token = response.data.access_token
+              localStorage.setItem('access_token', this.token)
+              context.commit('retrieveToken', this.token)
               resolve(response)
             })
             .catch(error => {
               localStorage.removeItem('access_token')
-              context.commit('destroyToken')
               reject(error)
             })
         })
+      } catch (error) {
+        localStorage.removeItem('access_token')
       }
-    },
-    // -- login
-    retrieveToken (context, credentials) {
-      return new Promise((resolve, reject) => {
-        axios.post('u/login', {
-          username: credentials.username,
-          password: credentials.password
-        })
-          .then(response => {
-            this.token = response.data.access_token
-            localStorage.setItem('access_token', this.token)
-            context.commit('retrieveToken', this.token)
-            resolve(response)
-          })
-          .catch(error => {
-            localStorage.removeItem('access_token')
-            reject(error)
-          })
-      })
     }
   },
   modules: {

@@ -1,6 +1,6 @@
 <template>
 <v-app>
-  <v-content>
+  <v-content v-if="!loading">
     <v-container
       fluid
     >
@@ -19,11 +19,12 @@
               dark
               flat
             >
-              <v-toolbar-title>Companies</v-toolbar-title>
+              <v-toolbar-title>Welcome, {{ this.welcome }}</v-toolbar-title>
               <v-spacer />
             </v-toolbar>
             <v-card-text>
                 <v-select
+                  v-model="primekey"
                   :items="companies"
                   item-text="co_name_"
                   item-value="primekey"
@@ -34,7 +35,7 @@
             </v-card-text>
             <v-card-actions>
               <v-spacer />
-              <v-btn type="submit" color="success" @click="proceedToDashboard()">Proceed</v-btn>
+              <v-btn type="submit" color="success" :disabled="disabled" @click="proceedToDashboard()">Proceed</v-btn>
             </v-card-actions>
           </v-card>
         </v-col>
@@ -48,16 +49,25 @@ export default {
   name: 'UserAssignedCompany',
   data () {
     return {
+      welcome: '',
+      primekey: '',
       user_num: '',
       vli_subs: '',
       user_id_: '',
       user_nme: '',
       companies: [],
-      proceed: false,
-      primekey: ''
+      loading: true,
+      disabled: true
     }
   },
   methods: {
+    welcomeUser () {
+      this.$store.dispatch('retrieveUser')
+        .then(response => {
+          this.loading = false
+          this.welcome = this.$store.getters.retrieveUser.user_nme
+        })
+    },
     companyLogin () {
       // after login, get user's info
       this.$store.dispatch('retrieveUser')
@@ -78,8 +88,8 @@ export default {
             })
         })
     },
-    getSelectedValue (primekey) {
-      this.primekey = primekey
+    getSelectedValue () {
+      this.disabled = false
       // this.$cookies.set('primekey', this.primekey, '1d')
       localStorage.setItem('primekey', this.primekey)
     },
@@ -88,6 +98,7 @@ export default {
     }
   },
   created () {
+    this.welcomeUser()
     this.companyLogin()
   }
 }

@@ -38,12 +38,16 @@ router.beforeEach((to, from, next) => {
     }
   } else if (to.matched.some(record => record.meta.requiresPrimekey)) {
     // this route requires primekey, check if not exist
-    if (!store.getters.retrievePrimekey) {
+    if (localStorage.getItem('primekey') === null) {
+      console.log(localStorage.getItem('primekey'))
       next({
-        name: 'home'
+        name: 'userLogout'
       })
     } else {
-      next()
+      next({
+        name: 'userLogout'
+      })
+      console.log(localStorage.getItem('primekey'))
     }
   } else {
     next() // make sure to always call next()!
