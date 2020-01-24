@@ -13,7 +13,7 @@
           sm="8"
           md="4"
         >
-          <v-card class="elevation-12">
+          <v-card class="elevation-12" loading>
             <v-toolbar
               color="primary"
               dark
@@ -44,7 +44,7 @@
             </v-card-text>
             <v-card-actions>
               <v-spacer />
-              <v-btn type="submit" color="success" form="login">Login</v-btn>
+              <v-btn type="submit" color="success" form="login" :disabled="disabled">Login</v-btn>
             </v-card-actions>
           </v-card>
         </v-col>
@@ -60,12 +60,14 @@ export default {
   data () {
     return {
       username: '',
-      password: ''
+      password: '',
+      disabled: false
     }
   },
   methods: {
     login () {
       // login and get acccess token
+      this.disabled = true
       this.$store.dispatch('retrieveToken', {
         username: this.username,
         password: this.password

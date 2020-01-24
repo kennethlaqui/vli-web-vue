@@ -12,6 +12,7 @@
       <v-btn v-if="!loggedIn" :to="{ name: 'userLogin' }" text>Login</v-btn>
       <v-btn v-if="!loggedIn" :to="{ name: 'clientRegister' }" text>Register</v-btn>
       <v-btn v-if="loggedIn" :to="{ name: 'UserAssignedCompany' }" text>Dashboard</v-btn>
+      <v-btn v-if="loggedIn" :to="{ name: 'userLogout' }" text>Logout</v-btn>
     </v-toolbar-items>
   </v-app-bar>
 
