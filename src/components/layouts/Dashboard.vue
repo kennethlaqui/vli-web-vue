@@ -278,7 +278,7 @@ export default {
           active: false,
           items: [
             { action: 'mdi-account-multiple-outline', title: 'Masterfile', url: { name: 'UserMasterfile' } },
-            { action: 'mdi-animation', title: 'Reference File', url: 'about' }
+            { action: 'mdi-animation', title: 'Reference File', url: { name: 'reference' } }
           ]
         }
       ],
