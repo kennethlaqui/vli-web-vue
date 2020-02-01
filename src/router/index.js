@@ -9,6 +9,8 @@ import Dashboard from '../components/dashboard/Dashboard.vue'
 import ClientRegister from '../components/client/Register.vue'
 import Directory from '../views/personnel/Directory.vue'
 import Folder from '../components/personnel/Folder.vue'
+import FolderEmployees from '../components/personnel/Employees.vue'
+import Reference from '../components/maintenance/Holidays.vue'
 import UserMasterfile from '../views/maintenance/Masterfile.vue'
 // import EasyCreateEmployee from '../components/controller/dialog/CreateEmployee.vue'
 
@@ -85,9 +87,27 @@ const routes = [
     }
   },
   {
+    path: '/personnel/directory/folder/employees',
+    name: 'switchEmployees',
+    component: FolderEmployees,
+    meta: {
+      requiresAuth: true,
+      layout: 'dashboard'
+    }
+  },
+  {
     path: '/maintenance/masterfile',
     name: 'UserMasterfile',
     component: UserMasterfile,
+    meta: {
+      requiresAuth: true,
+      layout: 'dashboard'
+    }
+  },
+  {
+    path: '/reference',
+    name: 'reference',
+    component: Reference,
     meta: {
       requiresAuth: true,
       layout: 'dashboard'

@@ -14,7 +14,7 @@
       <v-toolbar flat color="white">
         <v-switch v-model="singleSelect" label="Single select" class="pa-3 mt-3"></v-switch>
         <v-spacer></v-spacer>
-        <v-btn color="primary" dark class="mb-2" small>Switch to Employees</v-btn>
+        <v-btn color="primary" dark class="mb-2" small :to="{ name: 'switchEmployees' }">Switch to Employees</v-btn>
       </v-toolbar>
     </template>
     <template v-slot:item.day="{ item }">
