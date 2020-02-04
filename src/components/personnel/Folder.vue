@@ -157,6 +157,9 @@ export default {
     },
     closeDayType () {
       this.saveDayType()
+    },
+    editItem (item) {
+      this.$router.push({ name: 'uploadDtr', params: { cntrl_no: this.$route.params.cntrl_no, folder: item.cntrl_no } })
     }
   },
   created () {
