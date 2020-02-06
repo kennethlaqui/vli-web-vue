@@ -91,63 +91,36 @@
           <v-form>
             <v-container>
               <v-row>
-                <v-col cols="12" sm="6" md="3">
+                <v-col cols="12" sm="6" md="6">
                   <v-text-field
-                    label="Regular"
-                  ></v-text-field>
-                </v-col>
-                <v-col cols="12" sm="6" md="3">
-                  <v-text-field
-                    label="Regular"
-                    placeholder="Placeholder"
-                  ></v-text-field>
-                </v-col>
-
-                <v-col cols="12" sm="6" md="3">
-                  <v-text-field
-                    label="Solo"
-                    solo
-                  ></v-text-field>
-                </v-col>
-
-                <v-col cols="12" sm="6" md="3">
-                  <v-text-field
-                    label="Solo"
-                    placeholder="Placeholder"
-                    solo
-                  ></v-text-field>
-                </v-col>
-
-                <v-col cols="12" sm="6" md="3">
-                  <v-text-field
-                    label="Filled"
-                    filled
-                  ></v-text-field>
-                </v-col>
-
-                <v-col cols="12" sm="6" md="3">
-                  <v-text-field
-                    label="Filled"
-                    placeholder="Placeholder"
-                    filled
-                  ></v-text-field>
-                </v-col>
-
-                <v-col cols="12" sm="6" md="3">
-                  <v-text-field
-                    label="Outlined"
+                    v-if="clickedDone"
+                    v-model="shiftSchedule"
+                    label="Shift"
+                    placeholder="Shift Schedule"
                     outlined
+                    dense
                   ></v-text-field>
                 </v-col>
-
                 <v-col cols="12" sm="6" md="3">
                   <v-text-field
-                    label="Outlined"
-                    placeholder="Placeholder"
+                    v-if="clickedDone"
+                    v-model="firstTimeIn"
+                    label="In"
+                    placeholder="First In"
                     outlined
+                    dense
                   ></v-text-field>
                 </v-col>
-
+                <v-col cols="12" sm="6" md="3">
+                  <v-text-field
+                    v-if="clickedDone"
+                    v-model="lastTimeOut"
+                    label="Out"
+                    placeholder="Last Out"
+                    outlined
+                    dense
+                  ></v-text-field>
+                </v-col>
               </v-row>
             </v-container>
           </v-form>
@@ -180,10 +153,15 @@ export default {
       route: this.$route.params.folder,
       singleSelect: false,
       loading: false,
+      clickedDone: false,
       bol: true,
       show: false,
       selectRow: '',
+      onThisDateBio: [],
+      onThisDateBio2: [],
       employeeInfo: '',
+      employeeOut: '',
+      shiftSchedule: '07:30 - 19:30',
       search: '',
       bio: [],
       selected: [],
@@ -219,6 +197,19 @@ export default {
     },
     uploaded () {
       return 'Not yet'
+    },
+    firstTimeIn () {
+      const firstIn = this.onThisDateBio.map(e => ({
+        dtr_time: `${this.timeFormat(e.dtr_time)}`
+      }))
+      return firstIn[0].dtr_time
+    },
+    lastTimeOut () {
+      const lastOut = this.onThisDateBio.map(e => ({
+        dtr_time: `${this.timeFormat(e.dtr_time)}`
+      }))
+      const lastOutLength = this.onThisDateBio.length - 1
+      return lastOut[lastOutLength].dtr_time
     }
     // emplCode () {
     //   const selectedRow = this.selected[0]
@@ -246,13 +237,16 @@ export default {
       }
     },
     timeFormat (time) {
-      return time.slice(0, 2) + ':' + time.slice(3, 5)
+      return time.slice(0, 2) + ':' + time.slice(2, 4)
     },
     getEmployeeCode (item) {
       this.selectRow = item.empl_cde
       this.$set(item, 'selected', true)
       this.employeeInfo = item
       this.retrieveBio(item.empl_cde.trim())
+    },
+    retrieveShift () {
+
     },
     async retrieveEmployees () {
       try {
@@ -296,6 +290,11 @@ export default {
           axios.get(`u/personnel/directory/folder/uploaddtremployee/bio/${this.primekey}/${emplCode}/${this.dtrDate}`)
             .then(response => {
               this.bio = response.data
+              this.onThisDateBio = this.bio.filter(obj => {
+                return obj.dtr_date === this.dtrDate
+              })
+              this.onThisDateBio2 = this.onThisDateBio
+              this.clickedDone = true
               resolve(response)
               this.loading = false
             })
