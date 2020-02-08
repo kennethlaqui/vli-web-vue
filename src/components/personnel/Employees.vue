@@ -53,7 +53,6 @@ export default {
             })
               .then(response => {
                 this.employees = response.data
-                console.log(this.employees)
                 resolve(response)
               })
               .catch(error => {

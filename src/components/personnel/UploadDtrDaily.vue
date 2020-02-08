@@ -94,7 +94,7 @@
                 <v-col cols="12" sm="6" md="6">
                   <v-text-field
                     v-if="clickedDone"
-                    v-model="shiftSchedule"
+                    v-model="todayShift"
                     label="Shift"
                     placeholder="Shift Schedule"
                     outlined
@@ -109,6 +109,7 @@
                     placeholder="First In"
                     outlined
                     dense
+                    @change="computeRegularHours"
                   ></v-text-field>
                 </v-col>
                 <v-col cols="12" sm="6" md="3">
@@ -117,6 +118,28 @@
                     v-model="lastTimeOut"
                     label="Out"
                     placeholder="Last Out"
+                    outlined
+                    dense
+                  ></v-text-field>
+                </v-col>
+              </v-row>
+              <v-row>
+                <v-col cols="12" sm="6" md="3">
+                  <v-text-field
+                    v-if="clickedDone"
+                    v-model="comRegularHours"
+                    label="Regular"
+                    placeholder="Regular"
+                    outlined
+                    dense
+                  ></v-text-field>
+                </v-col>
+                <v-col cols="12" sm="6" md="3">
+                  <v-text-field
+                    v-if="clickedDone"
+                    v-model="comRegularLate"
+                    label="Late"
+                    placeholder="Late"
                     outlined
                     dense
                   ></v-text-field>
@@ -157,11 +180,13 @@ export default {
       bol: true,
       show: false,
       selectRow: '',
+      testSet: '',
       onThisDateBio: [],
-      onThisDateBio2: [],
+      employeeShift: [],
       employeeInfo: '',
       employeeOut: '',
-      shiftSchedule: '07:30 - 19:30',
+      regularHour: '',
+      regularLate: '',
       search: '',
       bio: [],
       selected: [],
@@ -195,29 +220,42 @@ export default {
     headers0 () {
       return this.headers.map(header => Object.assign({}, header, { fixed: false }))
     },
-    uploaded () {
-      return 'Not yet'
+    firstTimeIn: {
+      get: function () {
+        const firstIn = this.onThisDateBio.map(e => ({
+          dtr_time: `${this.timeFormat(e.dtr_time)}`
+        }))
+        // console.log(firstIn[0].dtr_time)
+        return firstIn[0].dtr_time
+      },
+      set: function (value) {
+        this.firstTimeIn = value
+      }
     },
-    firstTimeIn () {
-      const firstIn = this.onThisDateBio.map(e => ({
-        dtr_time: `${this.timeFormat(e.dtr_time)}`
-      }))
-      return firstIn[0].dtr_time
+    lastTimeOut: {
+      get: function () {
+        const lastOut = this.onThisDateBio.map(e => ({
+          dtr_time: `${this.timeFormat(e.dtr_time)}`
+        }))
+        const lastOutLength = this.onThisDateBio.length - 1
+        return lastOut[lastOutLength].dtr_time
+      },
+      set: function (value) {
+        this.testSet = value
+      }
     },
-    lastTimeOut () {
-      const lastOut = this.onThisDateBio.map(e => ({
-        dtr_time: `${this.timeFormat(e.dtr_time)}`
+    todayShift () {
+      const shift = this.employeeShift.map(e => ({
+        shift: `${e.shft_cde.trim()}: ${e.s1_in___} - ${e.s1_out__}`
       }))
-      const lastOutLength = this.onThisDateBio.length - 1
-      return lastOut[lastOutLength].dtr_time
+      return shift[0].shift
+    },
+    comRegularHours () {
+      return this.regularHours
+    },
+    comRegularLate () {
+      return this.regularLate
     }
-    // emplCode () {
-    //   const selectedRow = this.selected[0]
-    //   return selectedRow ? selectedRow.empl_cde : ''
-    //   // return this.empl_cde ? selectedRow.empl_cde
-    //   // return  selectedRow ? selectedRow.empl_cde
-    //   // console.log(selectedRow)
-    // }
   },
   methods: {
     rateType (rateType) {
@@ -245,8 +283,84 @@ export default {
       this.employeeInfo = item
       this.retrieveBio(item.empl_cde.trim())
     },
-    retrieveShift () {
+    convertTimeToMinutes (time) {
+      if (time.indexOf(':') < 0) {
+        const mm = parseInt(time.substr(0, 2) * 60) + parseInt(time.substr(2, 2))
+        return mm
+      } else {
+        const mm = parseInt(time.substr(0, 2) * 60) + parseInt(time.substr(2, 4))
+        return mm
+      }
+    },
+    computeRegularHours () {
+      // init variables
+      let mm1
+      let mm2
+      let diff
+      let hh
+      let regularHour
+      let regularLate
+      // remove : from string
+      let timeIn = this.firstTimeIn.substr(0, 2) + '' + this.firstTimeIn.substr(3, 4)
+      let timeOut = this.lastTimeOut.substr(0, 2) + '' + this.lastTimeOut.substr(3, 4)
+      // with break
+      const employeeShift = this.employeeShift.map(e => ({
+        cstrt_hr: `${e.cstrt_hr}`,
+        clast_am: `${e.clast_am}`,
+        cstrt_pm: `${e.cstrt_pm}`,
+        with_brk: `${e.with_brk}`,
+        basichrs: `${e.basichrs}`
+      }))
+      // compute late
+      switch (true) {
+        case timeIn > employeeShift[0].cstrt_hr:
+          mm1 = this.convertTimeToMinutes(timeIn)
+          mm2 = this.convertTimeToMinutes(employeeShift[0].cstrt_hr)
+          diff = parseInt(mm1 - mm2)
+          hh = parseInt(diff / 60)
+          regularLate = hh + (diff - (hh * 60)) / 60
+          this.regularLate = regularLate
+      }
+      // compute regular hours
+      if (timeIn < employeeShift[0].cstrt_hr) {
+        timeIn = employeeShift[0].cstrt_hr
+      }
+      //  am
+      mm1 = this.convertTimeToMinutes(timeIn)
+      mm2 = this.convertTimeToMinutes(employeeShift[0].clast_am)
+      diff = parseInt(mm2 - mm1)
+      hh = parseInt(diff / 60)
+      regularHour = hh + (diff - (hh * 60)) / 60
+      this.regularHours = regularHour
+      // pm
+      mm1 = this.convertTimeToMinutes(employeeShift[0].cstrt_pm)
+      mm2 = this.convertTimeToMinutes(timeOut)
+      diff = parseInt(mm2 - mm1)
+      hh = parseInt(diff / 60)
+      regularHour += hh + (diff - (hh * 60)) / 60
+      this.regularHours = regularHour
+      if ((parseInt(regularHour.toFixed(2) + regularLate.toFixed(2))) > employeeShift[0].basichrs) {
+        this.regularHours = employeeShift[0].basichrs - this.regularLate
+      }
+    },
+    async retrieveEmployeeShift (emplCode) {
+      try {
+        axios.defaults.headers.common['Authorization'] = 'Bearer ' + localStorage.getItem('access_token')
+        await new Promise((resolve, reject) => {
+          axios.get(`u/personne/directory/folder/uploaddtremployee/shift/${this.primekey}/${emplCode}/${this.dtrDate}`)
+            .then(response => {
+              this.employeeShift = response.data
+              resolve(response)
+              this.clickedDone = true
+              this.computeRegularHours()
+            })
+            .catch(error => {
+              reject(error)
+            })
+        })
+      } catch (error) {
 
+      }
     },
     async retrieveEmployees () {
       try {
@@ -290,12 +404,15 @@ export default {
           axios.get(`u/personnel/directory/folder/uploaddtremployee/bio/${this.primekey}/${emplCode}/${this.dtrDate}`)
             .then(response => {
               this.bio = response.data
+              resolve(response)
               this.onThisDateBio = this.bio.filter(obj => {
                 return obj.dtr_date === this.dtrDate
               })
-              this.onThisDateBio2 = this.onThisDateBio
-              this.clickedDone = true
-              resolve(response)
+              if (this.onThisDateBio.length !== 0) {
+                this.retrieveEmployeeShift(emplCode)
+              } else {
+                this.clickedDone = false
+              }
               this.loading = false
             })
             .catch(error => {
