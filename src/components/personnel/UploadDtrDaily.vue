@@ -85,13 +85,42 @@
         </v-col>
       <v-col cols="12" md="9" lg="9">
         <v-card>
-          <v-card-title>{{ employeeInfo.last_nme }}, {{ employeeInfo.frst_nme }} {{ employeeInfo.midl_nme }}</v-card-title>
+          <v-card-title>
+            <v-avatar size="36">
+              <img
+                :src="employeeInfo.avatar__"
+                alt="John"
+              >
+            </v-avatar>{{ employeeInfo.last_nme }}, {{ employeeInfo.frst_nme }} {{ employeeInfo.midl_nme }}</v-card-title>
           <v-card-subtitle>{{ employeeInfo.position }} - {{ rateType(employeeInfo.rate_typ) }}</v-card-subtitle>
+          <v-card-actions><v-btn class="primary" @click="computeRegularHours()">Calculate</v-btn></v-card-actions>
           <v-divider></v-divider>
           <v-form>
             <v-container>
               <v-row>
-                <v-col cols="12" sm="6" md="6">
+                <v-col cols="12" sm="6" md="3">
+                  <v-select
+                    v-if="clickedDone"
+                    :items="whyNoDtr"
+                    item-text="descript"
+                    item-value="cntrl_no"
+                    label="DTR Type"
+                    outlined
+                    dense
+                  ></v-select>
+                </v-col>
+                <v-col cols="12" sm="6" md="3">
+                  <v-select
+                    v-if="fromPresent"
+                    :items="whyNoDtr"
+                    label="Holidays"
+                    outlined
+                    dense
+                  ></v-select>
+                </v-col>
+              </v-row>
+              <v-row>
+                <v-col cols="12" sm="6" md="3">
                   <v-text-field
                     v-if="clickedDone"
                     v-model="todayShift"
@@ -99,49 +128,78 @@
                     placeholder="Shift Schedule"
                     outlined
                     dense
+                    readonly
                   ></v-text-field>
                 </v-col>
                 <v-col cols="12" sm="6" md="3">
                   <v-text-field
                     v-if="clickedDone"
                     v-model="firstTimeIn"
+                    v-mask="maskTimeIn"
                     label="In"
                     placeholder="First In"
                     outlined
                     dense
-                    @change="computeRegularHours"
+                    clearable
                   ></v-text-field>
                 </v-col>
                 <v-col cols="12" sm="6" md="3">
                   <v-text-field
                     v-if="clickedDone"
                     v-model="lastTimeOut"
+                    v-mask="maskTimeIn"
                     label="Out"
                     placeholder="Last Out"
                     outlined
                     dense
+                    clearable
                   ></v-text-field>
                 </v-col>
               </v-row>
+              <!-- hours output -->
               <v-row>
                 <v-col cols="12" sm="6" md="3">
                   <v-text-field
                     v-if="clickedDone"
-                    v-model="comRegularHours"
+                    v-model="regularHour"
                     label="Regular"
                     placeholder="Regular"
                     outlined
                     dense
+                    clearable
                   ></v-text-field>
                 </v-col>
                 <v-col cols="12" sm="6" md="3">
                   <v-text-field
                     v-if="clickedDone"
-                    v-model="comRegularLate"
+                    v-model="regularOt"
+                    label="Overtime"
+                    placeholder="Overtime"
+                    outlined
+                    dense
+                    clearable
+                  ></v-text-field>
+                </v-col>
+                <v-col cols="12" sm="6" md="3">
+                  <v-text-field
+                    v-if="clickedDone"
+                    v-model="regularLate"
                     label="Late"
                     placeholder="Late"
                     outlined
                     dense
+                    clearable
+                  ></v-text-field>
+                </v-col>
+                <v-col cols="12" sm="6" md="3">
+                  <v-text-field
+                    v-if="clickedDone"
+                    v-model="regularUnderTime"
+                    label="Undertime"
+                    placeholder="Undertime"
+                    outlined
+                    dense
+                    clearable
                   ></v-text-field>
                 </v-col>
               </v-row>
@@ -179,14 +237,22 @@ export default {
       clickedDone: false,
       bol: true,
       show: false,
+      fromPresent: false,
       selectRow: '',
       testSet: '',
       onThisDateBio: [],
       employeeShift: [],
+      dayType: [],
       employeeInfo: '',
       employeeOut: '',
       regularHour: '',
       regularLate: '',
+      regularUnderTime: '',
+      regularOt: '',
+      newValueTimeIn: '',
+      newValueTimeOut: '',
+      maskTimeIn: '##:##',
+      maskTimeOut: '##:##',
       search: '',
       bio: [],
       selected: [],
@@ -213,6 +279,28 @@ export default {
         },
         { text: 'Time', value: 'dtr_time' },
         { text: 'Description', value: 'tran_typ' }
+      ],
+      whyNoDtr: [
+        {
+          cntrl_no: 0,
+          descript: 'Present'
+        },
+        {
+          cntrl_no: 'R',
+          descript: 'Restday'
+        },
+        {
+          cntrl_no: 'A',
+          descript: 'Absent'
+        },
+        {
+          cntrl_no: 'H',
+          descript: 'Holidays'
+        },
+        {
+          cntrl_no: 'P',
+          descript: 'Paid Holiday'
+        }
       ]
     }
   },
@@ -229,7 +317,7 @@ export default {
         return firstIn[0].dtr_time
       },
       set: function (value) {
-        this.firstTimeIn = value
+        this.newValueTimeIn = value
       }
     },
     lastTimeOut: {
@@ -241,7 +329,7 @@ export default {
         return lastOut[lastOutLength].dtr_time
       },
       set: function (value) {
-        this.testSet = value
+        this.newValueTimeOut = value
       }
     },
     todayShift () {
@@ -249,13 +337,13 @@ export default {
         shift: `${e.shft_cde.trim()}: ${e.s1_in___} - ${e.s1_out__}`
       }))
       return shift[0].shift
-    },
-    comRegularHours () {
-      return this.regularHours
-    },
-    comRegularLate () {
-      return this.regularLate
     }
+    // comRegularHours () {
+    //   return this.regularHours
+    // },
+    // comRegularLate () {
+    //   return this.regularLate
+    // }
   },
   methods: {
     rateType (rateType) {
@@ -275,7 +363,7 @@ export default {
       }
     },
     timeFormat (time) {
-      return time.slice(0, 2) + ':' + time.slice(2, 4)
+      return time.substr(0, 2) + ':' + time.substr(2, 2)
     },
     getEmployeeCode (item) {
       this.selectRow = item.empl_cde
@@ -285,41 +373,71 @@ export default {
     },
     convertTimeToMinutes (time) {
       if (time.indexOf(':') < 0) {
-        const mm = parseInt(time.substr(0, 2) * 60) + parseInt(time.substr(2, 2))
+        const mm = parseFloat(time.substr(0, 2) * 60) + parseFloat(time.substr(2, 2))
         return mm
       } else {
-        const mm = parseInt(time.substr(0, 2) * 60) + parseInt(time.substr(2, 4))
+        const mm = parseFloat(time.substr(0, 2) * 60) + parseFloat(time.substr(2, 4))
         return mm
       }
     },
     computeRegularHours () {
-      // init variables
+      let timeIn
+      let timeOut
       let mm1
       let mm2
       let diff
       let hh
       let regularHour
       let regularLate
-      // remove : from string
-      let timeIn = this.firstTimeIn.substr(0, 2) + '' + this.firstTimeIn.substr(3, 4)
-      let timeOut = this.lastTimeOut.substr(0, 2) + '' + this.lastTimeOut.substr(3, 4)
-      // with break
+      let regularUnderTime
+      // init variables
+      this.regularHour = ''
+      this.regularLate = ''
+      this.regularOt = ''
+      this.regularUnderTime = ''
+      //  check if manually input
+      if (this.newValueTimeIn !== '') {
+        timeIn = this.newValueTimeIn.substr(0, 2) + '' + this.newValueTimeIn.substr(3, 4)
+        timeOut = this.lastTimeOut.substr(0, 2) + '' + this.lastTimeOut.substr(3, 4)
+      } else {
+        timeIn = this.firstTimeIn.substr(0, 2) + '' + this.firstTimeIn.substr(3, 4)
+        timeOut = this.lastTimeOut.substr(0, 2) + '' + this.lastTimeOut.substr(3, 4)
+      }
+      if (this.newValueTimeOut !== '') {
+        if (this.newValueTimeIn !== '') {
+          timeIn = this.newValueTimeIn.substr(0, 2) + '' + this.newValueTimeIn.substr(3, 4)
+        }
+        timeOut = this.newValueTimeOut.substr(0, 2) + '' + this.newValueTimeOut.substr(3, 4)
+      }
+      // init data
       const employeeShift = this.employeeShift.map(e => ({
         cstrt_hr: `${e.cstrt_hr}`,
         clast_am: `${e.clast_am}`,
+        clast_pm: `${e.clast_pm}`,
         cstrt_pm: `${e.cstrt_pm}`,
         with_brk: `${e.with_brk}`,
-        basichrs: `${e.basichrs}`
+        basichrs: `${e.basichrs}`,
+        ot_strt_: `${e.ot_strt_}`
       }))
       // compute late
       switch (true) {
         case timeIn > employeeShift[0].cstrt_hr:
           mm1 = this.convertTimeToMinutes(timeIn)
           mm2 = this.convertTimeToMinutes(employeeShift[0].cstrt_hr)
-          diff = parseInt(mm1 - mm2)
-          hh = parseInt(diff / 60)
+          diff = parseFloat(mm1 - mm2)
+          hh = parseFloat(diff / 60)
           regularLate = hh + (diff - (hh * 60)) / 60
           this.regularLate = regularLate
+      }
+      // compute undertime
+      switch (true) {
+        case timeOut < this.timeFormat(employeeShift[0].clast_pm):
+          mm1 = this.convertTimeToMinutes(employeeShift[0].clast_pm)
+          mm2 = this.convertTimeToMinutes(timeOut)
+          diff = parseFloat(mm1 - mm2)
+          hh = parseFloat(diff / 60)
+          regularUnderTime = hh + (diff - (hh * 60)) / 60
+          this.regularUnderTime = regularUnderTime
       }
       // compute regular hours
       if (timeIn < employeeShift[0].cstrt_hr) {
@@ -328,20 +446,37 @@ export default {
       //  am
       mm1 = this.convertTimeToMinutes(timeIn)
       mm2 = this.convertTimeToMinutes(employeeShift[0].clast_am)
-      diff = parseInt(mm2 - mm1)
-      hh = parseInt(diff / 60)
+      diff = parseFloat(mm2 - mm1)
+      hh = parseFloat(diff / 60)
       regularHour = hh + (diff - (hh * 60)) / 60
-      this.regularHours = regularHour
+      this.regularHour = regularHour
       // pm
       mm1 = this.convertTimeToMinutes(employeeShift[0].cstrt_pm)
       mm2 = this.convertTimeToMinutes(timeOut)
-      diff = parseInt(mm2 - mm1)
-      hh = parseInt(diff / 60)
+      diff = parseFloat(mm2 - mm1)
+      hh = parseFloat(diff / 60)
       regularHour += hh + (diff - (hh * 60)) / 60
-      this.regularHours = regularHour
-      if ((parseInt(regularHour.toFixed(2) + regularLate.toFixed(2))) > employeeShift[0].basichrs) {
-        this.regularHours = employeeShift[0].basichrs - this.regularLate
+      this.regularHour = regularHour
+      if ((parseFloat(this.regularHour + this.regularLate)) > employeeShift[0].basichrs) {
+        this.regularHour = employeeShift[0].basichrs - this.regularLate - this.regularUnderTime
       }
+      // compute overtime
+      if (timeOut > employeeShift[0].ot_strt_) {
+        mm1 = this.convertTimeToMinutes(timeOut)
+        mm2 = this.convertTimeToMinutes(employeeShift[0].ot_strt_)
+        diff = parseFloat(mm1 - mm2)
+        hh = parseFloat(diff / 60)
+        this.regularOt = hh.toFixed(2)
+      }
+    },
+    retrieveDayType () {
+      // display all day type
+      this.$store.dispatch('retrieveDayType', {
+        primekey: localStorage.getItem('primekey')
+      })
+        .then(response => {
+          this.dayType = this.$store.getters.retrieveDayType
+        })
     },
     async retrieveEmployeeShift (emplCode) {
       try {
@@ -426,6 +561,7 @@ export default {
   created () {
     this.retrieveEmployees()
     this.retrieveDtrDate()
+    this.retrieveDayType()
   }
 }
 </script>

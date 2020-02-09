@@ -9,9 +9,11 @@ import store from './store'
 import vuetify from './plugins/vuetify'
 import Vuelidate from 'vuelidate'
 import VueCookies from 'vue-cookies'
+import VueTheMask from 'vue-the-mask'
 
 Vue.use(Vuelidate)
 Vue.use(VueCookies)
+Vue.use(VueTheMask)
 
 Vue.config.productionTip = false
 
