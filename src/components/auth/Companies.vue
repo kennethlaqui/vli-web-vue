@@ -45,6 +45,8 @@
 </v-app>
 </template>
 <script>
+// import axios from 'axios'
+
 export default {
   name: 'UserAssignedCompany',
   data () {
@@ -94,7 +96,15 @@ export default {
       localStorage.setItem('primekey', this.primekey)
     },
     proceedToDashboard () {
-      this.$router.push({ name: 'userDashboard' })
+      // save primekey in mirage server
+      // axios.post('/storage/primekey', {
+      //   data: this.primekey
+      // })
+      //   .then(response => {
+      //     let primekey = response.data
+      //     console.log(primekey)
+      //     // this.$router.push({ name: 'userDashboard' })
+      //   })
     }
   },
   created () {
