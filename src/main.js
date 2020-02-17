@@ -10,23 +10,17 @@ import vuetify from './plugins/vuetify'
 import Vuelidate from 'vuelidate'
 import VueCookies from 'vue-cookies'
 import VueTheMask from 'vue-the-mask'
-import { Server } from 'miragejs'
-
-const server = new Server({
-  timing: 500
-})
-
-// mirage.js accept primekey
-server.post('/storage/primekey', (schema, request) => {
-  let primekey = JSON.parse(request.requestBody).data
-  return schema.db.storage.insert(primekey)
-})
+// import { makeServer } from './server'
 
 Vue.use(Vuelidate)
 Vue.use(VueCookies)
 Vue.use(VueTheMask)
 
 Vue.config.productionTip = false
+
+// if (process.env.NODE_ENV === 'development') {
+//   makeServer()
+// }
 
 router.beforeEach((to, from, next) => {
   if (to.matched.some(record => record.meta.requiresAuth)) {

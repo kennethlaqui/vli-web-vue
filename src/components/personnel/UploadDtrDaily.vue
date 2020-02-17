@@ -5,7 +5,7 @@
         <v-col cols="12" md="12" lg="12">
           <v-data-table
             v-model="selected"
-            :headers="headers0"
+            :headers="headers_"
             :items="employees"
             item-key="empl_cde"
             class="elevation-2"
@@ -65,7 +65,7 @@
       <v-row>
         <v-col cols="12" md="3" lg="3">
           <v-data-table
-            :headers="bioHeaders"
+            :headers="bioHeadr"
             :items="bio"
             class="elevation-2"
             :loading="loading"
@@ -77,8 +77,8 @@
             <template v-slot:item="{ item }">
               <tr>
                 <td>{{ item.dtr_date }}</td>
-                <td class="text-xs-center">{{ timeFormat(item.dtr_time) }}</td>
-                <td class="text-xs-center">{{ entryType(item.tran_typ) }}</td>
+                <td class="text-xs-center">{{ timeFrmt(item.dtr_time) }}</td>
+                <td class="text-xs-center">{{ entryTyp(item.tran_typ) }}</td>
               </tr>
             </template>
           </v-data-table>
@@ -134,8 +134,8 @@
                 <v-col cols="12" sm="6" md="3">
                   <v-text-field
                     v-if="clickedDone"
-                    v-model="firstTimeIn"
-                    v-mask="maskTimeIn"
+                    v-model="timeIn_c"
+                    v-mask="maskTimeIn__"
                     label="In"
                     placeholder="First In"
                     outlined
@@ -146,8 +146,8 @@
                 <v-col cols="12" sm="6" md="3">
                   <v-text-field
                     v-if="clickedDone"
-                    v-model="lastTimeOut"
-                    v-mask="maskTimeIn"
+                    v-model="timeOutc"
+                    v-mask="maskTimeOut_"
                     label="Out"
                     placeholder="Last Out"
                     outlined
@@ -161,7 +161,7 @@
                 <v-col cols="12" sm="6" md="3">
                   <v-text-field
                     v-if="clickedDone"
-                    v-model="regularHour"
+                    v-model="rglrHour"
                     label="Regular"
                     placeholder="Regular"
                     outlined
@@ -172,7 +172,7 @@
                 <v-col cols="12" sm="6" md="3">
                   <v-text-field
                     v-if="clickedDone"
-                    v-model="regularOt"
+                    v-model="rglrOt__"
                     label="Overtime"
                     placeholder="Overtime"
                     outlined
@@ -183,7 +183,7 @@
                 <v-col cols="12" sm="6" md="3">
                   <v-text-field
                     v-if="clickedDone"
-                    v-model="regularLate"
+                    v-model="rglrLate"
                     label="Late"
                     placeholder="Late"
                     outlined
@@ -194,7 +194,7 @@
                 <v-col cols="12" sm="6" md="3">
                   <v-text-field
                     v-if="clickedDone"
-                    v-model="regularUnderTime"
+                    v-model="rglrUndr"
                     label="Undertime"
                     placeholder="Undertime"
                     outlined
@@ -232,33 +232,32 @@ export default {
     return {
       primekey: localStorage.getItem('primekey'),
       route: this.$route.params.folder,
+      maskTimeIn__: '##:##',
+      maskTimeOut_: '##:##',
       singleSelect: false,
-      loading: false,
       clickedDone: false,
-      bol: true,
-      show: false,
       fromPresent: false,
-      selectRow: '',
-      testSet: '',
-      onThisDateBio: [],
-      employeeShift: [],
-      dayType: [],
+      loading: false,
+      show: false,
+      bol: true,
       employeeInfo: '',
       employeeOut: '',
-      regularHour: '',
-      regularLate: '',
-      regularUnderTime: '',
-      regularOt: '',
-      newValueTimeIn: '',
-      newValueTimeOut: '',
-      maskTimeIn: '##:##',
-      maskTimeOut: '##:##',
-      search: '',
-      bio: [],
-      selected: [],
-      employees: [],
+      rglrHour: '',
+      rglrLate: '',
+      rglrUndr: '',
+      rglrOt__: '',
+      timeIn_f: '',
+      timeOutf: '',
+      selectRow: '',
       dtrDate: '',
-      headers: [
+      search: '',
+      onThisDateBio: [],
+      employeeShift: [],
+      employees: [],
+      selected: [],
+      dayType: [],
+      bio: [],
+      headers_: [
         { text: 'Image', value: 'avatar__', align: 'center', sortable: false },
         {
           text: 'Employee ID',
@@ -270,7 +269,7 @@ export default {
         { text: 'First Name', value: 'frst_nme', align: 'center' },
         { text: 'Middle Name', value: 'midl_nme', align: 'center' }
       ],
-      bioHeaders: [
+      bioHeadr: [
         {
           text: 'DTR Date',
           align: 'left',
@@ -305,45 +304,36 @@ export default {
     }
   },
   computed: {
-    headers0 () {
-      return this.headers.map(header => Object.assign({}, header, { fixed: false }))
-    },
-    firstTimeIn: {
+    timeIn_c: {
       get: function () {
-        const firstIn = this.onThisDateBio.map(e => ({
-          dtr_time: `${this.timeFormat(e.dtr_time)}`
+        const timeIn__ = this.onThisDateBio.map(e => ({
+          dtr_time: `${this.timeFrmt(e.dtr_time)}`
         }))
         // console.log(firstIn[0].dtr_time)
-        return firstIn[0].dtr_time
+        return timeIn__[0].dtr_time
       },
       set: function (value) {
-        this.newValueTimeIn = value
+        this.timeIn_f = value
       }
     },
-    lastTimeOut: {
+    timeOutc: {
       get: function () {
-        const lastOut = this.onThisDateBio.map(e => ({
-          dtr_time: `${this.timeFormat(e.dtr_time)}`
+        const timeOut_ = this.onThisDateBio.map(e => ({
+          dtr_time: `${this.timeFrmt(e.dtr_time)}`
         }))
-        const lastOutLength = this.onThisDateBio.length - 1
-        return lastOut[lastOutLength].dtr_time
+        const timeOutLength = this.onThisDateBio.length - 1
+        return timeOut_[timeOutLength].dtr_time
       },
       set: function (value) {
-        this.newValueTimeOut = value
+        this.timeOutf = value
       }
     },
     todayShift () {
-      const shift = this.employeeShift.map(e => ({
+      const shiftSch = this.employeeShift.map(e => ({
         shift: `${e.shft_cde.trim()}: ${e.s1_in___} - ${e.s1_out__}`
       }))
-      return shift[0].shift
+      return shiftSch[0].shift
     }
-    // comRegularHours () {
-    //   return this.regularHours
-    // },
-    // comRegularLate () {
-    //   return this.regularLate
-    // }
   },
   methods: {
     rateType (rateType) {
@@ -354,16 +344,16 @@ export default {
           return 'Daily'
       }
     },
-    entryType (entryType) {
-      switch (entryType) {
+    entryTyp (entryTyp) {
+      switch (entryTyp) {
         case '1':
           return 'In'
         case '2':
           return 'Out'
       }
     },
-    timeFormat (time) {
-      return time.substr(0, 2) + ':' + time.substr(2, 2)
+    timeFrmt (timeFrmt) {
+      return timeFrmt.substr(0, 2) + ':' + timeFrmt.substr(2, 2)
     },
     getEmployeeCode (item) {
       this.selectRow = item.empl_cde
@@ -371,43 +361,43 @@ export default {
       this.employeeInfo = item
       this.retrieveBio(item.empl_cde.trim())
     },
-    convertTimeToMinutes (time) {
-      if (time.indexOf(':') < 0) {
-        const mm = parseFloat(time.substr(0, 2) * 60) + parseFloat(time.substr(2, 2))
+    convertTimeToMinutes (timeFrtA) {
+      if (timeFrtA.indexOf(':') < 0) {
+        const mm = parseFloat(timeFrtA.substr(0, 2) * 60) + parseFloat(timeFrtA.substr(2, 2))
         return mm
       } else {
-        const mm = parseFloat(time.substr(0, 2) * 60) + parseFloat(time.substr(2, 4))
+        const mm = parseFloat(timeFrtA.substr(0, 2) * 60) + parseFloat(timeFrtA.substr(2, 4))
         return mm
       }
     },
     computeRegularHours () {
-      let timeIn
-      let timeOut
-      let mm1
-      let mm2
-      let diff
-      let hh
-      let regularHour
-      let regularLate
-      let regularUnderTime
+      let timeIn__
+      let timeOut_
+      let minutes1
+      let minutes2
+      let diffrnts
+      let hours___
+      let rglrHour
+      let rglrLate
+      let rglrUndr
       // init variables
-      this.regularHour = ''
-      this.regularLate = ''
-      this.regularOt = ''
-      this.regularUnderTime = ''
+      this.rglrHour = ''
+      this.rglrLate = ''
+      this.rglrOt__ = ''
+      this.rglrUndr = ''
       //  check if manually input
-      if (this.newValueTimeIn !== '') {
-        timeIn = this.newValueTimeIn.substr(0, 2) + '' + this.newValueTimeIn.substr(3, 4)
-        timeOut = this.lastTimeOut.substr(0, 2) + '' + this.lastTimeOut.substr(3, 4)
+      if (this.timeIn_f !== '') {
+        timeIn__ = this.timeIn_f.substr(0, 2) + '' + this.timeIn_f.substr(3, 4)
+        timeOut_ = this.timeOutc.substr(0, 2) + '' + this.timeOutc.substr(3, 4)
       } else {
-        timeIn = this.firstTimeIn.substr(0, 2) + '' + this.firstTimeIn.substr(3, 4)
-        timeOut = this.lastTimeOut.substr(0, 2) + '' + this.lastTimeOut.substr(3, 4)
+        timeIn__ = this.timeIn_c.substr(0, 2) + '' + this.timeIn_c.substr(3, 4)
+        timeOut_ = this.timeOutc.substr(0, 2) + '' + this.timeOutc.substr(3, 4)
       }
-      if (this.newValueTimeOut !== '') {
-        if (this.newValueTimeIn !== '') {
-          timeIn = this.newValueTimeIn.substr(0, 2) + '' + this.newValueTimeIn.substr(3, 4)
+      if (this.timeOutf !== '') {
+        if (this.timeIn_f !== '') {
+          timeIn__ = this.timeIn_f.substr(0, 2) + '' + this.timeIn_f.substr(3, 4)
         }
-        timeOut = this.newValueTimeOut.substr(0, 2) + '' + this.newValueTimeOut.substr(3, 4)
+        timeOut_ = this.timeOutf.substr(0, 2) + '' + this.timeOutf.substr(3, 4)
       }
       // init data
       const employeeShift = this.employeeShift.map(e => ({
@@ -421,52 +411,52 @@ export default {
       }))
       // compute late
       switch (true) {
-        case timeIn > employeeShift[0].cstrt_hr:
-          mm1 = this.convertTimeToMinutes(timeIn)
-          mm2 = this.convertTimeToMinutes(employeeShift[0].cstrt_hr)
-          diff = parseFloat(mm1 - mm2)
-          hh = parseFloat(diff / 60)
-          regularLate = hh + (diff - (hh * 60)) / 60
-          this.regularLate = regularLate
+        case timeIn__ > employeeShift[0].cstrt_hr:
+          minutes1 = this.convertTimeToMinutes(timeIn__)
+          minutes2 = this.convertTimeToMinutes(employeeShift[0].cstrt_hr)
+          diffrnts = parseFloat(minutes1 - minutes2)
+          hours___ = parseFloat(diffrnts / 60)
+          rglrLate = hours___ + (diffrnts - (hours___ * 60)) / 60
+          this.rglrLate = rglrLate
       }
       // compute undertime
       switch (true) {
-        case timeOut < this.timeFormat(employeeShift[0].clast_pm):
-          mm1 = this.convertTimeToMinutes(employeeShift[0].clast_pm)
-          mm2 = this.convertTimeToMinutes(timeOut)
-          diff = parseFloat(mm1 - mm2)
-          hh = parseFloat(diff / 60)
-          regularUnderTime = hh + (diff - (hh * 60)) / 60
-          this.regularUnderTime = regularUnderTime
+        case timeOut_ < this.timeFrmt(employeeShift[0].clast_pm):
+          minutes1 = this.convertTimeToMinutes(employeeShift[0].clast_pm)
+          minutes2 = this.convertTimeToMinutes(timeOut_)
+          diffrnts = parseFloat(minutes1 - minutes2)
+          hours___ = parseFloat(diffrnts / 60)
+          rglrUndr = hours___ + (diffrnts - (hours___ * 60)) / 60
+          this.rglrUndr = rglrUndr
       }
       // compute regular hours
-      if (timeIn < employeeShift[0].cstrt_hr) {
-        timeIn = employeeShift[0].cstrt_hr
+      if (timeIn__ < employeeShift[0].cstrt_hr) {
+        timeIn__ = employeeShift[0].cstrt_hr
       }
       //  am
-      mm1 = this.convertTimeToMinutes(timeIn)
-      mm2 = this.convertTimeToMinutes(employeeShift[0].clast_am)
-      diff = parseFloat(mm2 - mm1)
-      hh = parseFloat(diff / 60)
-      regularHour = hh + (diff - (hh * 60)) / 60
-      this.regularHour = regularHour
+      minutes1 = this.convertTimeToMinutes(timeIn__)
+      minutes2 = this.convertTimeToMinutes(employeeShift[0].clast_am)
+      diffrnts = parseFloat(minutes2 - minutes1)
+      hours___ = parseFloat(diffrnts / 60)
+      rglrHour = hours___ + (diffrnts - (hours___ * 60)) / 60
+      this.rglrHour = rglrHour
       // pm
-      mm1 = this.convertTimeToMinutes(employeeShift[0].cstrt_pm)
-      mm2 = this.convertTimeToMinutes(timeOut)
-      diff = parseFloat(mm2 - mm1)
-      hh = parseFloat(diff / 60)
-      regularHour += hh + (diff - (hh * 60)) / 60
-      this.regularHour = regularHour
-      if ((parseFloat(this.regularHour + this.regularLate)) > employeeShift[0].basichrs) {
-        this.regularHour = employeeShift[0].basichrs - this.regularLate - this.regularUnderTime
+      minutes1 = this.convertTimeToMinutes(employeeShift[0].cstrt_pm)
+      minutes2 = this.convertTimeToMinutes(timeOut_)
+      diffrnts = parseFloat(minutes2 - minutes1)
+      hours___ = parseFloat(diffrnts / 60)
+      rglrHour += hours___ + (diffrnts - (hours___ * 60)) / 60
+      this.rglrHour = rglrHour
+      if ((parseFloat(this.rglrHour + this.rglrLate)) > employeeShift[0].basichrs) {
+        this.rglrHour = employeeShift[0].basichrs - this.rglrLate - this.rglrUndr
       }
       // compute overtime
-      if (timeOut > employeeShift[0].ot_strt_) {
-        mm1 = this.convertTimeToMinutes(timeOut)
-        mm2 = this.convertTimeToMinutes(employeeShift[0].ot_strt_)
-        diff = parseFloat(mm1 - mm2)
-        hh = parseFloat(diff / 60)
-        this.regularOt = hh.toFixed(2)
+      if (timeOut_ > employeeShift[0].ot_strt_) {
+        minutes1 = this.convertTimeToMinutes(timeOut_)
+        minutes2 = this.convertTimeToMinutes(employeeShift[0].ot_strt_)
+        diffrnts = parseFloat(minutes1 - minutes2)
+        hours___ = parseFloat(diffrnts / 60)
+        this.rglrOt__ = hours___.toFixed(2)
       }
     },
     retrieveDayType () {

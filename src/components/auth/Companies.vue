@@ -103,7 +103,7 @@ export default {
       //   .then(response => {
       //     let primekey = response.data
       //     console.log(primekey)
-      //     // this.$router.push({ name: 'userDashboard' })
+      this.$router.push({ name: 'userDashboard' })
       //   })
     }
   },
