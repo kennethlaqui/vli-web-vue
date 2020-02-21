@@ -8,7 +8,7 @@
             :headers="headers_"
             :items="employees"
             item-key="empl_cde"
-            class="elevation-2"
+            class="elevation-2 table"
             :items-per-page="5"
             :search="search"
           >
@@ -555,3 +555,8 @@ export default {
   }
 }
 </script>
+<style scoped>
+  table.v-table tbody td {
+    font-size: 1px !important;
+  }
+</style>

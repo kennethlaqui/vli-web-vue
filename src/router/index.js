@@ -11,6 +11,7 @@ import Directory from '../views/personnel/Directory.vue'
 import Folder from '../components/personnel/Folder.vue'
 import FolderEmployees from '../components/personnel/Employees.vue'
 import UploadDtr from '../views/personnel/UploadDtr.vue'
+import manPower from '../views/personnel/Manpower.vue'
 import Reference from '../components/maintenance/Holidays.vue'
 import UserMasterfile from '../views/maintenance/Masterfile.vue'
 // import EasyCreateEmployee from '../components/controller/dialog/CreateEmployee.vue'
@@ -100,6 +101,15 @@ const routes = [
     path: '/personnel/directory/folder/:cntrl_no/:folder',
     name: 'uploadDtr',
     component: UploadDtr,
+    meta: {
+      requiresAuth: true,
+      layout: 'dashboard'
+    }
+  },
+  {
+    path: '/personnel/manpower',
+    name: 'manPower',
+    component: manPower,
     meta: {
       requiresAuth: true,
       layout: 'dashboard'

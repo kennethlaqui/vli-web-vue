@@ -9,12 +9,32 @@
     show-select
     class="elevation-2"
     :loading="loading"
+    :items-per-page="15"
+    :search="search"
   >
     <template v-slot:top>
-      <v-toolbar flat color="white">
-        <v-switch v-model="singleSelect" label="Single select" class="pa-3 mt-3"></v-switch>
+      <v-toolbar color="white" dense class="elevation-2">
+        <v-tooltip bottom>
+          <template v-slot:activator="{ on }">
+            <v-btn v-if="$routerHistory.hasPrevious()" :to="{ path: $routerHistory.previous().path }" v-on="on" icon exact>
+              <v-icon>mdi-arrow-left</v-icon>
+            </v-btn>
+          </template>
+          <span>Directory</span>
+        </v-tooltip>
+        <v-toolbar-title>DTR Folder</v-toolbar-title>
         <v-spacer></v-spacer>
-        <v-btn color="primary" dark class="mb-2" small :to="{ name: 'switchEmployees' }">Switch to Employees</v-btn>
+        <v-tooltip bottom>
+          <template v-slot:activator="{ on }">
+          <v-btn :to="{ name: 'switchEmployees' }" v-on="on" icon exact>
+            <v-icon>mdi-sync</v-icon>
+          </v-btn>
+          </template>
+          <span>Switch to Employees</span>
+        </v-tooltip>
+        <v-btn icon>
+          <v-icon>mdi-dots-vertical</v-icon>
+        </v-btn>
       </v-toolbar>
     </template>
     <template v-slot:item.day="{ item }">
@@ -41,11 +61,10 @@
     </template>
     <template v-slot:item.action="{ item }">
       <v-icon
-        small
         class="mr-2"
         @click="editItem(item)"
       >
-        edit
+        mdi-exit-to-app
       </v-icon>
     </template>
   </v-data-table>
@@ -65,6 +84,7 @@ export default {
   data () {
     return {
       primekey: '',
+      search: '',
       snackColor: '',
       snackText: '',
       folder: [],

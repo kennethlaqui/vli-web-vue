@@ -23,6 +23,7 @@ export default new Vuex.Store({
     emplstat: [],
     positions: [],
     companies: [],
+    shiftfile: [],
     department: [],
     directories: [],
     showdialog: false
@@ -75,6 +76,9 @@ export default new Vuex.Store({
     },
     retrieveDayType (state) {
       return state.daytype
+    },
+    retrieveShiftFile (state) {
+      return state.shiftfile
     },
     showDialog (state) {
       return state.showdialog
@@ -132,11 +136,33 @@ export default new Vuex.Store({
     retrieveDayType (state, payload) {
       state.daytype = payload
     },
+    retrieveShiftFile (state, payload) {
+      state.shiftfile = payload
+    },
     toggleDialog (state) {
       state.showdialog = !state.showdialog
     }
   },
   actions: {
+    async retrieveShiftFile (context, payload) {
+      try {
+        axios.defaults.headers.common['Authorization'] = 'Bearer ' + context.state.token
+        if (context.getters.loggedIn) {
+          await new Promise((resolve, reject) => {
+            axios.get(`l/helper/shiftfile/${payload.primekey}`)
+              .then(response => {
+                this.shiftfile = response.data
+                context.commit('retrieveShiftFile', this.shiftfile)
+                resolve(response)
+              })
+              .catch(error => {
+                reject(error)
+              })
+          })
+        }
+      } catch (error) {
+      }
+    },
     async retrieveDayType (context, payload) {
       try {
         axios.defaults.headers.common['Authorization'] = 'Bearer ' + context.state.token

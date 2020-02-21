@@ -254,7 +254,7 @@ export default {
           active: true,
           items: [
             { action: 'mdi-calendar-plus', title: 'Encode DTR', url: { name: 'directory' } },
-            { action: 'mdi-timetable', title: 'Manpower', url: '' }
+            { action: 'mdi-timetable', title: 'Manpower', url: { name: 'manPower' } }
           ]
         },
         {
