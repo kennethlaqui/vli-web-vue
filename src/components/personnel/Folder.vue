@@ -60,12 +60,14 @@
     </v-edit-dialog>
     </template>
     <template v-slot:item.action="{ item }">
-      <v-icon
-        class="mr-2"
-        @click="editItem(item)"
-      >
-        mdi-exit-to-app
-      </v-icon>
+      <v-tooltip bottom>
+          <template v-slot:activator="{ on }">
+          <v-btn v-on="on" icon exact @click="editItem(item)">
+            <v-icon class="mr-2">mdi-exit-to-app</v-icon>
+          </v-btn>
+          </template>
+          <span>Upload DTR</span>
+        </v-tooltip>
     </template>
   </v-data-table>
   <v-snackbar v-model="snack" :timeout="3000" :color="snackColor">
