@@ -248,7 +248,8 @@ export default {
           axios.post('u/personnel/manpower', {
             primekey: this.primekey,
             employees: this.selected,
-            dteArray_: this.dteArray
+            dteArray: this.dteArray,
+            shiftCde: this.newShft_
           })
             .then(response => {
               resolve(response)
