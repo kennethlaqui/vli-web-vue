@@ -231,22 +231,24 @@ export default {
     async createStartEndDate () {
       var strtDate = moment(this.strtDate).format('YYYY-MM-DD')
       var endDate_ = moment(this.endDate_).format('YYYY-MM-DD')
+      this.dteArray.length = 0
       while (strtDate <= endDate_) {
         this.dteArray.push(moment(strtDate).format('YYYY-MM-DD'))
         strtDate = moment(strtDate).add(1, 'days').format('YYYY-MM-DD')
       }
-      this.employees = this.employees.map(e => {
-        var obj = Object.assign({}, e)
-        obj.dteArray = this.dteArray
-        return obj
-      })
+      // this.employees = this.employees.map(e => {
+      //   var obj = Object.assign({}, e)
+      //   obj.dteArray = this.dteArray
+      //   return obj
+      // })
       console.log(this.employees)
       try {
         await new Promise((resolve, reject) => {
           axios.defaults.headers.common['Authorization'] = 'Bearer ' + localStorage.getItem('access_token')
           axios.post('u/personnel/manpower', {
             primekey: this.primekey,
-            employees: this.employees
+            employees: this.selected,
+            dteArray_: this.dteArray
           })
             .then(response => {
               resolve(response)
