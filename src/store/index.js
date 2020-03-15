@@ -26,6 +26,7 @@ export default new Vuex.Store({
     shiftfile: [],
     department: [],
     directories: [],
+    incomeType: [],
     showdialog: false
   },
   getters: {
@@ -79,6 +80,9 @@ export default new Vuex.Store({
     },
     retrieveShiftFile (state) {
       return state.shiftfile
+    },
+    retrieveIncomeType (state) {
+      return state.incomeType
     },
     showDialog (state) {
       return state.showdialog
@@ -139,11 +143,33 @@ export default new Vuex.Store({
     retrieveShiftFile (state, payload) {
       state.shiftfile = payload
     },
+    retrieveIncomeType (state, payload) {
+      state.incomeType = payload
+    },
     toggleDialog (state) {
       state.showdialog = !state.showdialog
     }
   },
   actions: {
+    async retrieveIncomeType (context, payload) {
+      try {
+        axios.defaults.headers.common['Authorization'] = 'Bearer ' + context.state.token
+        if (context.getters.loggedIn) {
+          await new Promise((resolve, reject) => {
+            axios.get(`l/helper/incometype/${payload.primekey}`)
+              .then(response => {
+                this.incomeType = response.data
+                context.commit('retrieveIncomeType', this.incomeType)
+                resolve(response)
+              })
+              .catch(error => {
+                reject(error)
+              })
+          })
+        }
+      } catch (error) {
+      }
+    },
     async retrieveShiftFile (context, payload) {
       try {
         axios.defaults.headers.common['Authorization'] = 'Bearer ' + context.state.token

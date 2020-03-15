@@ -12,7 +12,10 @@ import Folder from '../components/personnel/Folder.vue'
 import FolderEmployees from '../components/personnel/Employees.vue'
 import UploadDtr from '../views/personnel/UploadDtr.vue'
 import manPower from '../views/personnel/Manpower.vue'
+import PayrollHeader from '../views/payroll/Header.vue'
+import OneTimeIncome from '../views/payroll/OneTimeIncome.vue'
 import Reference from '../components/maintenance/Holidays.vue'
+import Biometrics from '../components/maintenance/Biometrics.vue'
 import UserMasterfile from '../views/maintenance/Masterfile.vue'
 // import EasyCreateEmployee from '../components/controller/dialog/CreateEmployee.vue'
 
@@ -116,6 +119,33 @@ const routes = [
     }
   },
   {
+    path: '/payroll/header',
+    name: 'manPower',
+    component: manPower,
+    meta: {
+      requiresAuth: true,
+      layout: 'dashboard'
+    }
+  },
+  {
+    path: '/payroll/income/header',
+    name: 'PayrollHeader',
+    component: PayrollHeader,
+    meta: {
+      requiresAuth: true,
+      layout: 'dashboard'
+    }
+  },
+  {
+    path: '/payroll/income/onetime/:cntrl_no',
+    name: 'OneTimeIncome',
+    component: OneTimeIncome,
+    meta: {
+      requiresAuth: true,
+      layout: 'dashboard'
+    }
+  },
+  {
     path: '/maintenance/masterfile',
     name: 'UserMasterfile',
     component: UserMasterfile,
@@ -128,6 +158,15 @@ const routes = [
     path: '/reference',
     name: 'reference',
     component: Reference,
+    meta: {
+      requiresAuth: true,
+      layout: 'dashboard'
+    }
+  },
+  {
+    path: '/biometrics',
+    name: 'biometrics',
+    component: Biometrics,
     meta: {
       requiresAuth: true,
       layout: 'dashboard'
