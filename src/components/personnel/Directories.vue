@@ -234,6 +234,7 @@ export default {
             havefolder: `${e.dtr_fldr === 'T' ? 'Yes' : 'No'}`
           }))
           this.items = this.directories
+          console.log(this.directories)
         })
     },
     createDtrFolder (item) {
