@@ -164,22 +164,19 @@
         <v-col cols="12" sm="8" md="9" lg="9">
           <v-data-table
             v-model="manpowerSlct"
-            :headers="hdrManpowerCoverage"
-            :items="manpowerSchedules.data"
-            :single-select="singleSelect"
+            :headers="manpowerCoverageHeader"
+            :items="manpowerDetails"
             item-key="cntrl_no"
-            show-select
             class="elevation-1"
             fixed-header
             height="600px"
             v-if="switchManpower"
-            hide-actions
           >
           <template v-slot:item="{ item }">
             <tr>
-              <td>{{ item.empl_cde }}</td>
-              <!-- <td v-for="hdrManpowerCoverages in hdrManpowerCoverage" v-bind:key="hdrManpowerCoverages.empl_cde">{{ item[hdrManpowerCoverages.shft_cde] }}</td> -->
-              <td class="text-xs-right">{{ item.shft_cde }}</td>
+              <td v-for="(manpowerCoverageHeaders, index) in manpowerCoverageHeader" v-bind:key="manpowerCoverageHeaders.cntrl_no">
+                {{ item.strt_dte === manpowerCoverageHeader[index].text ? item[manpowerCoverageHeaders.value] : '' }}
+              </td>
             </tr>
           </template>
           </v-data-table>
@@ -226,6 +223,7 @@ export default {
       primekey: localStorage.getItem('primekey'),
       message: 'Hello',
       date: new Date().toISOString().substr(0, 10),
+      x: [],
       menu: false,
       modal: false,
       menu2: false,
@@ -241,14 +239,16 @@ export default {
       search: '',
       dprtment: [],
       singleSelect: false,
+      checkbox: true,
       bol: true,
       emplSlct: [],
       dprtSlct: [],
       employees: [],
       dteArray: [],
-      manpowerSchedules: [],
-      hdrManpowerCoverage: [],
+      manpowerDetails: [],
+      // hdrManpowerCoverage: [],
       coverage: [],
+      manpowerEmployeeCode: [],
       manpowerData: [],
       manpowerSlct: [],
       strtDate: new Date().toISOString().substr(0, 10),
@@ -289,6 +289,21 @@ export default {
       ]
     }
   },
+  computed: {
+    manpowerCoverageHeader () {
+      // json coverage only
+      return this.coverage.map(coverage => ({
+        text: `${coverage}`,
+        value: 'shft_cde'
+      }))
+    },
+    manpowerEmployeeCodeHeader () {
+      return this.manpowerEmployeeCode.map(employeeCode => ({
+        text: 'Employee Code',
+        value: `${employeeCode}`
+      }))
+    }
+  },
   watch: {
     switchManpower (bol) {
       if (bol) {
@@ -314,32 +329,33 @@ export default {
           this.shftFile = this.$store.getters.retrieveShiftFile
         })
     },
-    getManpowerCoverage () {
-      this.hdrManpowerCoverage = this.coverage.map(date => ({
-        text: `${date}`,
-        value: false
-      }))
-    // this.coverage.forEach(coverage => {
-    //   console.log(coverage)
-      // this.manpowerData = this.manpowerSchedules.map(e => ({
-      //   text: `${coverage}`,
-      //   align: 'left',
-      //   sortable: false,
-      //   value: 'shft_cde',
-      //   width: '300px'
-      // }))
-    // })
-    },
+    // getManpowerCoverage () {
+    //   this.hdrManpowerCoverage = this.coverage.filter((obj) => {
+    //   })
+    // // this.coverage.forEach(coverage => {
+    // //   console.log(coverage)
+    //   // this.manpowerData = this.manpowerSchedules.map(e => ({
+    //   //   text: `${coverage}`,
+    //   //   align: 'left',
+    //   //   sortable: false,
+    //   //   value: 'shft_cde',
+    //   //   width: '300px'
+    //   // }))
+    // // })
+    // },
     async retrieveManpowerSchedules () {
       try {
         axios.defaults.headers.common['Authorization'] = 'Bearer ' + localStorage.getItem('access_token')
         await new Promise((resolve, reject) => {
           axios.get(`u/personnel/manpower/schedules/${this.primekey}/${this.strtDate}/${this.endDate_}`)
             .then(response => {
-              this.manpowerSchedules = response.data
-              this.coverage = response.data.strt_dte
+              this.manpowerDetails = response.data.items
+              this.coverage = response.data.coverage
+              this.manpowerEmployeeCode = response.data.employeeCode
               resolve(response)
-              console.log(this.manpowerSchedules)
+              console.log(this.manpowerEmployeeCode)
+              // console.log(this.manpowerSchedules)
+              // console.log(this.hdrManpowerCoverage[0].text)
               this.getManpowerCoverage()
             })
             .catch(error => {
