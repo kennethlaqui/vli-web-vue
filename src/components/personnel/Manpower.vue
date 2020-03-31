@@ -82,7 +82,7 @@
                 v-on="on"
               ></v-text-field>
             </template>
-            <v-date-picker v-model="strtDate" no-title scrollable>
+            <v-date-picker v-model="strtDate" no-title scrollable @change="getEmployeeCodeWithManpowerSchedule()">
               <v-spacer></v-spacer>
               <v-btn text color="primary" @click="strtMenu = false">Cancel</v-btn>
               <v-btn text color="primary" @click="$refs.strtMenu.save(strtDate)">OK</v-btn>
@@ -108,7 +108,7 @@
                 v-on="on"
               ></v-text-field>
             </template>
-            <v-date-picker v-model="endDate_" no-title scrollable>
+            <v-date-picker v-model="endDate_" no-title scrollable @change="getEmployeeCodeWithManpowerSchedule()">
               <v-spacer></v-spacer>
               <v-btn text color="primary" @click="endMenu_ = false">Cancel</v-btn>
               <v-btn text color="primary" @click="$refs.endMenu_.save(endDate_)">OK</v-btn>
@@ -141,10 +141,24 @@
         </v-row> -->
       </v-card-actions>
       </v-card>
+      <!-- deparment and employee codes section -->
       <v-row>
-        <v-col cols="12" sm="4" md="3" lg="3">
+        <v-col cols="12" sm="4" md="4" lg="4">
           <div>
           <v-data-table
+            v-model="employeeWithScheduleSelect"
+            :headers="employeesWithSchedulesHeader"
+            :items="employeeWithSchedules"
+            :single-select="singleSelect"
+            item-key="empl_cde"
+            show-select
+            class="elevation-1"
+            fixed-header
+            height="600px"
+            v-if="switchManpower"
+          >
+        </v-data-table>
+        <v-data-table
             v-model="dprtSlct"
             :headers="departmentHeader"
             :items="dprtment"
@@ -154,30 +168,45 @@
             class="elevation-1"
             fixed-header
             height="600px"
+            v-else
           >
         </v-data-table>
         <div class="text-center pt-2">
-          <v-btn class="primary" @click="retrieveEmployees()">Search</v-btn>
+          <v-btn v-if="switchManpower" class="primary" @click="retrieveEmployeeWithManpower()">Search</v-btn>
+          <v-btn v-else class="primary" @click="retrieveEmployees()">Search</v-btn>
         </div>
         </div>
         </v-col>
-        <v-col cols="12" sm="8" md="9" lg="9">
+        <!-- employee and manpower schedules -->
+        <v-col cols="12" sm="12" md="8" lg="8">
           <v-data-table
             v-model="manpowerSlct"
-            :headers="manpowerCoverageHeader"
-            :items="manpowerDetails"
+            :headers="employeesWithManpower"
+            :items="manpowerSchedules"
             item-key="cntrl_no"
             class="elevation-1"
             fixed-header
             height="600px"
+            group-by="employee"
             v-if="switchManpower"
           >
-          <template v-slot:item="{ item }">
-            <tr>
-              <td v-for="(manpowerCoverageHeaders, index) in manpowerCoverageHeader" v-bind:key="manpowerCoverageHeaders.cntrl_no">
-                {{ item.strt_dte === manpowerCoverageHeader[index].text ? item[manpowerCoverageHeaders.value] : '' }}
-              </td>
-            </tr>
+          <template v-slot:item.day="{ item }">
+            {{ getDay(item.strt_dte) }}
+          </template>
+          <template v-slot:item.std_shft="{ item }">
+            <v-edit-dialog
+              @close="closeShiftFile"
+            > {{ item.std_shft }}
+              <template v-slot:input>
+                <v-select
+                  v-model="item.std_shft"
+                  :items="shftFile"
+                  item-text="std_shft"
+                  item-value="shftFile"
+                  label="Available Shift"
+                ></v-select>
+              </template>
+            </v-edit-dialog>
           </template>
           </v-data-table>
           <v-data-table
@@ -232,6 +261,7 @@ export default {
       loading: false,
       snack: false,
       switchManpower: false,
+      searchManpower: false,
       shftFile: [],
       newShft_: '',
       snackColor: '',
@@ -245,11 +275,9 @@ export default {
       dprtSlct: [],
       employees: [],
       dteArray: [],
-      manpowerDetails: [],
-      // hdrManpowerCoverage: [],
-      coverage: [],
-      manpowerEmployeeCode: [],
-      manpowerData: [],
+      employeeWithSchedules: [],
+      employeeWithScheduleSelect: [],
+      manpowerSchedules: [],
       manpowerSlct: [],
       strtDate: new Date().toISOString().substr(0, 10),
       endDate_: new Date().toISOString().substr(0, 10),
@@ -259,24 +287,26 @@ export default {
           align: 'left',
           sortable: false,
           value: 'avatar__',
-          width: '100px'
+          width: '100px',
+          divider: true
         },
         {
           text: 'Employee ID',
           align: 'left',
           sortable: true,
           value: 'empl_cde',
-          width: '200px'
+          width: '200px',
+          divider: true
         },
-        { text: 'Last Name', value: 'last_nme', align: 'left', width: '200px', disabled: true },
-        { text: 'First Name', value: 'frst_nme', align: 'left', width: '200px' },
-        { text: 'Payroll Group', value: 'paygroupdescript', align: 'left', width: '200px' },
-        { text: 'Status', value: 'workstatdescript', align: 'left', width: '200px' },
-        { text: 'Position', value: 'position', sortable: false, align: 'left', width: '200px' },
-        { text: 'Division', value: 'division', align: 'left', width: '200px' },
-        { text: 'Department', value: 'department', align: 'left', width: '200px' },
-        { text: 'Section', value: 'section', align: 'left', width: '200px' },
-        { text: 'Actions', value: 'action', sortable: false, align: 'center' }
+        { text: 'Last Name', value: 'last_nme', align: 'left', width: '200px', divider: true },
+        { text: 'First Name', value: 'frst_nme', align: 'left', width: '200px', divider: true },
+        { text: 'Payroll Group', value: 'paygroupdescript', align: 'left', width: '200px', divider: true },
+        { text: 'Status', value: 'workstatdescript', align: 'left', width: '200px', divider: true },
+        { text: 'Position', value: 'position', sortable: false, align: 'left', width: '200px', divider: true },
+        { text: 'Division', value: 'division', align: 'left', width: '200px', divider: true },
+        { text: 'Department', value: 'department', align: 'left', width: '200px', divider: true },
+        { text: 'Section', value: 'section', align: 'left', width: '200px', divider: true },
+        { text: 'Actions', value: 'action', sortable: false, align: 'center', divider: true }
       ],
       departmentHeader: [
         {
@@ -286,28 +316,39 @@ export default {
           value: 'descript',
           width: '300px'
         }
+      ],
+      employeesWithSchedulesHeader: [
+        {
+          text: 'Employee #',
+          align: 'left',
+          sortable: true,
+          width: '120px',
+          value: 'empl_cde',
+          divider: true
+        },
+        { text: 'Last Name', value: 'last_nme', align: 'left', width: '200px', divider: true },
+        { text: 'First Name', value: 'frst_nme', align: 'left', width: '200px', divider: true }
+      ],
+      employeesWithManpower: [
+        {
+          text: 'Date',
+          align: 'left',
+          sortable: true,
+          value: 'strt_dte',
+          divider: true,
+          resizable: true
+        },
+        { text: 'Day', value: 'day', align: 'left', divider: true },
+        { text: 'Shift', value: 'std_shft', align: 'left', divider: true },
+        { text: 'Hours', value: 'ttl_hrs_', align: 'left', divider: true },
+        { text: 'Overtime', value: 'ot_hrs__', align: 'left', divider: true }
       ]
-    }
-  },
-  computed: {
-    manpowerCoverageHeader () {
-      // json coverage only
-      return this.coverage.map(coverage => ({
-        text: `${coverage}`,
-        value: 'shft_cde'
-      }))
-    },
-    manpowerEmployeeCodeHeader () {
-      return this.manpowerEmployeeCode.map(employeeCode => ({
-        text: 'Employee Code',
-        value: `${employeeCode}`
-      }))
     }
   },
   watch: {
     switchManpower (bol) {
       if (bol) {
-        this.retrieveManpowerSchedules()
+        this.getEmployeeCodeWithManpowerSchedule()
       }
     }
   },
@@ -329,34 +370,42 @@ export default {
           this.shftFile = this.$store.getters.retrieveShiftFile
         })
     },
-    // getManpowerCoverage () {
-    //   this.hdrManpowerCoverage = this.coverage.filter((obj) => {
-    //   })
-    // // this.coverage.forEach(coverage => {
-    // //   console.log(coverage)
-    //   // this.manpowerData = this.manpowerSchedules.map(e => ({
-    //   //   text: `${coverage}`,
-    //   //   align: 'left',
-    //   //   sortable: false,
-    //   //   value: 'shft_cde',
-    //   //   width: '300px'
-    //   // }))
-    // // })
-    // },
-    async retrieveManpowerSchedules () {
+    async retrieveEmployeeWithManpower () {
+      const employeeCode = this.employeeWithScheduleSelect.map(e => {
+        return e.empl_cde
+      })
+      console.log(employeeCode)
+      // retrieve manpower schedule of employee based on primekey, employee code, start and end date
       try {
         axios.defaults.headers.common['Authorization'] = 'Bearer ' + localStorage.getItem('access_token')
         await new Promise((resolve, reject) => {
-          axios.get(`u/personnel/manpower/schedules/${this.primekey}/${this.strtDate}/${this.endDate_}`)
+          axios.get('u/personnel/manpower/schedules/', {
+            params: {
+              primekey: this.primekey,
+              empl_cde: employeeCode,
+              strtDate: this.strtDate,
+              endDate_: this.endDate_
+            }
+          })
             .then(response => {
-              this.manpowerDetails = response.data.items
-              this.coverage = response.data.coverage
-              this.manpowerEmployeeCode = response.data.employeeCode
+              this.manpowerSchedules = response.data.manpowerSchedules
               resolve(response)
-              console.log(this.manpowerEmployeeCode)
-              // console.log(this.manpowerSchedules)
-              // console.log(this.hdrManpowerCoverage[0].text)
-              this.getManpowerCoverage()
+            })
+            .catch(error => {
+              reject(error)
+            })
+        })
+      } catch (error) {
+      }
+    },
+    async getEmployeeCodeWithManpowerSchedule () {
+      // retrieve all employee code based on primekey, start and end date
+      try {
+        axios.defaults.headers.common['Authorization'] = 'Bearer ' + localStorage.getItem('access_token')
+        await new Promise((resolve, reject) => {
+          axios.get(`u/personnel/manpower/employeecode/${this.primekey}/${this.strtDate}/${this.endDate_}`)
+            .then(response => {
+              this.employeeWithSchedules = response.data.employees
             })
             .catch(error => {
               reject(error)
@@ -370,6 +419,7 @@ export default {
       const dprtSlct = this.dprtSlct.map(e => {
         return e.pos_code
       })
+      console.log(dprtSlct)
       try {
         axios.defaults.headers.common['Authorization'] = 'Bearer ' + localStorage.getItem('access_token')
         if (this.bol) {
@@ -404,7 +454,7 @@ export default {
       try {
         await new Promise((resolve, reject) => {
           axios.defaults.headers.common['Authorization'] = 'Bearer ' + localStorage.getItem('access_token')
-          axios.post('u/personnel/manpower', {
+          axios.post('u/personnel/manpower/', {
             primekey: this.primekey,
             employees: this.emplSlct,
             dteArray: this.dteArray,
@@ -428,6 +478,11 @@ export default {
         this.snackColor = 'error'
         this.snackText = 'Error in data'
       }
+    },
+    getDay (value) {
+      return moment(value).format('dddd')
+    },
+    closeShiftFile () {
     }
   },
   created () {
