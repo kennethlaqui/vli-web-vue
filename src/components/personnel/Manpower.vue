@@ -82,7 +82,7 @@
                 v-on="on"
               ></v-text-field>
             </template>
-            <v-date-picker v-model="strtDate" no-title scrollable @change="getEmployeeCodeWithManpowerSchedule()">
+            <v-date-picker v-model="strtDate" no-title scrollable @change="retrieveEmployeeCode()">
               <v-spacer></v-spacer>
               <v-btn text color="primary" @click="strtMenu = false">Cancel</v-btn>
               <v-btn text color="primary" @click="$refs.strtMenu.save(strtDate)">OK</v-btn>
@@ -108,7 +108,7 @@
                 v-on="on"
               ></v-text-field>
             </template>
-            <v-date-picker v-model="endDate_" no-title scrollable @change="getEmployeeCodeWithManpowerSchedule()">
+            <v-date-picker v-model="endDate_" no-title scrollable @change="retrieveEmployeeCode()">
               <v-spacer></v-spacer>
               <v-btn text color="primary" @click="endMenu_ = false">Cancel</v-btn>
               <v-btn text color="primary" @click="$refs.endMenu_.save(endDate_)">OK</v-btn>
@@ -134,11 +134,6 @@
           ></v-text-field>
         </v-col>
         </v-row>
-        <!-- <v-row>
-          <v-col cols="12" sm="6" md="4">
-            <v-btn class="primary" >Create Manpower</v-btn>
-          </v-col>
-        </v-row> -->
       </v-card-actions>
       </v-card>
       <!-- deparment and employee codes section -->
@@ -150,6 +145,7 @@
             :headers="employeesWithSchedulesHeader"
             :items="employeeWithSchedules"
             :single-select="singleSelect"
+            :loading="loading"
             item-key="empl_cde"
             show-select
             class="elevation-1"
@@ -163,6 +159,7 @@
             :headers="departmentHeader"
             :items="dprtment"
             :single-select="singleSelect"
+            :loading="loading"
             item-key="pos_code"
             show-select
             class="elevation-1"
@@ -181,8 +178,9 @@
         <v-col cols="12" sm="12" md="8" lg="8">
           <v-data-table
             v-model="manpowerSlct"
-            :headers="employeesWithManpower"
+            :headers="employeesWithManpowerHeader"
             :items="manpowerSchedules"
+            :loading="loading"
             item-key="cntrl_no"
             class="elevation-1"
             fixed-header
@@ -190,20 +188,32 @@
             group-by="employee"
             v-if="switchManpower"
           >
+          <template v-slot:item.avatar__="{ item }">
+            <v-avatar size="36">
+              <img
+                :src="item.avatar__"
+                alt="John"
+              >
+            </v-avatar>
+          </template>
           <template v-slot:item.day="{ item }">
             {{ getDay(item.strt_dte) }}
           </template>
           <template v-slot:item.std_shft="{ item }">
             <v-edit-dialog
+              @save="saveShiftFile"
+              @cancel="cancelShiftFile"
+              @open="openShiftFile"
               @close="closeShiftFile"
             > {{ item.std_shft }}
               <template v-slot:input>
                 <v-select
-                  v-model="item.std_shft"
+                  v-model="item.shft_cde"
                   :items="shftFile"
                   item-text="std_shft"
-                  item-value="shftFile"
+                  item-value="shft_cde"
                   label="Available Shift"
+                  @change="getNewShift(item)"
                 ></v-select>
               </template>
             </v-edit-dialog>
@@ -243,6 +253,7 @@
 </template>
 <script>
 import axios from 'axios'
+import { Form } from 'vform'
 var moment = require('moment')
 
 export default {
@@ -281,6 +292,11 @@ export default {
       manpowerSlct: [],
       strtDate: new Date().toISOString().substr(0, 10),
       endDate_: new Date().toISOString().substr(0, 10),
+      form: new Form({
+        primekey: '',
+        cntrl_no: '',
+        shft_cde: ''
+      }),
       employeesHeader: [
         {
           text: 'Image',
@@ -329,7 +345,14 @@ export default {
         { text: 'Last Name', value: 'last_nme', align: 'left', width: '200px', divider: true },
         { text: 'First Name', value: 'frst_nme', align: 'left', width: '200px', divider: true }
       ],
-      employeesWithManpower: [
+      employeesWithManpowerHeader: [
+        {
+          text: 'Profile',
+          align: 'center',
+          sortable: true,
+          value: 'avatar__',
+          divider: true
+        },
         {
           text: 'Date',
           align: 'left',
@@ -346,20 +369,50 @@ export default {
     }
   },
   watch: {
-    switchManpower (bol) {
-      if (bol) {
-        this.getEmployeeCodeWithManpowerSchedule()
+    switchManpower (value) {
+      if (value) {
+        this.retrieveEmployeeCode()
       }
+    },
+    employeeWithScheduleSelect (value) {
+      return value.length > 0 ? this.retrieveEmployeeWithManpower() : ''
+    },
+    dprtSlct (value) {
+      return value.length > 0 ? this.retrieveEmployees() : ''
     }
   },
   methods: {
     retrieveDepartment () {
+      this.loading = true
       this.$store.dispatch('retrieveDepartment', {
         primekey: this.primekey
       })
         .then(response => {
           this.dprtment = this.$store.getters.retrieveDepartment
+          this.loading = false
         })
+    },
+    async updateEmployeeShift () {
+      try {
+        axios.defaults.headers.common['Authorization'] = 'Bearer ' + localStorage.getItem('access_token')
+        if (this.$store.getters.loggedIn) {
+          await new Promise((resolve, reject) => {
+            this.form.patch('u/personnel/manpower/shift/update', {
+            })
+              .then(response => {
+                resolve(response)
+                this.$emit('retrieveEmployeeWithManpower')
+              })
+              .catch(error => {
+                reject(error)
+              })
+          })
+        }
+      } catch (error) {
+      }
+      this.snack = true
+      this.snackColor = 'success'
+      this.snackText = 'Data saved'
     },
     retrieveShiftFile () {
       // display all day type
@@ -371,15 +424,15 @@ export default {
         })
     },
     async retrieveEmployeeWithManpower () {
+      this.loading = true
       const employeeCode = this.employeeWithScheduleSelect.map(e => {
         return e.empl_cde
       })
-      console.log(employeeCode)
       // retrieve manpower schedule of employee based on primekey, employee code, start and end date
       try {
         axios.defaults.headers.common['Authorization'] = 'Bearer ' + localStorage.getItem('access_token')
         await new Promise((resolve, reject) => {
-          axios.get('u/personnel/manpower/schedules/', {
+          axios.get('u/personnel/manpower/', {
             params: {
               primekey: this.primekey,
               empl_cde: employeeCode,
@@ -388,8 +441,9 @@ export default {
             }
           })
             .then(response => {
-              this.manpowerSchedules = response.data.manpowerSchedules
+              this.manpowerSchedules = response.data.manpower
               resolve(response)
+              this.loading = false
             })
             .catch(error => {
               reject(error)
@@ -398,16 +452,20 @@ export default {
       } catch (error) {
       }
     },
-    async getEmployeeCodeWithManpowerSchedule () {
+    async retrieveEmployeeCode () {
       // retrieve all employee code based on primekey, start and end date
+      this.loading = true
       try {
         axios.defaults.headers.common['Authorization'] = 'Bearer ' + localStorage.getItem('access_token')
         await new Promise((resolve, reject) => {
           axios.get(`u/personnel/manpower/employeecode/${this.primekey}/${this.strtDate}/${this.endDate_}`)
             .then(response => {
-              this.employeeWithSchedules = response.data.employees
+              this.employeeWithSchedules = response.data.employeeCode
+              resolve(response)
+              this.loading = false
             })
             .catch(error => {
+              this.getErrorStatus(error)
               reject(error)
             })
         })
@@ -419,12 +477,11 @@ export default {
       const dprtSlct = this.dprtSlct.map(e => {
         return e.pos_code
       })
-      console.log(dprtSlct)
       try {
         axios.defaults.headers.common['Authorization'] = 'Bearer ' + localStorage.getItem('access_token')
         if (this.bol) {
           await new Promise((resolve, reject) => {
-            axios.get('u/personnel/directory/employees/', {
+            axios.get('u/personnel/manpower/employees/', {
               params: {
                 primekey: this.primekey,
                 dprtment: dprtSlct
@@ -444,6 +501,12 @@ export default {
       }
     },
     async createStartEndDate () {
+      if (this.newShft_.length === 0) {
+        this.snack = true
+        this.snackColor = 'error'
+        this.snackText = 'Invalid Shift'
+        return
+      }
       var strtDate = moment(this.strtDate).format('YYYY-MM-DD')
       var endDate_ = moment(this.endDate_).format('YYYY-MM-DD')
       this.dteArray.length = 0
@@ -454,7 +517,7 @@ export default {
       try {
         await new Promise((resolve, reject) => {
           axios.defaults.headers.common['Authorization'] = 'Bearer ' + localStorage.getItem('access_token')
-          axios.post('u/personnel/manpower/', {
+          axios.post('u/personnel/manpower/create', {
             primekey: this.primekey,
             employees: this.emplSlct,
             dteArray: this.dteArray,
@@ -482,13 +545,49 @@ export default {
     getDay (value) {
       return moment(value).format('dddd')
     },
+    getErrorStatus (arg) {
+      switch (arg.response.status) {
+        case 500:
+          this.snack = true
+          this.snackColor = 'error'
+          this.snackText = 'Internal Server Error'
+          break
+
+        case 429:
+          this.snack = true
+          this.snackColor = 'error'
+          this.snackText = 'Too Many Request. Try Again Later.'
+          break
+      }
+    },
+    cancelShiftFile () {
+      this.snack = true
+      this.snackColor = 'error'
+      this.snackText = 'Canceled'
+    },
+    openShiftFile () {
+      this.snack = true
+      this.snackColor = 'info'
+      this.snackText = 'Dialog opened'
+    },
     closeShiftFile () {
+      this.saveShiftFile()
+    },
+    saveShiftFile () {
+      this.updateEmployeeShift()
+    },
+    getNewShift (item) {
+      this.form.primekey = this.primekey
+      this.form.cntrl_no = item.cntrl_no
+      this.form.shft_cde = item.shft_cde
     }
   },
   created () {
     this.retrieveShiftFile()
     this.retrieveDepartment()
-    // this.retrieveEmployees()
+    this.$on('retrieveEmployeeWithManpower', () => {
+      this.retrieveEmployeeWithManpower()
+    })
   }
 }
 </script>
