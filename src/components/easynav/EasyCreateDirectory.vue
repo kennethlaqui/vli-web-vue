@@ -13,29 +13,39 @@
             <v-row>
               <v-col cols="12" sm="6" md="6">
                 <v-select
-                  :items="['Regular']"
+                  :items="payrollGroup"
                   label="Payroll Group*"
+                  item-text="descript"
+                  item-value="group_no"
                   required
                 ></v-select>
               </v-col>
               <v-col cols="12" sm="6" md="6">
                 <v-select
-                  :items="['1st Part','2nd Part', '13th Month Pay']"
+                  :items="itemPart"
                   label="Payroll Type*"
+                  item-text="descript"
+                  item-value="cntrl_no"
                   required
                 ></v-select>
               </v-col>
               <v-col cols="12" sm="6" md="6">
                 <v-select
-                  :items="['2019','2020', '2021', '2020']"
+                  v-model="year____"
+                  :items="itemYear_"
                   label="Year*"
+                  item-text="descript"
+                  item-value="year____"
                   required
                 ></v-select>
               </v-col>
               <v-col cols="12" sm="6" md="6">
                 <v-select
-                  :items="['January','February','March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']"
+                  v-model="month___"
+                  :items="itemMos_"
                   label="Month*"
+                  item-text="descript"
+                  item-value="month___"
                   required
                 ></v-select>
               </v-col>
@@ -121,16 +131,103 @@
 export default {
   data () {
     return {
+      primekey: localStorage.getItem('primekey'),
+      payrollGroup: [],
+      year____: '',
+      month___: '',
       lb_menu: false,
       lb_menu2: false,
       lb_dialog: true,
       lb_strtModal: false,
       lb_lastModal: false,
       ld_strtDate: new Date().toISOString().substr(0, 10),
-      ld_lastDate: new Date().toISOString().substr(0, 10)
+      ld_lastDate: new Date().toISOString().substr(0, 10),
+      itemPart: [
+        {
+          'cntrl_no': 1,
+          'descript': '1st Part'
+        },
+        {
+          'cntrl_no': 2,
+          'descript': '2nd Part'
+        }
+      ],
+      itemYear_: [
+        {
+          'year____': '2019',
+          'descript': '2019'
+        },
+        {
+          'year____': '2020',
+          'descript': '2020'
+        },
+        {
+          'year____': '2021',
+          'descript': '2021'
+        }
+      ],
+      itemMos_: [
+        {
+          'month___': '1',
+          'descript': 'January'
+        },
+        {
+          'month___': '2',
+          'descript': 'February'
+        },
+        {
+          'month___': '3',
+          'descript': 'March'
+        },
+        {
+          'month___': '4',
+          'descript': 'April'
+        },
+        {
+          'month___': '5',
+          'descript': 'May'
+        },
+        {
+          'month___': '6',
+          'descript': 'June'
+        },
+        {
+          'month___': '7',
+          'descript': 'July'
+        },
+        {
+          'month___': '8',
+          'descript': 'August'
+        },
+        {
+          'month___': '9',
+          'descript': 'September'
+        },
+        {
+          'month___': '10',
+          'descript': 'October'
+        },
+        {
+          'month___': '11',
+          'descript': 'November'
+        },
+        {
+          'month___': '12',
+          'descript': 'December'
+        }
+      ]
     }
   },
   methods: {
+    retrievePayrollGroup () {
+      // accept parameter for retrieve
+      this.$store.dispatch('retrievePayrollGroup', {
+        primekey: localStorage.getItem('primekey')
+      })
+        .then(response => {
+          this.payrollGroup = this.$store.getters.retrievePayrollGroup
+        })
+    },
     save () {
       this.$router.push({ name: 'encodeDtr' })
       this.lb_dialog = false
@@ -139,6 +236,9 @@ export default {
       this.lb_dialog = false
       this.$store.commit('toggleDialog')
     }
+  },
+  created () {
+    this.retrievePayrollGroup()
   }
 }
 </script>

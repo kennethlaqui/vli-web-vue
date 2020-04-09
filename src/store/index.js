@@ -27,6 +27,7 @@ export default new Vuex.Store({
     department: [],
     directories: [],
     incomeType: [],
+    payrollgroup: [],
     showdialog: false
   },
   getters: {
@@ -83,6 +84,9 @@ export default new Vuex.Store({
     },
     retrieveIncomeType (state) {
       return state.incomeType
+    },
+    retrievePayrollGroup (state) {
+      return state.payrollgroup
     },
     showDialog (state) {
       return state.showdialog
@@ -146,11 +150,37 @@ export default new Vuex.Store({
     retrieveIncomeType (state, payload) {
       state.incomeType = payload
     },
+    retrievePayrollGroup (state, payload) {
+      state.payrollgroup = payload
+    },
     toggleDialog (state) {
       state.showdialog = !state.showdialog
     }
   },
   actions: {
+    async retrievePayrollGroup (context, payload) {
+      try {
+        axios.defaults.headers.common['Authorization'] = 'Bearer ' + context.state.token
+        if (context.getters.loggedIn) {
+          await new Promise((resolve, reject) => {
+            axios.get('l/helper/payrollgroup', {
+              params: {
+                primekey: payload.primekey
+              }
+            })
+              .then(response => {
+                this.payrollgroup = response.data
+                context.commit('retrievePayrollGroup', this.payrollgroup)
+                resolve(response)
+              })
+              .catch(error => {
+                reject(error)
+              })
+          })
+        }
+      } catch (error) {
+      }
+    },
     async retrieveIncomeType (context, payload) {
       try {
         axios.defaults.headers.common['Authorization'] = 'Bearer ' + context.state.token
