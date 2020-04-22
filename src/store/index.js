@@ -28,6 +28,7 @@ export default new Vuex.Store({
     directories: [],
     incomeType: [],
     payrollgroup: [],
+    payrolldirectorybuild: [],
     showdialog: false
   },
   getters: {
@@ -87,6 +88,9 @@ export default new Vuex.Store({
     },
     retrievePayrollGroup (state) {
       return state.payrollgroup
+    },
+    buildPayrollDirectory (state) {
+      return state.payrolldirectorybuild
     },
     showDialog (state) {
       return state.showdialog
@@ -153,11 +157,37 @@ export default new Vuex.Store({
     retrievePayrollGroup (state, payload) {
       state.payrollgroup = payload
     },
+    buildPayrollDirectory (state, payload) {
+      state.payrolldirectorybuild = payload
+    },
     toggleDialog (state) {
       state.showdialog = !state.showdialog
     }
   },
   actions: {
+    async buildPayrollDirectory (context, payload) {
+      try {
+        axios.defaults.headers.common['Authorization'] = 'Bearer ' + context.state.token
+        if (context.getters.loggedIn) {
+          await new Promise((resolve, reject) => {
+            axios.get('u/personnel/directory/build/{primekey?}', {
+              params: {
+                primekey: payload.primekey
+              }
+            })
+              .then(response => {
+                this.payrolldirectorybuild = response.data
+                context.commit('buildPayrollDirectory', this.payrolldirectorybuild)
+                resolve(response)
+              })
+              .catch(error => {
+                reject(error)
+              })
+          })
+        }
+      } catch (error) {
+      }
+    },
     async retrievePayrollGroup (context, payload) {
       try {
         axios.defaults.headers.common['Authorization'] = 'Bearer ' + context.state.token
