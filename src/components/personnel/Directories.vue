@@ -234,7 +234,6 @@ export default {
             havefolder: `${e.dtr_fldr === 'T' ? 'Yes' : 'No'}`
           }))
           this.items = this.directories
-          console.log(this.directories)
         })
     },
     createDtrFolder (item) {
@@ -288,6 +287,11 @@ export default {
   created () {
     this.getDirectories()
     this.$on('getDirectories', () => {
+      this.getDirectories()
+    })
+  },
+  mounted () {
+    this.$root.$on('saved', () => {
       this.getDirectories()
     })
   }
