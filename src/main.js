@@ -9,11 +9,20 @@ import store from './store'
 import vuetify from './plugins/vuetify'
 import Vuelidate from 'vuelidate'
 import VueCookies from 'vue-cookies'
+import VueTheMask from 'vue-the-mask'
+import VueRouterBackButton from 'vue-router-back-button'
+// import { makeServer } from './server'
 
 Vue.use(Vuelidate)
 Vue.use(VueCookies)
+Vue.use(VueTheMask)
+Vue.use(VueRouterBackButton, { router })
 
 Vue.config.productionTip = false
+
+// if (process.env.NODE_ENV === 'development') {
+//   makeServer()
+// }
 
 router.beforeEach((to, from, next) => {
   if (to.matched.some(record => record.meta.requiresAuth)) {

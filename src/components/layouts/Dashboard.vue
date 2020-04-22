@@ -254,7 +254,7 @@ export default {
           active: true,
           items: [
             { action: 'mdi-calendar-plus', title: 'Encode DTR', url: { name: 'directory' } },
-            { action: 'mdi-timetable', title: 'Manpower', url: '' }
+            { action: 'mdi-timetable', title: 'Manpower', url: { name: 'manPower' } }
           ]
         },
         {
@@ -263,7 +263,11 @@ export default {
           active: false,
           items: [
             { action: 'mdi-cached', title: 'Compute Payroll', url: 'about' },
-            { action: 'mdi-coin', title: 'Salaries', url: 'about' }
+            { action: 'mdi-currency-usd', title: 'Salaries', url: 'about' },
+            { action: 'mdi-currency-usd', title: 'One-Time Income', url: { name: 'PayrollHeader' } },
+            { action: 'mdi-currency-usd', title: 'Other Income', url: 'about' },
+            { action: 'mdi-currency-usd', title: 'One-Time Deduct', url: 'about' },
+            { action: 'mdi-currency-usd', title: 'Other Deduct', url: 'about' }
           ]
         },
         {
@@ -281,7 +285,8 @@ export default {
           active: false,
           items: [
             { action: 'mdi-account-multiple-outline', title: 'Masterfile', url: { name: 'UserMasterfile' } },
-            { action: 'mdi-animation', title: 'Reference File', url: { name: 'reference' } }
+            { action: 'mdi-animation', title: 'Reference File', url: { name: 'reference' } },
+            { action: 'mdi-upload', title: 'Upload Bio', url: { name: 'biometrics' } }
           ]
         }
       ],

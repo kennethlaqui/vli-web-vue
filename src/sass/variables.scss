@@ -1,6 +1,6 @@
 // $body-font-family: 'Work Sans', serif;
 // $border-radius-root: 6px;
-$font-size-root: 11px;
+// $font-size-root: 11px;
 
 // // Variables must come before the import
 // $btn-letter-spacing: 0;
@@ -24,5 +24,10 @@ $font-size-root: 11px;
 //   'h2': (
 //     'size': 2.25rem,
 //     'line-height': 1.5em
-//   )
+// 	),
+// 	'subtitle-2': (
+// 		'size': 1px
+// 	)
 // );
+
+// $data-table-regular-row-font-size: map-get(map-get($headings, 'subtitle-2'), 'size');

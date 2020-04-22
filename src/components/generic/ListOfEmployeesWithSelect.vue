@@ -4,7 +4,7 @@
     :headers="headers"
     :items="employees"
     :single-select="singleSelect"
-    item-key="name"
+    item-key="empl_cde"
     show-select
     class="elevation-1"
   >
@@ -20,7 +20,9 @@ export default {
   data () {
     return {
       primekey: localStorage.getItem('primekey'),
+      singleSelect: false,
       bol: true,
+      selected: [],
       employees: [],
       headers: [
         {

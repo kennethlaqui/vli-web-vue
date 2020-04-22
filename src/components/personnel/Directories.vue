@@ -289,6 +289,11 @@ export default {
     this.$on('getDirectories', () => {
       this.getDirectories()
     })
+  },
+  mounted () {
+    this.$root.$on('saved', () => {
+      this.getDirectories()
+    })
   }
 }
 </script>
