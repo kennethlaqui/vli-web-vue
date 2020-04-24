@@ -90,10 +90,10 @@ export default {
             })
         })
     },
-    getSelectedValue () {
+    getSelectedValue (primekey) {
       this.disabled = false
       // this.$cookies.set('primekey', this.primekey, '1d')
-      localStorage.setItem('primekey', this.primekey)
+      localStorage.setItem('primekey', primekey)
     },
     proceedToDashboard () {
       // save primekey in mirage server
