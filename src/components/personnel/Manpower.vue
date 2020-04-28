@@ -1,12 +1,13 @@
 <template>
   <v-app>
+    <v-container>
     <div>
       <v-card>
         <v-app-bar
-      color="deep-purple accent-4"
-      dense
-      dark
-    >
+          color="primary"
+          dense
+          dark
+        >
       <!-- <v-app-bar-nav-icon></v-app-bar-nav-icon> -->
 
       <v-toolbar-title>Manpower</v-toolbar-title>
@@ -80,6 +81,7 @@
                 prepend-icon="event"
                 readonly
                 v-on="on"
+                class="font-weight-light"
               ></v-text-field>
             </template>
             <v-date-picker v-model="strtDate" no-title scrollable @change="retrieveEmployeeCode()">
@@ -106,6 +108,7 @@
                 prepend-icon="event"
                 readonly
                 v-on="on"
+                class="font-weight-light"
               ></v-text-field>
             </template>
             <v-date-picker v-model="endDate_" no-title scrollable @change="retrieveEmployeeCode()">
@@ -122,6 +125,7 @@
             item-text="std_shft"
             item-value="shft_cde"
             label="Shift"
+            class="font-weight-light"
           ></v-select>
         </v-col>
         <v-col cols="12" sm="6" md="3">
@@ -131,6 +135,7 @@
             label="Search"
             single-line
             hide-details
+            class="font-weight-light"
           ></v-text-field>
         </v-col>
         </v-row>
@@ -148,7 +153,7 @@
             :loading="loading"
             item-key="empl_cde"
             show-select
-            class="elevation-1"
+            class="elevation-1 font-weight-light caption"
             fixed-header
             height="600px"
             v-if="switchManpower"
@@ -162,7 +167,7 @@
             :loading="loading"
             item-key="pos_code"
             show-select
-            class="elevation-1"
+            class="elevation-1 font-weight-light caption"
             fixed-header
             height="600px"
             v-else
@@ -182,7 +187,7 @@
             :items="manpowerSchedules"
             :loading="loading"
             item-key="cntrl_no"
-            class="elevation-1"
+            class="elevation-1 font-weight-light caption"
             fixed-header
             height="600px"
             group-by="employee"
@@ -228,7 +233,7 @@
             item-key="empl_cde"
             show-select
             :search="search"
-            class="elevation-1"
+            class="elevation-1 font-weight-light caption"
             fixed-header
             height="600px"
             v-else
@@ -249,6 +254,7 @@
       <v-btn text @click="snack = false">Close</v-btn>
     </v-snackbar>
     </div>
+    </v-container>
   </v-app>
 </template>
 <script>
@@ -343,7 +349,8 @@ export default {
           divider: true
         },
         { text: 'Last Name', value: 'last_nme', align: 'left', width: '200px', divider: true },
-        { text: 'First Name', value: 'frst_nme', align: 'left', width: '200px', divider: true }
+        { text: 'First Name', value: 'frst_nme', align: 'left', width: '200px', divider: true },
+        { text: 'Department', value: 'dprtment', align: 'left', width: '200px', divider: true }
       ],
       employeesWithManpowerHeader: [
         {
