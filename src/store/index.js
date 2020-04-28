@@ -11,7 +11,8 @@ export default new Vuex.Store({
   state: {
     token: localStorage.getItem('access_token') || null,
     user: '',
-    primekey: localStorage.getItem('primekey') || null,
+    primekey: [],
+    vli_subs: [], // no getters
     username: '',
     maxemployee: '',
     folder: [],
@@ -522,19 +523,18 @@ export default new Vuex.Store({
     },
     // -- assigned company
     async retrieveCompany (context, payload) {
-      // stringify primekeys
-      let data = JSON.stringify(payload.primekey)
+      const primekeys = payload.primekey.map((item) => {
+        return item.primekey
+      })
       try {
         axios.defaults.headers.common['Authorization'] = 'Bearer ' + context.state.token
         if (context.getters.loggedIn) {
           await new Promise((resolve, reject) => {
-            axios({
-              method: 'post',
-              url: '/u/login/primekey/company/',
-              headers: {
-                'Content-Type': 'application/json'
-              },
-              data: data
+            axios.get('u/login/primekey/company', {
+              params: {
+                primekey: primekeys,
+                vli_subs: this.vli_subs
+              }
             })
               .then(response => {
                 this.companies = response.data
@@ -550,6 +550,35 @@ export default new Vuex.Store({
       }
     },
     // -- primekey
+    // async retrieveCompany (context, payload) {
+    //   // stringify primekeys
+    //   let data = JSON.stringify(payload.primekey)
+    //   try {
+    //     axios.defaults.headers.common['Authorization'] = 'Bearer ' + context.state.token
+    //     if (context.getters.loggedIn) {
+    //       await new Promise((resolve, reject) => {
+    //         axios({
+    //           method: 'post',
+    //           url: '/u/login/primekey/company/',
+    //           headers: {
+    //             'Content-Type': 'application/json'
+    //           },
+    //           data: data
+    //         })
+    //           .then(response => {
+    //             this.companies = response.data
+    //             context.commit('retrieveCompany', this.companies)
+    //             resolve(response)
+    //           })
+    //           .catch(error => {
+    //             reject(error)
+    //           })
+    //       })
+    //     }
+    //   } catch (error) {
+    //   }
+    // },
+    // -- primekey and vli_subs
     async retrievePrimekey (context, payload) {
       try {
         axios.defaults.headers.common['Authorization'] = 'Bearer ' + context.state.token
@@ -557,7 +586,8 @@ export default new Vuex.Store({
           await new Promise((resolve, reject) => {
             axios.get('u/login/primekey/' + payload.vli_subs + '/' + payload.user_num)
               .then(response => {
-                this.primekey = response.data
+                this.primekey = response.data.primekey
+                this.vli_subs = response.data.vli_subs
                 context.commit('retrievePrimekey', this.primekey)
                 resolve(response)
               })
