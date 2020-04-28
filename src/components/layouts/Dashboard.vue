@@ -7,7 +7,7 @@
       clipped
       right
     >
-    <v-list shaped dense>
+    <v-list rounded dense>
       <v-subheader>Easy Navigation</v-subheader>
       <v-list-item-group v-model="sideItem">
         <v-list-item
@@ -237,14 +237,17 @@
               <v-list
                 dense
               >
-                <v-list-item>
+                <v-list-item
+                  link
+                >
                   <v-list-item-avatar>
-                    <img src="https://cdn.vuetifyjs.com/images/john.jpg" alt="John">
+                    <img :src="images.profile" alt="John">
                   </v-list-item-avatar>
 
                   <v-list-item-content>
                     <v-list-item-title>{{ user_nme }}</v-list-item-title>
-                    <v-list-item-subtitle>{{ user_id_ }}</v-list-item-subtitle>
+                    <v-list-item-subtitle v-if="user_num == 0">{{ user_id_ }} - Admin</v-list-item-subtitle>
+                    <v-list-item-subtitle v-else>{{ user_id_ }}</v-list-item-subtitle>
                   </v-list-item-content>
 
                   <!-- <v-list-item-action>
@@ -275,7 +278,18 @@
                     <v-list-item-content>
                       <v-list-item-title v-text="account.text"></v-list-item-title>
                     </v-list-item-content>
-                  </v-list-item>
+                </v-list-item>
+                <v-list-item
+                  link
+                  @click="logout()"
+                >
+                  <v-list-item-icon>
+                    <v-icon>logout</v-icon>
+                  </v-list-item-icon>
+                  <v-list-item-content>
+                    <v-list-item-title>Logout</v-list-item-title>
+                  </v-list-item-content>
+                </v-list-item>
               </v-list>
             </v-card>
           </v-menu>
@@ -370,7 +384,7 @@ export default {
       user_id_: '',
       user_nme: '',
       userData: {},
-      drawer: null,
+      drawer: true,
       drawer2: true,
       drawerRight: false,
       menu: false,
@@ -382,9 +396,9 @@ export default {
       right: false,
       left: false,
       images: {
-        company: require('@/assets/android-chrome-192x192.png')
+        company: require('@/assets/android-chrome-192x192.png'),
+        profile: require('@/assets/me2.jpg')
       },
-      selected: [2],
       items: [
         {
           action: 'mdi-folder-plus',
@@ -440,40 +454,7 @@ export default {
       ],
       accounts: [
         { text: 'Switch Company', icon: 'sync', url: { name: 'UserAssignedCompany' } },
-        { text: 'Settings and admin', icon: 'settings' },
-        { text: 'Logout', icon: 'logout', url: { name: 'userLogout' } }
-      ],
-      monitoring: [
-        {
-          action: '15 min',
-          headline: 'Brunch this weekend?',
-          title: 'Ali Connors',
-          subtitle: "I'll be in your neighborhood doing errands this weekend. Do you want to hang out?"
-        },
-        {
-          action: '2 hr',
-          headline: 'Summer BBQ',
-          title: 'me, Scrott, Jennifer',
-          subtitle: "Wish I could come, but I'm out of town this weekend."
-        },
-        {
-          action: '6 hr',
-          headline: 'Oui oui',
-          title: 'Sandra Adams',
-          subtitle: 'Do you have Paris recommendations? Have you ever been?'
-        },
-        {
-          action: '12 hr',
-          headline: 'Birthday gift',
-          title: 'Trevor Hansen',
-          subtitle: 'Have any ideas about what we should get Heidi for her birthday?'
-        },
-        {
-          action: '18hr',
-          headline: 'Recipe to try',
-          title: 'Britta Holt',
-          subtitle: 'We should eat this: Grate, Squash, Corn, and tomatillo Tacos.'
-        }
+        { text: 'Settings and admin', icon: 'settings' }
       ]
     }
   },
@@ -534,6 +515,12 @@ export default {
           this.user_num = this.$store.getters.retrieveUser.user_num
           this.user_id_ = this.$store.getters.retrieveUser.user_id_
           this.user_nme = this.$store.getters.retrieveUser.user_nme
+        })
+    },
+    logout () {
+      this.$store.dispatch('destroyToken')
+        .then(response => {
+          this.$router.push({ name: 'userLogout' })
         })
     },
     easyCreateDirectory () {
