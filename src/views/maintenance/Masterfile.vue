@@ -7,7 +7,7 @@
 import masterfile from '@/components/maintenance/Masterfile.vue'
 
 export default {
-  name: 'EncodeDtr',
+  name: 'Masterfile',
   components: {
     masterfile
   }
