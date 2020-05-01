@@ -1,5 +1,9 @@
 <template>
-<v-card>
+<v-app>
+<v-container
+  fluid
+>
+<v-card  v-if="!b_show_NewEmployeeComponent">
   <v-data-table
     v-model="selected"
     :headers="headers"
@@ -30,6 +34,7 @@
         ></v-text-field>
         <!-- <v-switch v-model="singleSelect" label="Single select" class="pa-3"></v-switch> -->
         <v-spacer></v-spacer>
+        <v-btn @click="createNewEmployee"></v-btn>
         <v-dialog v-model="dialog" fullscreen hide-overlay transition="dialog-bottom-transition">
             <template v-slot:activator="{ on }">
               <v-btn color="primary" dark class="mb-2" v-on="on" small>Create Employee</v-btn>
@@ -389,13 +394,20 @@
     </template>
   </v-data-table>
 </v-card>
+<newEmployee v-if="b_show_NewEmployeeComponent" :create="b_createNew" :employeeData="editedItem"></newEmployee>
+</v-container>
+</v-app>
 </template>
 <script>
 import axios from 'axios'
 import { mask } from 'vue-the-mask'
+import newEmployee from '@/components/maintenance/NewEmployee.vue'
 
 export default {
-  props: ['visible'],
+  name: 'Masterfile',
+  components: {
+    newEmployee
+  },
   data () {
     return {
       loading: false,
@@ -406,6 +418,8 @@ export default {
       modalDateHired: false,
       modalDateRglr: false,
       modalDateRsgn: false,
+      b_show_NewEmployeeComponent: false,
+      b_createNew: false,
       bol: true,
       dialog: false,
       primekey: localStorage.getItem('primekey'),
@@ -427,11 +441,15 @@ export default {
       ],
       editedIndex: -1,
       editedItem: {
+        primekey: '',
         empl_cde: '',
         empl_cd2: '',
         asso_cde: '',
         chro_num: '',
         last_nme: '',
+        frst_nme: '',
+        midl_nme: '',
+        midl_ini: '',
         birthday: '',
         sex_____: '',
         cvilstat: '',
@@ -455,11 +473,36 @@ export default {
         philhlth: ''
       },
       defaultItem: {
-        name: '',
-        calories: 0,
-        fat: 0,
-        carbs: 0,
-        protein: 0
+        primekey: localStorage.getItem('primekey'),
+        empl_cde: '',
+        empl_cd2: '',
+        asso_cde: '',
+        chro_num: '',
+        last_nme: '',
+        frst_nme: '',
+        midl_nme: '',
+        midl_ini: '',
+        birthday: '',
+        sex_____: '',
+        cvilstat: '',
+        address1: '',
+        address2: '',
+        address3: '',
+        cel_numb: '',
+        dte_hire: '',
+        dte_rglr: '',
+        dte_rsgn: '',
+        pos_code: '',
+        emp_stat: '',
+        workstat: '',
+        workarea: '',
+        grp_lvl1: '',
+        grp_lvl2: '',
+        grp_lvl3: '',
+        tax_numb: '',
+        sss_numb: '',
+        pag_ibig: '',
+        philhlth: ''
       },
       gender: [
         {
@@ -532,10 +575,19 @@ export default {
       } catch (error) {
       }
     },
+    createNewEmployee () {
+      this.b_show_NewEmployeeComponent = true
+      this.b_createNew = true
+      this.editedItem = Object.assign({}, this.defaultItem)
+    },
     editItem (item) {
       this.editedIndex = this.masterfile.indexOf(item)
       this.editedItem = Object.assign({}, item)
-      this.dialog = true
+      // this.$root.$emit('employeeData', this.editedItem)
+      // this.$router.push({ name: 'UserNewEmployee' })
+      // this.dialog = true
+      this.b_show_NewEmployeeComponent = true
+      this.b_createNew = false
     },
     deleteItem (item) {
       const index = this.masterfile.indexOf(item)
@@ -648,14 +700,20 @@ export default {
   },
   created () {
     this.retrieveMasterFile()
-    this.getPositions()
-    this.getEmplStat()
-    this.getWorkStat()
-    this.getWorkArea()
-    this.getDivision()
-    this.getDepartment()
-    this.getSection()
-    this.getMaxEmployeeCode()
+    // this.getPositions()
+    // this.getEmplStat()
+    // this.getWorkStat()
+    // this.getWorkArea()
+    // this.getDivision()
+    // this.getDepartment()
+    // this.getSection()
+    // this.getMaxEmployeeCode()
+    this.$root.$on('create', () => {
+      this.b_show_NewEmployeeComponent = false
+      this.editedItem = Object.assign({}, this.defaultItem)
+      this.editedIndex = -1
+      this.retrieveMasterFile()
+    })
   },
   watch: {
     dialog (val) {
