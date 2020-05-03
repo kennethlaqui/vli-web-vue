@@ -1,12 +1,27 @@
 <template>
 <v-app>
-  <v-card v-show="show">
+  <v-layout v-if="loadingSave" row justify-center align-center>
+    <v-progress-circular
+      :size="50"
+      color="primary"
+      indeterminate
+    ></v-progress-circular>
+  </v-layout>
+  <v-card v-else v-show="show">
     <v-app-bar
       color="primary"
       dense
       dark
       elevation="3"
     >
+      <v-btn
+        icon
+        @click="back"
+      >
+        <v-icon>
+          mdi-arrow-left
+        </v-icon>
+      </v-btn>
       <v-toolbar-title v-text="c_cardTitle"></v-toolbar-title>
       <v-spacer></v-spacer>
       <v-menu
@@ -46,7 +61,7 @@
     </v-row>
     <v-row class="mt-n6">
       <v-col cols="12" md="12">
-        <v-card-title v-text="h_firstname" class="justify-center font-weight-light"></v-card-title >
+        <v-card-title v-text="h_fullName" class="justify-center font-weight-light"></v-card-title >
       </v-col>
     </v-row>
     <v-row class="mt-n12">
@@ -158,6 +173,7 @@
               <v-text-field
                 v-model="form.midl_ini"
                 label="Middle initial"
+                :rules="r_middleInitial"
                 outlined
                 dense
                 rounded
@@ -267,7 +283,7 @@
             <!-- Dates and work status-->
             <v-row class="mt-4">
               <!-- work status -->
-              <v-col cols="12" sm="6" md="3">
+              <v-col cols="12" sm="6" md="4">
                 <v-select
                   v-model="form.workstat"
                   :items="workStat"
@@ -280,7 +296,7 @@
                 ></v-select>
               </v-col>
               <!-- date hired -->
-              <v-col cols="12" sm="6" md="3">
+              <v-col cols="12" sm="6" md="2">
                 <v-menu
                   v-model="dateHiredMenu"
                   :close-on-content-click="false"
@@ -304,7 +320,7 @@
                 </v-menu>
               </v-col>
               <!-- date regular -->
-              <v-col cols="12" sm="6" md="3">
+              <v-col cols="12" sm="6" md="2">
                 <v-menu
                   v-model="dateRegularMenu"
                   :close-on-content-click="false"
@@ -328,7 +344,7 @@
                 </v-menu>
               </v-col>
               <!-- date resign -->
-              <v-col cols="12" sm="6" md="3">
+              <v-col cols="12" sm="6" md="2">
                 <v-menu
                   v-model="dateResignMenu"
                   :close-on-content-click="false"
@@ -349,6 +365,31 @@
                     v-model="form.dte_rsgn"
                     no-title
                     @input="dateResignPicker = false"
+                  ></v-date-picker>
+                </v-menu>
+              </v-col>
+              <!-- end of contract -->
+              <!-- please include eoc option in table work status to trigger disabled-->
+              <v-col cols="12" sm="6" md="2">
+                <v-menu
+                  v-model="dateEocMenu"
+                  :close-on-content-click="false"
+                  transition="scale-transition"
+                >
+                <template v-slot:activator="{ on }">
+                  <v-text-field
+                    v-model="form.dte_eoc_"
+                    label="Date EOC"
+                    outlined
+                    dense
+                    rounded
+                    v-on="on"
+                  ></v-text-field>
+                </template>
+                  <v-date-picker
+                    v-model="form.dte_eoc_"
+                    no-title
+                    @input="dateEocPicker = false"
                   ></v-date-picker>
                 </v-menu>
               </v-col>
@@ -380,7 +421,8 @@
                   outlined
                   dense
                   rounded
-                ></v-select>
+                >
+                </v-select>
               </v-col>
               <!-- work area -->
               <v-col cols="12" sm="6" md="4">
@@ -440,6 +482,95 @@
               </v-col>
             </v-row>
             <!-- end of 3rd row -->
+            <v-divider class="mt-n2"></v-divider>
+            <!-- 4th row -->
+            <v-row class="mt-3">
+              <!-- rate type -->
+              <v-col cols="12" sm="6" md="3">
+                <v-select
+                  v-model="form.rate_typ"
+                  :items="rate_typ"
+                  item-text="descript"
+                  item-value="id"
+                  label="Rate Type"
+                  outlined
+                  dense
+                  rounded
+                ></v-select>
+              </v-col>
+              <!-- minimum wage -->
+              <v-col cols="12" sm="6" md="2">
+                <v-select
+                  v-model="form.min_wage"
+                  :items="TrueOrFalse"
+                  item-text="descript"
+                  item-value="id"
+                  label="Minimum Wage"
+                  outlined
+                  dense
+                  rounded
+                ></v-select>
+              </v-col>
+              <!-- trainee -->
+              <v-col cols="12" sm="6" md="2">
+                <v-select
+                  v-model="form.trainee_"
+                  :items="TrueOrFalse"
+                  item-text="descript"
+                  item-value="id"
+                  label="Trainee"
+                  outlined
+                  dense
+                  rounded
+                ></v-select>
+              </v-col>
+              <!-- default shift -->
+              <v-col cols="12" sm="6" md="3">
+                <v-select
+                  v-model="form.shft_cde"
+                  :items="shftFile"
+                  item-text="std_shft"
+                  item-value="shft_cde"
+                  label="Official shift"
+                  outlined
+                  dense
+                  rounded
+                ></v-select>
+              </v-col>
+              <!-- trainee -->
+              <v-col cols="12" sm="6" md="2">
+                <v-select
+                  v-model="form.alw_flex"
+                  :items="TrueOrFalse"
+                  item-text="descript"
+                  item-value="id"
+                  label="Flexible time  "
+                  outlined
+                  dense
+                  rounded
+                ></v-select>
+              </v-col>
+            </v-row>
+            <!-- end of 4th row -->
+            <!-- 5th row -->
+            <v-row class="mt-n4">
+              <v-col cols="12" sm="6" md="4">
+                <v-select
+                  v-model="m_restday"
+                  :items="restdayItem"
+                  item-value="id"
+                  item-text="descript"
+                  label="Restday"
+                  multiple
+                  outlined
+                  dense
+                  rounded
+                  chips
+                  small-chips
+                ></v-select>
+              </v-col>
+            </v-row>
+            <!-- end row -->
           </v-container>
         </v-card>
       </v-tab-item>
@@ -504,36 +635,13 @@
       </v-tab-item>
     </v-tabs-items>
     <v-row justify="center">
-      <v-dialog
-        v-model="dialog"
-        max-width="400"
+      <dialogSave
+        v-if="dialog"
+        :dialog="this.dialog"
+        :dialogsave="this.dialogSave"
+        title="Save new employee?"
       >
-        <v-card>
-          <v-card-title>Save new employee {{ this.form.empl_cde }}?</v-card-title>
-          <v-card-text>
-            Note: You are not allowed to change the System Code after you agree.
-          </v-card-text>
-          <v-card-actions>
-            <v-spacer></v-spacer>
-
-            <v-btn
-              color="green darken-1"
-              text
-              @click="dialog = false"
-            >
-              Disagree
-            </v-btn>
-
-            <v-btn
-              color="green darken-1"
-              text
-              @click="dialogSave = true, dialog = false"
-            >
-              Agree
-            </v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
+      </dialogSave>
     </v-row>
     <v-card-actions>
       <v-spacer></v-spacer>
@@ -552,12 +660,12 @@
 import axios from 'axios'
 import { Form } from 'vform'
 import { mask } from 'vue-the-mask'
-import dmasterfilesave from '@/components/dialogs/masterfile/MasterFileSave.vue'
+import dialogSave from '@/components/dialogs/masterfile/DialogSave.vue'
 
 export default {
   name: 'NewEmployee',
   components: {
-    dmasterfilesave
+    dialogSave
   },
   props: {
     employeeData: Object,
@@ -566,8 +674,10 @@ export default {
   data () {
     return {
       primekey: localStorage.getItem('primekey'),
-      h_firstname: '',
+      h_fullName: '',
       h_position: '',
+      r_middleInitial: [v => v.length <= 1],
+      m_restday: [],
       snackText: '',
       snackColor: '',
       m_maskTin: null,
@@ -586,6 +696,7 @@ export default {
       emplStat: [],
       workArea: [],
       division: [],
+      shftFile: [],
       positions: [],
       department: [],
       snackTimeOut: 3000,
@@ -603,6 +714,7 @@ export default {
       dialog: false,
       loading: true,
       dialogSave: false,
+      loadingSave: false,
       birthdayMenu: false,
       birthdayPicker: false,
       dateHiredMenu: false,
@@ -611,6 +723,8 @@ export default {
       dateRegularPicker: false,
       dateResignMenu: false,
       dateResignPicker: false,
+      dateEocMenu: false,
+      dateEocPicker: false,
       disable_dateResign: true,
       images: {
         company: require('@/assets/android-chrome-192x192.png'),
@@ -643,6 +757,57 @@ export default {
           description: 'Married'
         }
       ],
+      rate_typ: [
+        {
+          id: 'M',
+          descript: 'Monthly'
+        },
+        {
+          id: 'D',
+          descript: 'Daily'
+        }
+      ],
+      TrueOrFalse: [
+        {
+          id: 'T',
+          descript: 'Yes'
+        },
+        {
+          id: 'F',
+          descript: 'No'
+        }
+      ],
+      restdayItem: [
+        {
+          id: '1',
+          descript: 'Monday'
+        },
+        {
+          id: '2',
+          descript: 'Tuesday'
+        },
+        {
+          id: '3',
+          descript: 'Wednesday'
+        },
+        {
+          id: '4',
+          descript: 'Thursday'
+        },
+        {
+          id: '5',
+          descript: 'Friday'
+        },
+        {
+          id: '6',
+          descript: 'Saturday'
+        },
+        {
+          id: '7',
+          descript: 'Sunday'
+        }
+      ],
+      restday: [],
       form: new Form({
         primekey: '',
         empl_cde: '',
@@ -663,6 +828,7 @@ export default {
         dte_hire: '',
         dte_rglr: '',
         dte_rsgn: '',
+        dte_eoc_: '',
         pos_code: '',
         emp_stat: '',
         workstat: '',
@@ -670,11 +836,22 @@ export default {
         grp_lvl1: '',
         grp_lvl2: '',
         grp_lvl3: '',
+        min_wage: '',
+        trainee_: '',
+        shft_cde: '',
+        alw_flex: '',
+        rest_day: '',
+        rest_da2: '',
         tax_numb: '',
         sss_numb: '',
         pag_ibig: '',
-        philhlth: ''
-      })
+        philhlth: '',
+        rate_typ: ''
+      }),
+      initialRestDay: {
+        rest_day: '',
+        rest_da2: ''
+      }
     }
   },
   computed: {
@@ -685,7 +862,7 @@ export default {
       get: function () {
         let disable = null
         const filterDateResign = this.workStat.filter((item) => {
-          return item.cntrl_no === this.employeeData.workstat
+          return item.cntrl_no === this.form.workstat
         })
         const withDateResign = filterDateResign.map((item) => {
           return item.w_dte_rsgn
@@ -698,69 +875,52 @@ export default {
         return disable === null ? true : disable === 'F'
       },
       set: function (newValue) {
-        this.employeeData.workstat = newValue
+        this.form.workstat = newValue
       }
     }
-    // h_position: {
-    //   // getters
-    //   get: function () {
-    //     const findPosition = this.positions.find((item) => {
-    //       return item.pos_code === this.m_position
-    //     })
-    //     if (this.m_position !== null) {
-    //       console.log(findPosition)
-    //       const position = findPosition.map((item) => {
-    //         return item.descript
-    //       })
-    //       return position
-    //     }
-    //     return findPosition
-    //   },
-    //   // setters
-    //   set: function (newValue) {
-    //     this.m_position = newValue
-    //   }
-    // }
   },
   watch: {
-    // endpoint: take note if you removed this watcher then you need to be make sure that the props are copied to new object to avoid data lose
-    dialogSave: function (value) {
-      if (value) {
-        this.save()
-        this.dialogSave = false
-      }
-    }
-    // create: function (value) {
-    //   console.log(value)
-    //   if (value) {
-    //     // create new
-    //     this.cloneProps()
-    //   } else {
-    //     // edit
-    //     this.cloneProps()
-    //   }
-    // }
   },
   methods: {
+    back () {
+      this.cloneProps()
+      this.form = new Form()
+      this.$root.$emit('newEmployee', false)
+    },
     reload () {
-      this.$store.commit('resetMasterfileSelect')
-      setTimeout(() => {
-        this.loadWorkStat()
-        this.loadEmplStat()
-        this.loadPositions()
-        this.loadWorkArea()
-        this.loadSection()
-        this.loadDepartment()
-        this.loadDivision()
-      }, 3000)
+      this.$store.commit('resetMasterfileReference')
+      this.loadWorkStat()
+      this.loadEmplStat()
+      this.loadPositions()
+      this.loadWorkArea()
+      this.loadSection()
+      this.loadDepartment()
+      this.loadDivision()
+      this.loadShiftFile()
+      this.arrayRestDay()
     },
     cancel () {
-      this.$root.$emit('create', false)
+      this.cloneProps()
+      this.form = new Form()
+      this.$root.$emit('newEmployee', false)
+    },
+    destructuringRestDay () {
+      let restDay, restDa2
+      [restDay, restDa2] = [this.m_restday[0], this.m_restday[1]] // get first two element in array and copy to each element in assignment variable
+      restDay = typeof restDay === 'undefined' ? '0' : restDay // catch undefined and replace temporary value
+      restDa2 = typeof restDa2 === 'undefined' ? '0' : restDa2 // catch undefined and replcae temporary value
+      this.form.rest_day = restDay
+      this.form.rest_da2 = restDa2
+    },
+    arrayRestDay () {
+      this.m_restday.push(this.form.rest_day, this.form.rest_da2) // first - accept two rest day
+      const filteredRestDay = this.m_restday.filter(e => e !== '0') // second - filter rest day not equal to 0
+      this.m_restday = [ ...filteredRestDay ] // final - replace m_restday to filteredRestDay without zero
     },
     cloneProps () {
       // this also a reset form
+      // this.form = new Form()
       const employeeData = this.employeeData
-      this.form = new Form()
       Object.keys(employeeData).forEach(key => {
         this.form[key] = employeeData[key]
       })
@@ -770,9 +930,10 @@ export default {
       // this.form = { ...this.employeeData }
     },
     update () {
-
+      this.destructuringRestDay()
     },
     save () {
+      this.loadingSave = true
       axios.defaults.headers.common['Authorization'] = 'Bearer ' + localStorage.getItem('access_token')
       if (this.$store.getters.loggedIn) {
         return new Promise((resolve, reject) => {
@@ -783,6 +944,7 @@ export default {
               this.snackColor = 'success'
               this.snackText = 'Successfully added!'
               this.snackTimeOut = 3000
+              this.loadingSave = false
               this.cloneProps()
               this.requestEmployeeCode()
             })
@@ -792,12 +954,13 @@ export default {
               this.snackColor = 'error'
               this.snackText = 'Error while saving.'
               this.snackTimeOut = 3000
+              this.loadingSave = false
             })
         })
       }
     },
     header () {
-      this.h_firstname = 'Kenneth Kim Aguilar Laqui'
+      this.h_fullName = this.employeeData.frst_nme + ' ' + this.employeeData.midl_nme + ' ' + this.employeeData.last_nme
       this.h_position = 'Software Engineer'
     },
     checkEmployeeCode () {
@@ -826,6 +989,15 @@ export default {
           this.form.chro_num = this.$store.getters.retrieveEmployeeCode
         })
     },
+    loadShiftFile () {
+      // display all day type
+      this.$store.dispatch('retrieveShiftFile', {
+        primekey: this.primekey
+      })
+        .then(response => {
+          this.shftFile = this.$store.getters.retrieveShiftFile
+        })
+    },
     loadWorkStat () {
       this.$store.dispatch('retrieveWorkStat', {
         primekey: this.primekey
@@ -848,6 +1020,7 @@ export default {
       })
         .then(response => {
           this.positions = this.$store.getters.retrievePositions
+          this.objPos = this.$store.getters.retrievePositions
         })
     },
     loadWorkArea () {
@@ -893,6 +1066,12 @@ export default {
       // run once
       this.cloneProps()
     }
+    this.$root.$on('masterFileSaveDialog', () => {
+      this.dialog = false
+    })
+    this.$root.$on('masterFileSaveDialogSave', () => {
+      this.save()
+    })
     this.loadWorkStat()
     this.loadEmplStat()
     this.loadPositions()
@@ -900,6 +1079,8 @@ export default {
     this.loadSection()
     this.loadDepartment()
     this.loadDivision()
+    this.loadShiftFile()
+    this.arrayRestDay()
   },
   directives: {
     mask
