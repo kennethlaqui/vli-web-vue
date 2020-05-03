@@ -305,7 +305,7 @@
                 <template v-slot:activator="{ on }">
                   <v-text-field
                     v-model="form.dte_hire"
-                    label="Date hired"
+                    label="Date Hired"
                     outlined
                     dense
                     rounded
@@ -329,7 +329,7 @@
                 <template v-slot:activator="{ on }">
                   <v-text-field
                     v-model="form.dte_rglr"
-                    label="Date regular"
+                    label="Date Regular"
                     outlined
                     dense
                     rounded
@@ -353,12 +353,12 @@
                 <template v-slot:activator="{ on }">
                   <v-text-field
                     v-model="form.dte_rsgn"
-                    label="Date resign"
+                    label="Date Resign"
                     outlined
                     dense
                     rounded
                     v-on="on"
-                    :disabled="c_dateResign"
+                    :disabled="c_disableDateResign"
                   ></v-text-field>
                 </template>
                   <v-date-picker
@@ -404,7 +404,7 @@
                   :items="emplStat"
                   item-text="descript"
                   item-value="cntrl_no"
-                  label="Employment status"
+                  label="Employment Status"
                   outlined
                   dense
                   rounded
@@ -524,6 +524,19 @@
                   rounded
                 ></v-select>
               </v-col>
+              <!-- flexible time -->
+              <v-col cols="12" sm="6" md="2">
+                <v-select
+                  v-model="form.alw_flex"
+                  :items="TrueOrFalse"
+                  item-text="descript"
+                  item-value="id"
+                  label="Flexible Time"
+                  outlined
+                  dense
+                  rounded
+                ></v-select>
+              </v-col>
               <!-- default shift -->
               <v-col cols="12" sm="6" md="3">
                 <v-select
@@ -531,29 +544,18 @@
                   :items="shftFile"
                   item-text="std_shft"
                   item-value="shft_cde"
-                  label="Official shift"
+                  label="Official Shift"
                   outlined
                   dense
                   rounded
-                ></v-select>
-              </v-col>
-              <!-- trainee -->
-              <v-col cols="12" sm="6" md="2">
-                <v-select
-                  v-model="form.alw_flex"
-                  :items="TrueOrFalse"
-                  item-text="descript"
-                  item-value="id"
-                  label="Flexible time  "
-                  outlined
-                  dense
-                  rounded
+                  :disabled="c_disableShiftFile"
                 ></v-select>
               </v-col>
             </v-row>
             <!-- end of 4th row -->
             <!-- 5th row -->
             <v-row class="mt-n4">
+              <!-- restday - have own function m_restday is default-->
               <v-col cols="12" sm="6" md="4">
                 <v-select
                   v-model="m_restday"
@@ -561,6 +563,8 @@
                   item-value="id"
                   item-text="descript"
                   label="Restday"
+                  hint="Maximum of two restday only"
+                  persistent-hint
                   multiple
                   outlined
                   dense
@@ -569,13 +573,107 @@
                   small-chips
                 ></v-select>
               </v-col>
+              <!-- compress week -->
+              <v-col cols="12" sm="6" md="2">
+                <v-select
+                  v-model="form.compweek"
+                  :items="TrueOrFalse"
+                  item-text="descript"
+                  item-value="id"
+                  label="Compress Week"
+                  outlined
+                  dense
+                  rounded
+                ></v-select>
+              </v-col>
+              <!-- required biometrics -->
+              <v-col cols="12" sm="6" md="2">
+                <v-select
+                  v-model="form.bio_reqd"
+                  :items="TrueOrFalse"
+                  item-text="descript"
+                  item-value="id"
+                  label="Bio Required"
+                  outlined
+                  dense
+                  rounded
+                ></v-select>
+              </v-col>
+              <!-- required biometrics -->
+              <v-col cols="12" sm="6" md="2">
+                <v-select
+                  v-model="form.tmeinout"
+                  :items="TrueOrFalse"
+                  item-text="descript"
+                  item-value="id"
+                  label="Time In / Out"
+                  outlined
+                  dense
+                  rounded
+                ></v-select>
+              </v-col>
+              <!-- early time in -->
+              <v-col cols="12" sm="6" md="2">
+                <v-select
+                  v-model="form.earlytme"
+                  :items="TrueOrFalse"
+                  item-text="descript"
+                  item-value="id"
+                  label="Early Time-In"
+                  outlined
+                  dense
+                  rounded
+                ></v-select>
+              </v-col>
             </v-row>
-            <!-- end row -->
+            <!-- end of 5th row -->
+            <!-- 6th row -->
+            <v-row class="mt-n2">
+              <!-- allow overtime -->
+              <v-col cols="12" sm="6" md="2">
+                <v-select
+                  v-model="form.alw_ot__"
+                  :items="TrueOrFalse"
+                  item-text="descript"
+                  item-value="id"
+                  label="Overtime"
+                  outlined
+                  dense
+                  rounded
+                ></v-select>
+              </v-col>
+              <!-- allow overtime -->
+              <v-col cols="12" sm="6" md="2">
+                <v-select
+                  v-model="form.alw_nsd_"
+                  :items="TrueOrFalse"
+                  item-text="descript"
+                  item-value="id"
+                  label="Night Differential"
+                  outlined
+                  dense
+                  rounded
+                ></v-select>
+              </v-col>
+              <!-- allow overtime -->
+              <v-col cols="12" sm="6" md="2">
+                <v-select
+                  v-model="form.alw_nsd_"
+                  :items="TrueOrFalse"
+                  item-text="descript"
+                  item-value="id"
+                  label="Holiday"
+                  outlined
+                  dense
+                  rounded
+                ></v-select>
+              </v-col>
+            </v-row>
           </v-container>
         </v-card>
       </v-tab-item>
       <!-- end of general -->
-      <!-- general -->
+      <!-- government -->
       <v-tab-item>
         <v-card flat>
           <v-container>
@@ -630,6 +728,29 @@
               </v-text-field>
             </v-col>
           </v-row>
+          </v-container>
+        </v-card>
+      </v-tab-item>
+      <!-- end of government -->
+      <!-- payroll -->
+      <v-tab-item>
+        <v-card flat>
+          <v-container>
+            <!-- Payroll -->
+            <v-row class="mt-4">
+              <v-col cols="12" sm="6" md="2">
+                <v-select
+                  v-model="form.alw_payr"
+                  :items="TrueOrFalse"
+                  item-text="descript"
+                  item-value="id"
+                  label="With Payroll"
+                  outlined
+                  dense
+                  rounded
+                ></v-select>
+              </v-col>
+            </v-row>
           </v-container>
         </v-card>
       </v-tab-item>
@@ -731,7 +852,7 @@ export default {
         profile: require('@/assets/me2.jpg')
       },
       tabHeaders: [
-        'Personal', 'General', 'Government'
+        'Personal', 'General', 'Government', 'Payroll'
       ],
       gender: [
         {
@@ -840,25 +961,29 @@ export default {
         trainee_: '',
         shft_cde: '',
         alw_flex: '',
+        compweek: '',
         rest_day: '',
         rest_da2: '',
+        bio_reqd: '',
+        tmeinout: '',
+        earlytme: '',
+        alw_ot__: '',
+        alw_nsd_: '',
+        alw_hol_: '',
         tax_numb: '',
         sss_numb: '',
         pag_ibig: '',
         philhlth: '',
-        rate_typ: ''
-      }),
-      initialRestDay: {
-        rest_day: '',
-        rest_da2: ''
-      }
+        rate_typ: '',
+        alw_payr: ''
+      })
     }
   },
   computed: {
     c_cardTitle () {
       return this.create ? 'Create New Employee' : 'Edit Employee Information'
     },
-    c_dateResign: {
+    c_disableDateResign: {
       get: function () {
         let disable = null
         const filterDateResign = this.workStat.filter((item) => {
@@ -877,6 +1002,9 @@ export default {
       set: function (newValue) {
         this.form.workstat = newValue
       }
+    },
+    c_disableShiftFile () {
+      return this.form.alw_flex === 'T'
     }
   },
   watch: {
