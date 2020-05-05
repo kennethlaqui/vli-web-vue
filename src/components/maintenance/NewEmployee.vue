@@ -56,7 +56,7 @@
         size="100"
         rounded
       >
-        <v-img :src="images.profile"></v-img>
+        <v-img :src="this.form.avatar__"></v-img>
       </v-avatar>
     </v-row>
     <v-row class="mt-n6">
@@ -224,8 +224,8 @@
             <v-select
               v-model="form.sex_____"
               :items="gender"
-              item-text="description"
-              item-value="id"
+              item-text="text"
+              item-value="value"
               label="Gender"
               outlined
               dense
@@ -237,8 +237,8 @@
             <v-select
               v-model="form.cvilstat"
               :items="civilStatus"
-              item-text="description"
-              item-value="id"
+              item-text="text"
+              item-value="value"
               label="Civil Status"
               outlined
               dense
@@ -405,6 +405,7 @@
                   item-text="descript"
                   item-value="cntrl_no"
                   label="Employment Status"
+                  @change="employmentDefault"
                   outlined
                   dense
                   rounded
@@ -490,8 +491,8 @@
                 <v-select
                   v-model="form.rate_typ"
                   :items="rate_typ"
-                  item-text="descript"
-                  item-value="id"
+                  item-text="text"
+                  item-value="value"
                   label="Rate Type"
                   outlined
                   dense
@@ -503,9 +504,10 @@
                 <v-select
                   v-model="form.min_wage"
                   :items="TrueOrFalse"
-                  item-text="descript"
-                  item-value="id"
+                  item-text="text"
+                  item-value="value"
                   label="Minimum Wage"
+                  @change="minWage"
                   outlined
                   dense
                   rounded
@@ -516,8 +518,8 @@
                 <v-select
                   v-model="form.trainee_"
                   :items="TrueOrFalse"
-                  item-text="descript"
-                  item-value="id"
+                  item-text="text"
+                  item-value="value"
                   label="Trainee"
                   outlined
                   dense
@@ -529,8 +531,8 @@
                 <v-select
                   v-model="form.alw_flex"
                   :items="TrueOrFalse"
-                  item-text="descript"
-                  item-value="id"
+                  item-text="text"
+                  item-value="value"
                   label="Flexible Time"
                   outlined
                   dense
@@ -560,8 +562,8 @@
                 <v-select
                   v-model="m_restday"
                   :items="restdayItem"
-                  item-value="id"
-                  item-text="descript"
+                  item-value="value"
+                  item-text="text"
                   label="Restday"
                   hint="Maximum of two restday only"
                   persistent-hint
@@ -578,8 +580,8 @@
                 <v-select
                   v-model="form.compweek"
                   :items="TrueOrFalse"
-                  item-text="descript"
-                  item-value="id"
+                  item-text="text"
+                  item-value="value"
                   label="Compress Week"
                   outlined
                   dense
@@ -591,8 +593,8 @@
                 <v-select
                   v-model="form.bio_reqd"
                   :items="TrueOrFalse"
-                  item-text="descript"
-                  item-value="id"
+                  item-text="text"
+                  item-value="value"
                   label="Bio Required"
                   outlined
                   dense
@@ -604,8 +606,8 @@
                 <v-select
                   v-model="form.tmeinout"
                   :items="TrueOrFalse"
-                  item-text="descript"
-                  item-value="id"
+                  item-text="text"
+                  item-value="value"
                   label="Time In / Out"
                   outlined
                   dense
@@ -617,8 +619,8 @@
                 <v-select
                   v-model="form.earlytme"
                   :items="TrueOrFalse"
-                  item-text="descript"
-                  item-value="id"
+                  item-text="text"
+                  item-value="value"
                   label="Early Time-In"
                   outlined
                   dense
@@ -634,8 +636,8 @@
                 <v-select
                   v-model="form.alw_ot__"
                   :items="TrueOrFalse"
-                  item-text="descript"
-                  item-value="id"
+                  item-text="text"
+                  item-value="value"
                   label="Overtime"
                   outlined
                   dense
@@ -647,8 +649,8 @@
                 <v-select
                   v-model="form.alw_nsd_"
                   :items="TrueOrFalse"
-                  item-text="descript"
-                  item-value="id"
+                  item-text="text"
+                  item-value="value"
                   label="Night Differential"
                   outlined
                   dense
@@ -660,8 +662,8 @@
                 <v-select
                   v-model="form.alw_nsd_"
                   :items="TrueOrFalse"
-                  item-text="descript"
-                  item-value="id"
+                  item-text="text"
+                  item-value="value"
                   label="Holiday"
                   outlined
                   dense
@@ -738,36 +740,213 @@
           <v-container>
             <!-- Payroll -->
             <v-row class="mt-4">
+              <!-- with payroll -->
               <v-col cols="12" sm="6" md="2">
                 <v-select
                   v-model="form.alw_payr"
                   :items="TrueOrFalse"
-                  item-text="descript"
-                  item-value="id"
+                  item-text="text"
+                  item-value="value"
                   label="With Payroll"
                   outlined
                   dense
                   rounded
                 ></v-select>
               </v-col>
+              <!-- payroll group -->
+              <v-col cols="12" sm="6" md="4">
+                <v-select
+                  v-model="form.paygroup"
+                  :items="payrollGroup"
+                  item-text="descript"
+                  item-value="group_no"
+                  label="Payroll Group"
+                  outlined
+                  dense
+                  rounded
+                ></v-select>
+              </v-col>
+              <!-- compute sss -->
+              <v-col cols="12" sm="6" md="2">
+                <v-select
+                  v-model="form.comp_sss"
+                  :items="TrueOrFalse"
+                  item-text="text"
+                  item-value="value"
+                  label="SSS"
+                  hint="Compute"
+                  persistent-hint
+                  outlined
+                  dense
+                  rounded
+                ></v-select>
+              </v-col>
+              <!-- compute philheatlh -->
+              <v-col cols="12" sm="6" md="2">
+                <v-select
+                  v-model="form.comp_med"
+                  :items="TrueOrFalse"
+                  item-text="text"
+                  item-value="value"
+                  label="Philhealth"
+                  hint="Compute"
+                  persistent-hint
+                  outlined
+                  dense
+                  rounded
+                ></v-select>
+              </v-col>
+              <!-- compute pagibig -->
+              <v-col cols="12" sm="6" md="2">
+                <v-select
+                  v-model="form.comp_pgi"
+                  :items="TrueOrFalse"
+                  item-text="text"
+                  item-value="value"
+                  label="Pag-ibig"
+                  hint="Compute"
+                  persistent-hint
+                  outlined
+                  dense
+                  rounded
+                ></v-select>
+              </v-col>
             </v-row>
+            <!-- end of with payroll -->
+            <!-- 2nd row -->
+            <v-row class="mt-n4">
+              <!-- compute tax -->
+              <v-col cols="12" sm="6" md="2">
+                <v-select
+                  v-model="form.comp_tax"
+                  :items="TrueOrFalse"
+                  item-text="text"
+                  item-value="value"
+                  label="Tax"
+                  hint="Compute"
+                  persistent-hint
+                  outlined
+                  dense
+                  rounded
+                ></v-select>
+              </v-col>
+              <!-- tax type -->
+              <v-col cols="12" sm="6" md="3">
+                <v-select
+                  v-model="form.tax_type"
+                  :items="taxType"
+                  item-text="descript"
+                  item-value="id"
+                  label="Tax Type"
+                  outlined
+                  dense
+                  rounded
+                ></v-select>
+              </v-col>
+              <!-- tax over -->
+              <v-col cols="12" sm="6" md="2">
+                <v-select
+                  v-model="form.tax_over"
+                  :items="TrueOrFalse"
+                  item-text="text"
+                  item-value="value"
+                  label="Tax Over"
+                  outlined
+                  dense
+                  rounded
+                ></v-select>
+              </v-col>
+              <!-- pagibig type -->
+              <v-col cols="12" sm="6" md="5">
+                <v-select
+                  v-model="form.pgbig_cd"
+                  :items="pagibigType"
+                  item-text="descript"
+                  item-value="id"
+                  label="Pagibig Type"
+                  outlined
+                  dense
+                  rounded
+                ></v-select>
+              </v-col>
+            </v-row>
+            <!-- end of 2nd row -->
+            <!-- 3rd row -->
+            <v-row class="mt-n4">
+              <!-- payroll bank -->
+              <v-col cols="12" sm="6" md="5">
+                <v-select
+                  v-model="form.bankfile"
+                  :items="bank"
+                  item-text="descript"
+                  item-value="bank_cde"
+                  label="Bank"
+                  outlined
+                  dense
+                  rounded
+                ></v-select>
+              </v-col>
+              <!-- account type -->
+              <v-col cols="12" sm="6" md="3">
+                <v-select
+                  v-model="form.acct_typ"
+                  :items="bankType"
+                  item-text="descript"
+                  item-value="id"
+                  label="Account Type"
+                  outlined
+                  dense
+                  rounded
+                ></v-select>
+              </v-col>
+              <!-- Account number -->
+              <v-col cols="12" sm="6" md="4">
+                <v-text-field
+                  v-model="form.acct_num"
+                  label="Account Number"
+                  outlined
+                  dense
+                  rounded
+                ></v-text-field>
+              </v-col>
+            </v-row>
+            <!-- 3rd row -->
           </v-container>
         </v-card>
       </v-tab-item>
     </v-tabs-items>
     <v-row justify="center">
-      <dialogSave
+      <dialogSaveUpdate
         v-if="dialog"
-        :dialog="this.dialog"
-        :dialogsave="this.dialogSave"
+        dialog
         title="Save new employee?"
+        content="Note: You are not allowed to change the System Code after you agree"
+        :dialogsave="this.dialogSave"
       >
-      </dialogSave>
+      <template v-slot:b-close>
+        <v-btn
+          color="green darken-1"
+          text
+          @click="dialog = false"
+        >
+          Disagree
+        </v-btn>
+      </template>
+      <template v-slot:b-submit>
+        <v-btn
+          color="green darken-1"
+          text
+          @click="save(); dialog = false"
+        >
+          Agree
+        </v-btn>
+      </template>
+      </dialogSaveUpdate>
     </v-row>
     <v-card-actions>
       <v-spacer></v-spacer>
       <v-btn v-if="create" @click.stop="dialog = true" text>Save</v-btn>
-      <v-btn v-if="!create" @click ="update" text>Update</v-btn>
+      <v-btn v-if="!create" @click.stop="dialog = true" text>Update</v-btn>
       <v-btn @click="cancel" text>Cancel</v-btn>
     </v-card-actions>
     <v-snackbar v-model="snack" :timeout="snackTimeOut" :color="snackColor">
@@ -781,12 +960,14 @@
 import axios from 'axios'
 import { Form } from 'vform'
 import { mask } from 'vue-the-mask'
-import dialogSave from '@/components/dialogs/masterfile/DialogSave.vue'
+import { Vmasterfileform } from '@/form/masterfile'
+import { Vgender, Vcivilstatus, Vratetype, Vweek, Vboolean } from '@/util/helper'
+import dialogSaveUpdate from '@/components/dialogs/masterfile/DialogSaveUpdate.vue'
 
 export default {
   name: 'NewEmployee',
   components: {
-    dialogSave
+    dialogSaveUpdate
   },
   props: {
     employeeData: Object,
@@ -798,7 +979,6 @@ export default {
       h_fullName: '',
       h_position: '',
       r_middleInitial: [v => v.length <= 1],
-      m_restday: [],
       snackText: '',
       snackColor: '',
       m_maskTin: null,
@@ -807,19 +987,29 @@ export default {
       m_position: null,
       m_workStat: null,
       m_workArea: null,
-      m_emplStat: null,
+      f_emplStat: '',
       m_maskPhic: null,
       m_division: null,
       m_department: null,
       m_maskPagibig: null,
+      form: '',
+      bank: [],
+      gender: [],
       section: [],
       workStat: [],
       emplStat: [],
       workArea: [],
       division: [],
       shftFile: [],
+      rate_typ: [],
+      m_restday: [],
       positions: [],
       department: [],
+      civilStatus: [],
+      restdayItem: [],
+      TrueOrFalse: [],
+      payrollGroup: [],
+      emplStatData: [],
       snackTimeOut: 3000,
       maskTin: '###-###-###',
       maskSss: '##-#######-#',
@@ -851,132 +1041,52 @@ export default {
         company: require('@/assets/android-chrome-192x192.png'),
         profile: require('@/assets/me2.jpg')
       },
+      restday: [],
       tabHeaders: [
         'Personal', 'General', 'Government', 'Payroll'
       ],
-      gender: [
+      taxType: [
         {
-          id: 'M',
-          description: 'Male'
+          id: 'C',
+          descript: 'Compensation'
         },
         {
-          id: 'F',
-          description: 'Female'
-        },
-        {
-          id: 'O',
-          description: 'Others'
+          id: 'E',
+          descript: 'Expanded'
         }
       ],
-      civilStatus: [
-        {
-          id: 'S',
-          description: 'Single'
-        },
-        {
-          id: 'M',
-          description: 'Married'
-        }
-      ],
-      rate_typ: [
-        {
-          id: 'M',
-          descript: 'Monthly'
-        },
-        {
-          id: 'D',
-          descript: 'Daily'
-        }
-      ],
-      TrueOrFalse: [
-        {
-          id: 'T',
-          descript: 'Yes'
-        },
-        {
-          id: 'F',
-          descript: 'No'
-        }
-      ],
-      restdayItem: [
+      pagibigType: [
         {
           id: '1',
-          descript: 'Monday'
+          descript: 'Maximum contribution of 100'
         },
         {
           id: '2',
-          descript: 'Tuesday'
+          descript: 'Percentage of Monthly Contribution (MC)'
         },
         {
           id: '3',
-          descript: 'Wednesday'
+          descript: 'EE % of MC + ER portion over P5000.00'
         },
         {
           id: '4',
-          descript: 'Thursday'
-        },
-        {
-          id: '5',
-          descript: 'Friday'
-        },
-        {
-          id: '6',
-          descript: 'Saturday'
-        },
-        {
-          id: '7',
-          descript: 'Sunday'
+          descript: 'Input Employee/Employer contribution'
         }
       ],
-      restday: [],
-      form: new Form({
-        primekey: '',
-        empl_cde: '',
-        empl_cd2: '',
-        asso_cde: '',
-        chro_num: '',
-        last_nme: '',
-        frst_nme: '',
-        midl_nme: '',
-        midl_ini: '',
-        birthday: '',
-        sex_____: '',
-        cvilstat: '',
-        address1: '',
-        address2: '',
-        address3: '',
-        cel_numb: '',
-        dte_hire: '',
-        dte_rglr: '',
-        dte_rsgn: '',
-        dte_eoc_: '',
-        pos_code: '',
-        emp_stat: '',
-        workstat: '',
-        workarea: '',
-        grp_lvl1: '',
-        grp_lvl2: '',
-        grp_lvl3: '',
-        min_wage: '',
-        trainee_: '',
-        shft_cde: '',
-        alw_flex: '',
-        compweek: '',
-        rest_day: '',
-        rest_da2: '',
-        bio_reqd: '',
-        tmeinout: '',
-        earlytme: '',
-        alw_ot__: '',
-        alw_nsd_: '',
-        alw_hol_: '',
-        tax_numb: '',
-        sss_numb: '',
-        pag_ibig: '',
-        philhlth: '',
-        rate_typ: '',
-        alw_payr: ''
-      })
+      bankType: [
+        {
+          id: 'X',
+          descript: 'No Account'
+        },
+        {
+          id: 'S',
+          descript: 'Savings'
+        },
+        {
+          id: 'C',
+          descript: 'Checking'
+        }
+      ]
     }
   },
   computed: {
@@ -1025,12 +1135,28 @@ export default {
       this.loadDepartment()
       this.loadDivision()
       this.loadShiftFile()
+      this.payrollGroup()
+      this.loadBank()
       this.arrayRestDay()
     },
     cancel () {
       this.cloneProps()
       this.form = new Form()
       this.$root.$emit('newEmployee', false)
+    },
+    callExport () {
+      this.gender = Vgender
+      this.rate_typ = Vratetype
+      this.civilStatus = Vcivilstatus
+      this.restdayItem = Vweek
+      this.TrueOrFalse = Vboolean
+      this.form = Vmasterfileform
+    },
+    minWage () {
+      this.form.min_wage === 'T' ? this.form.comp_tax = 'F' : this.form.comp_tax = 'T'
+    },
+    employmentDefault () {
+      this.loadEmplStatData()
     },
     destructuringRestDay () {
       let restDay, restDa2
@@ -1117,6 +1243,23 @@ export default {
           this.form.chro_num = this.$store.getters.retrieveEmployeeCode
         })
     },
+    loadBank () {
+      this.$store.dispatch('retrieveBank', {
+        primekey: this.primekey
+      })
+        .then(response => {
+          this.bank = this.$store.getters.retrieveBank
+        })
+    },
+    loadPayrollGroup () {
+      // display all day type
+      this.$store.dispatch('retrievePayrollGroup', {
+        primekey: this.primekey
+      })
+        .then(response => {
+          this.payrollGroup = this.$store.getters.retrievePayrollGroup
+        })
+    },
     loadShiftFile () {
       // display all day type
       this.$store.dispatch('retrieveShiftFile', {
@@ -1132,6 +1275,23 @@ export default {
       })
         .then(response => {
           this.workStat = this.$store.getters.retrieveWorkStat
+        })
+    },
+    loadEmplStatData () {
+      this.$store.dispatch('retrieveEmplStatData', {
+        primekey: this.primekey,
+        emp_stat: this.form.emp_stat
+      })
+        .then(response => {
+          this.emplStatData = this.$store.getters.retrieveEmplStatData
+          const obj = Object.assign({}, this.emplStatData)
+          this.form.paygroup = obj[0].defu_paygroup
+          this.form.rate_typ = obj[0].defu_rate_typ
+          this.form.comp_tax = obj[0].defu_comp_tax
+          this.form.comp_sss = obj[0].defu_comp_sss
+          this.form.comp_med = obj[0].defu_comp_med
+          this.form.comp_pgi = obj[0].defu_comp_pgi
+          this.form.min_wage = obj[0].defu_min_wage
         })
     },
     loadEmplStat () {
@@ -1186,6 +1346,7 @@ export default {
   },
   created () {
     this.header()
+    this.callExport()
     if (this.create) {
       // run once
       this.cloneProps()
@@ -1194,12 +1355,6 @@ export default {
       // run once
       this.cloneProps()
     }
-    this.$root.$on('masterFileSaveDialog', () => {
-      this.dialog = false
-    })
-    this.$root.$on('masterFileSaveDialogSave', () => {
-      this.save()
-    })
     this.loadWorkStat()
     this.loadEmplStat()
     this.loadPositions()
@@ -1208,6 +1363,9 @@ export default {
     this.loadDepartment()
     this.loadDivision()
     this.loadShiftFile()
+    this.loadPayrollGroup()
+    this.loadBank()
+    this.loadEmplStatData()
     this.arrayRestDay()
   },
   directives: {
