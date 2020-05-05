@@ -8,7 +8,6 @@
       :sort-by="sortBy.toLowerCase()"
       :sort-desc="sortDesc"
       hide-default-footer
-      loading
     >
       <template v-slot:header>
         <v-toolbar
@@ -78,17 +77,17 @@
             <v-card
               class="mx-auto"
               max-width="400"
-              :elevation="hover ? 4 : 2"
+              :elevation="hover ? 12 : 2"
             >
-              <v-card-title class="subtitle-1">{{ item.name }}</v-card-title>
-              <v-card-subtitle class="subheading font-weight-light"><v-icon dense>mdi-calendar</v-icon> {{ item.coverage }}</v-card-subtitle>
+              <v-card-title class="subheading">{{ item.name }}</v-card-title>
+              <v-card-subtitle class="subheading black--text"><v-icon dense>mdi-calendar</v-icon> {{ item.coverage }}</v-card-subtitle>
               <v-divider></v-divider>
               <v-list dense>
                 <v-list-item
                   v-for="(key, index) in filteredKeys"
                   :key="index"
                 >
-                  <v-list-item-content class="align-end font-weight-light" :class="{ 'blue--text': sortBy === key }">{{ key }}: {{ item[key.toLowerCase().replace(/\s/g, '')] }}</v-list-item-content>
+                  <v-list-item-content class="align-end" :class="{ 'blue--text': sortBy === key }">{{ key }}: {{ item[key.toLowerCase().replace(/\s/g, '')] }}</v-list-item-content>
                 </v-list-item>
               </v-list>
               <v-card-actions>

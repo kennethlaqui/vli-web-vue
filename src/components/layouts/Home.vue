@@ -2,7 +2,8 @@
 <!-- App.vue -->
 
 <v-app>
-  <v-app-bar :clipped-left="primaryDrawer.clipped" color="white" dense app elevation="2">
+  <v-app-bar :clipped-left="primaryDrawer.clipped" app>
+
     <v-toolbar-title>Virtual Logic Inc.</v-toolbar-title>
     <v-spacer></v-spacer>
     <v-toolbar-items>
@@ -43,9 +44,6 @@ export default {
     },
     footer: {
       inset: false
-    },
-    images: {
-      company: require('@/assets/android-chrome-192x192.png')
     }
   }),
   computed: {
