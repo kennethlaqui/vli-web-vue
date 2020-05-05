@@ -7,13 +7,29 @@ Vue.use(Vuex)
 
 axios.defaults.baseURL = process.env.VUE_APP_URL
 
+function defaultMasterfileReference () {
+  return {
+    section: [],
+    emplstat: [],
+    division: [],
+    workarea: [],
+    workstat: [],
+    positions: [],
+    department: []
+  }
+}
+
 export default new Vuex.Store({
   state: {
+    defaultMasterfileReference,
     token: localStorage.getItem('access_token') || null,
     user: '',
-    primekey: localStorage.getItem('primekey') || null,
+    primekey: [],
+    vli_subs: [], // no getters
     username: '',
     maxemployee: '',
+    employeecodechecker: '',
+    bank: [],
     folder: [],
     daytype: [],
     section: [],
@@ -25,9 +41,11 @@ export default new Vuex.Store({
     companies: [],
     shiftfile: [],
     department: [],
-    directories: [],
     incomeType: [],
+    directories: [],
     payrollgroup: [],
+    emplstatdata: [],
+    f_emplstatdata: '',
     payrolldirectorybuild: [],
     showdialog: false
   },
@@ -50,8 +68,14 @@ export default new Vuex.Store({
     retrieveEmployeeCode (state) {
       return state.maxemployee
     },
+    employeeCodeChecker (state) {
+      return state.employeecodechecker
+    },
     retrievePositions (state) {
       return state.positions
+    },
+    retrieveEmplStatData (state) {
+      return state.emplstatdata
     },
     retrieveEmplStat (state) {
       return state.emplstat
@@ -92,6 +116,9 @@ export default new Vuex.Store({
     buildPayrollDirectory (state) {
       return state.payrolldirectorybuild
     },
+    retrieveBank (state) {
+      return state.bank
+    },
     showDialog (state) {
       return state.showdialog
     }
@@ -115,11 +142,17 @@ export default new Vuex.Store({
     retrieveCompany (state, payload) {
       state.companies = payload
     },
+    employeeCodeChecker (state, payload) {
+      state.employeecodechecker = payload
+    },
     retrieveEmployeeCode (state, payload) {
       state.maxemployee = payload
     },
     retrievePositions (state, payload) {
       state.positions = payload
+    },
+    retrieveEmplStatData (state, payload) {
+      state.emplstatdata = payload
     },
     retrieveEmplStat (state, payload) {
       state.emplstat = payload
@@ -160,11 +193,45 @@ export default new Vuex.Store({
     buildPayrollDirectory (state, payload) {
       state.payrolldirectorybuild = payload
     },
+    retrieveBank (state, payload) {
+      state.bank = payload
+    },
     toggleDialog (state) {
       state.showdialog = !state.showdialog
+    },
+    resetMasterfileReference (state) {
+      const reset = defaultMasterfileReference()
+      Object.keys(reset).forEach(key => {
+        state[key] = reset[key]
+      })
     }
   },
   actions: {
+    async retrieveBank (context, payload) {
+      if (this.state.bank.length === 0) {
+        try {
+          axios.defaults.headers.common['Authorization'] = 'Bearer ' + context.state.token
+          if (context.getters.loggedIn) {
+            await new Promise((resolve, reject) => {
+              axios.get('l/helper/bank', {
+                params: {
+                  primekey: payload.primekey
+                }
+              })
+                .then(response => {
+                  this.bank = response.data
+                  context.commit('retrieveBank', this.bank)
+                  resolve(response)
+                })
+                .catch(error => {
+                  reject(error)
+                })
+            })
+          }
+        } catch (error) {
+        }
+      }
+    },
     async buildPayrollDirectory (context, payload) {
       try {
         axios.defaults.headers.common['Authorization'] = 'Bearer ' + context.state.token
@@ -189,26 +256,29 @@ export default new Vuex.Store({
       }
     },
     async retrievePayrollGroup (context, payload) {
-      try {
-        axios.defaults.headers.common['Authorization'] = 'Bearer ' + context.state.token
-        if (context.getters.loggedIn) {
-          await new Promise((resolve, reject) => {
-            axios.get('l/helper/payrollgroup', {
-              params: {
-                primekey: payload.primekey
-              }
+      // select
+      if (this.state.payrollgroup.length === 0) {
+        try {
+          axios.defaults.headers.common['Authorization'] = 'Bearer ' + context.state.token
+          if (context.getters.loggedIn) {
+            await new Promise((resolve, reject) => {
+              axios.get('l/helper/payrollgroup', {
+                params: {
+                  primekey: payload.primekey
+                }
+              })
+                .then(response => {
+                  this.payrollgroup = response.data
+                  context.commit('retrievePayrollGroup', this.payrollgroup)
+                  resolve(response)
+                })
+                .catch(error => {
+                  reject(error)
+                })
             })
-              .then(response => {
-                this.payrollgroup = response.data
-                context.commit('retrievePayrollGroup', this.payrollgroup)
-                resolve(response)
-              })
-              .catch(error => {
-                reject(error)
-              })
-          })
+          }
+        } catch (error) {
         }
-      } catch (error) {
       }
     },
     async retrieveIncomeType (context, payload) {
@@ -320,133 +390,165 @@ export default new Vuex.Store({
       }
     },
     async retrieveSection (context, payload) {
-      try {
-        axios.defaults.headers.common['Authorization'] = 'Bearer ' + context.state.token
-        if (context.getters.loggedIn) {
-          await new Promise((resolve, reject) => {
-            axios.get('l/helper/section/', {
-              params: {
-                primekey: payload.primekey
-              }
+      if (this.state.section.length === 0) {
+        try {
+          axios.defaults.headers.common['Authorization'] = 'Bearer ' + context.state.token
+          if (context.getters.loggedIn) {
+            await new Promise((resolve, reject) => {
+              axios.get('l/helper/section/', {
+                params: {
+                  primekey: payload.primekey
+                }
+              })
+                .then(response => {
+                  this.section = response.data
+                  context.commit('retrieveSection', this.section)
+                  resolve(response)
+                })
+                .catch(error => {
+                  reject(error)
+                })
             })
-              .then(response => {
-                this.section = response.data
-                context.commit('retrieveSection', this.section)
-                resolve(response)
-              })
-              .catch(error => {
-                reject(error)
-              })
-          })
+          }
+        } catch (error) {
         }
-      } catch (error) {
       }
     },
     async retrieveDepartment (context, payload) {
-      try {
-        axios.defaults.headers.common['Authorization'] = 'Bearer ' + context.state.token
-        if (context.getters.loggedIn) {
-          await new Promise((resolve, reject) => {
-            axios.get('l/helper/department/', {
-              params: {
-                primekey: payload.primekey
-              }
+      if (this.state.department.length === 0) {
+        try {
+          axios.defaults.headers.common['Authorization'] = 'Bearer ' + context.state.token
+          if (context.getters.loggedIn) {
+            await new Promise((resolve, reject) => {
+              axios.get('l/helper/department/', {
+                params: {
+                  primekey: payload.primekey
+                }
+              })
+                .then(response => {
+                  this.department = response.data
+                  context.commit('retrieveDepartment', this.department)
+                  resolve(response)
+                })
+                .catch(error => {
+                  reject(error)
+                })
             })
-              .then(response => {
-                this.department = response.data
-                context.commit('retrieveDepartment', this.department)
-                resolve(response)
-              })
-              .catch(error => {
-                reject(error)
-              })
-          })
+          }
+        } catch (error) {
         }
-      } catch (error) {
       }
     },
     async retrieveDivision (context, payload) {
-      try {
-        axios.defaults.headers.common['Authorization'] = 'Bearer ' + context.state.token
-        if (context.getters.loggedIn) {
-          await new Promise((resolve, reject) => {
-            axios.get('l/helper/division/', {
-              params: {
-                primekey: payload.primekey
-              }
+      if (this.state.division.length === 0) {
+        try {
+          axios.defaults.headers.common['Authorization'] = 'Bearer ' + context.state.token
+          if (context.getters.loggedIn) {
+            await new Promise((resolve, reject) => {
+              axios.get('l/helper/division/', {
+                params: {
+                  primekey: payload.primekey
+                }
+              })
+                .then(response => {
+                  this.division = response.data
+                  context.commit('retrieveDivision', this.division)
+                  resolve(response)
+                })
+                .catch(error => {
+                  reject(error)
+                })
             })
-              .then(response => {
-                this.division = response.data
-                context.commit('retrieveDivision', this.division)
-                resolve(response)
-              })
-              .catch(error => {
-                reject(error)
-              })
-          })
+          }
+        } catch (error) {
         }
-      } catch (error) {
       }
     },
     async retrievePositions (context, payload) {
-      try {
-        axios.defaults.headers.common['Authorization'] = 'Bearer ' + context.state.token
-        if (context.getters.loggedIn) {
-          await new Promise((resolve, reject) => {
-            axios.get('l/helper/positions/', {
-              params: {
-                primekey: payload.primekey
-              }
+      if (this.state.positions.length === 0) {
+        try {
+          axios.defaults.headers.common['Authorization'] = 'Bearer ' + context.state.token
+          if (context.getters.loggedIn) {
+            await new Promise((resolve, reject) => {
+              axios.get('l/helper/positions/', {
+                params: {
+                  primekey: payload.primekey
+                }
+              })
+                .then(response => {
+                  this.positions = response.data
+                  context.commit('retrievePositions', this.positions)
+                  resolve(response)
+                })
+                .catch(error => {
+                  reject(error)
+                })
             })
-              .then(response => {
-                this.positions = response.data
-                context.commit('retrievePositions', this.positions)
-                resolve(response)
-              })
-              .catch(error => {
-                reject(error)
-              })
-          })
+          }
+        } catch (error) {
         }
-      } catch (error) {
       }
     },
     async retrieveWorkArea (context, payload) {
-      try {
-        axios.defaults.headers.common['Authorization'] = 'Bearer ' + context.state.token
-        if (context.getters.loggedIn) {
-          await new Promise((resolve, reject) => {
-            axios.get('l/helper/workarea/', {
-              params: {
-                primekey: payload.primekey
-              }
+      if (this.state.workarea.length === 0) {
+        try {
+          axios.defaults.headers.common['Authorization'] = 'Bearer ' + context.state.token
+          if (context.getters.loggedIn) {
+            await new Promise((resolve, reject) => {
+              axios.get('l/helper/workarea/', {
+                params: {
+                  primekey: payload.primekey
+                }
+              })
+                .then(response => {
+                  this.workarea = response.data
+                  context.commit('retrieveWorkArea', this.workarea)
+                  resolve(response)
+                })
+                .catch(error => {
+                  reject(error)
+                })
             })
-              .then(response => {
-                this.workarea = response.data
-                context.commit('retrieveWorkArea', this.workarea)
-                resolve(response)
-              })
-              .catch(error => {
-                reject(error)
-              })
-          })
+          }
+        } catch (error) {
         }
-      } catch (error) {
       }
     },
     async retrieveWorkStat (context, payload) {
+      if (this.state.workstat.length === 0) {
+        try {
+          axios.defaults.headers.common['Authorization'] = 'Bearer ' + context.state.token
+          if (context.getters.loggedIn) {
+            await new Promise((resolve, reject) => {
+              axios.get('l/helper/workstat/', {
+                params: {
+                  primekey: payload.primekey
+                }
+              })
+                .then(response => {
+                  this.workstat = response.data
+                  context.commit('retrieveWorkStat', this.workstat)
+                  resolve(response)
+                })
+                .catch(error => {
+                  reject(error)
+                })
+            })
+          }
+        } catch (error) {
+        }
+      }
+    },
+    async retrieveEmplStatData (context, payload) {
+      // data
       try {
         axios.defaults.headers.common['Authorization'] = 'Bearer ' + context.state.token
         if (context.getters.loggedIn) {
           await new Promise((resolve, reject) => {
-            axios.get('l/helper/workstat/', {
-              params: {
-                primekey: payload.primekey
-              }
-            })
+            axios.get(`l/helper/emplstat/data/${payload.primekey}/${payload.emp_stat}`)
               .then(response => {
-                this.workstat = response.data
-                context.commit('retrieveWorkStat', this.workstat)
+                this.emplstatdata = response.data
+                context.commit('retrieveEmplStatData', this.emplstatdata)
                 resolve(response)
               })
               .catch(error => {
@@ -458,14 +560,45 @@ export default new Vuex.Store({
       }
     },
     async retrieveEmplStat (context, payload) {
+      // select
+      if (this.state.emplstat.length === 0) {
+        try {
+          axios.defaults.headers.common['Authorization'] = 'Bearer ' + context.state.token
+          if (context.getters.loggedIn) {
+            await new Promise((resolve, reject) => {
+              axios.get('l/helper/emplstat/', {
+                params: {
+                  primekey: payload.primekey
+                }
+              })
+                .then(response => {
+                  this.emplstat = response.data
+                  context.commit('retrieveEmplStat', this.emplstat)
+                  resolve(response)
+                })
+                .catch(error => {
+                  reject(error)
+                })
+            })
+          }
+        } catch (error) {
+        }
+      }
+    },
+    async employeeCodeChecker (context, payload) {
       try {
         axios.defaults.headers.common['Authorization'] = 'Bearer ' + context.state.token
         if (context.getters.loggedIn) {
           await new Promise((resolve, reject) => {
-            axios.get('l/helper/emplstat')
+            axios.get('l/helper/employee/code/checker/', {
+              params: {
+                primekey: payload.primekey,
+                tableName: payload.tableName
+              }
+            })
               .then(response => {
-                this.emplstat = response.data
-                context.commit('retrieveEmplStat', this.emplstat)
+                this.employeecodechecker = response.data
+                context.commit('employeeCodeChecker', this.employeecodechecker)
                 resolve(response)
               })
               .catch(error => {
@@ -522,19 +655,18 @@ export default new Vuex.Store({
     },
     // -- assigned company
     async retrieveCompany (context, payload) {
-      // stringify primekeys
-      let data = JSON.stringify(payload.primekey)
+      const primekeys = payload.primekey.map((item) => {
+        return item.primekey
+      })
       try {
         axios.defaults.headers.common['Authorization'] = 'Bearer ' + context.state.token
         if (context.getters.loggedIn) {
           await new Promise((resolve, reject) => {
-            axios({
-              method: 'post',
-              url: '/u/login/primekey/company/',
-              headers: {
-                'Content-Type': 'application/json'
-              },
-              data: data
+            axios.get('u/login/primekey/company', {
+              params: {
+                primekey: primekeys,
+                vli_subs: this.vli_subs
+              }
             })
               .then(response => {
                 this.companies = response.data
@@ -550,6 +682,35 @@ export default new Vuex.Store({
       }
     },
     // -- primekey
+    // async retrieveCompany (context, payload) {
+    //   // stringify primekeys
+    //   let data = JSON.stringify(payload.primekey)
+    //   try {
+    //     axios.defaults.headers.common['Authorization'] = 'Bearer ' + context.state.token
+    //     if (context.getters.loggedIn) {
+    //       await new Promise((resolve, reject) => {
+    //         axios({
+    //           method: 'post',
+    //           url: '/u/login/primekey/company/',
+    //           headers: {
+    //             'Content-Type': 'application/json'
+    //           },
+    //           data: data
+    //         })
+    //           .then(response => {
+    //             this.companies = response.data
+    //             context.commit('retrieveCompany', this.companies)
+    //             resolve(response)
+    //           })
+    //           .catch(error => {
+    //             reject(error)
+    //           })
+    //       })
+    //     }
+    //   } catch (error) {
+    //   }
+    // },
+    // -- primekey and vli_subs
     async retrievePrimekey (context, payload) {
       try {
         axios.defaults.headers.common['Authorization'] = 'Bearer ' + context.state.token
@@ -557,7 +718,8 @@ export default new Vuex.Store({
           await new Promise((resolve, reject) => {
             axios.get('u/login/primekey/' + payload.vli_subs + '/' + payload.user_num)
               .then(response => {
-                this.primekey = response.data
+                this.primekey = response.data.primekey
+                this.vli_subs = response.data.vli_subs
                 context.commit('retrievePrimekey', this.primekey)
                 resolve(response)
               })

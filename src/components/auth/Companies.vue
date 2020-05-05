@@ -1,9 +1,17 @@
 <template>
-<v-app>
-  <v-content v-if="!loading">
+  <div>
+    <v-content>
     <v-container
       fluid
+      fill-height
     >
+      <v-layout v-if="loading" row justify-center align-center>
+        <v-progress-circular
+          :size="50"
+          color="primary"
+          indeterminate
+        ></v-progress-circular>
+      </v-layout>
       <v-row
         align="center"
         justify="center"
@@ -13,36 +21,36 @@
           sm="8"
           md="4"
         >
-          <v-card class="elevation-12">
-            <v-toolbar
-              color="primary"
-              dark
-              flat
+      <v-card v-if="!loading" class="elevation-2">
+        <v-toolbar
+          color="primary"
+          dark
+          flat
+        >
+          <v-toolbar-title>Welcome, {{ this.welcome }}</v-toolbar-title>
+          <v-spacer />
+        </v-toolbar>
+        <v-card-text>
+            <v-select
+              v-model="primekey"
+              :items="companies"
+              item-text="co_name_"
+              item-value="primekey"
+              label="Choose your company"
+              @change="getSelectedValue"
             >
-              <v-toolbar-title>Welcome, {{ this.welcome }}</v-toolbar-title>
-              <v-spacer />
-            </v-toolbar>
-            <v-card-text>
-                <v-select
-                  v-model="primekey"
-                  :items="companies"
-                  item-text="co_name_"
-                  item-value="primekey"
-                  label="Choose your company"
-                  @change="getSelectedValue"
-                >
-                </v-select>
-            </v-card-text>
-            <v-card-actions>
-              <v-spacer />
-              <v-btn type="submit" color="success" :disabled="disabled" @click="proceedToDashboard()">Proceed</v-btn>
-            </v-card-actions>
-          </v-card>
-        </v-col>
-      </v-row>
+            </v-select>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer />
+          <v-btn type="submit" color="success" :disabled="disabled" @click="proceedToDashboard()">Proceed</v-btn>
+        </v-card-actions>
+      </v-card>
+      </v-col>
+    </v-row>
     </v-container>
-  </v-content>
-</v-app>
+    </v-content>
+  </div>
 </template>
 <script>
 // import axios from 'axios'
@@ -66,7 +74,6 @@ export default {
     welcomeUser () {
       this.$store.dispatch('retrieveUser')
         .then(response => {
-          this.loading = false
           this.welcome = this.$store.getters.retrieveUser.user_nme
         })
     },
@@ -86,14 +93,15 @@ export default {
               })
                 .then(response => {
                   this.companies = this.$store.getters.retrieveCompany
+                  this.loading = false
                 })
             })
         })
     },
-    getSelectedValue () {
+    getSelectedValue (primekey) {
       this.disabled = false
       // this.$cookies.set('primekey', this.primekey, '1d')
-      localStorage.setItem('primekey', this.primekey)
+      localStorage.setItem('primekey', primekey)
     },
     proceedToDashboard () {
       // save primekey in mirage server
@@ -113,3 +121,8 @@ export default {
   }
 }
 </script>
+<style scoped>
+  .loading-dialog {
+    background-color: #303030
+  }
+</style>

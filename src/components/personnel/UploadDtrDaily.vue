@@ -1,5 +1,8 @@
 <template>
   <v-app>
+    <v-container
+      fluid
+    >
     <div>
       <v-row>
         <v-col cols="12" md="12" lg="12">
@@ -222,6 +225,7 @@
         <v-switch v-model="singleSelect" label="Single select" class="pa-3"></v-switch>
       </template>
     </v-data-table> -->
+    </v-container>
   </v-app>
 </template>
 <script>
