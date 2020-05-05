@@ -7,7 +7,7 @@ Vue.use(Vuex)
 
 axios.defaults.baseURL = process.env.VUE_APP_URL
 
-function initialStateMasterfileSelect () {
+function defaultMasterfileReference () {
   return {
     section: [],
     emplstat: [],
@@ -21,7 +21,7 @@ function initialStateMasterfileSelect () {
 
 export default new Vuex.Store({
   state: {
-    initialStateMasterfileSelect,
+    defaultMasterfileReference,
     token: localStorage.getItem('access_token') || null,
     user: '',
     primekey: [],
@@ -29,6 +29,7 @@ export default new Vuex.Store({
     username: '',
     maxemployee: '',
     employeecodechecker: '',
+    bank: [],
     folder: [],
     daytype: [],
     section: [],
@@ -40,9 +41,11 @@ export default new Vuex.Store({
     companies: [],
     shiftfile: [],
     department: [],
-    directories: [],
     incomeType: [],
+    directories: [],
     payrollgroup: [],
+    emplstatdata: [],
+    f_emplstatdata: '',
     payrolldirectorybuild: [],
     showdialog: false
   },
@@ -70,6 +73,9 @@ export default new Vuex.Store({
     },
     retrievePositions (state) {
       return state.positions
+    },
+    retrieveEmplStatData (state) {
+      return state.emplstatdata
     },
     retrieveEmplStat (state) {
       return state.emplstat
@@ -110,6 +116,9 @@ export default new Vuex.Store({
     buildPayrollDirectory (state) {
       return state.payrolldirectorybuild
     },
+    retrieveBank (state) {
+      return state.bank
+    },
     showDialog (state) {
       return state.showdialog
     }
@@ -133,14 +142,17 @@ export default new Vuex.Store({
     retrieveCompany (state, payload) {
       state.companies = payload
     },
-    retrieveEmployeeCode (state, payload) {
-      state.maxemployee = payload
-    },
     employeeCodeChecker (state, payload) {
       state.employeecodechecker = payload
     },
+    retrieveEmployeeCode (state, payload) {
+      state.maxemployee = payload
+    },
     retrievePositions (state, payload) {
       state.positions = payload
+    },
+    retrieveEmplStatData (state, payload) {
+      state.emplstatdata = payload
     },
     retrieveEmplStat (state, payload) {
       state.emplstat = payload
@@ -181,17 +193,45 @@ export default new Vuex.Store({
     buildPayrollDirectory (state, payload) {
       state.payrolldirectorybuild = payload
     },
+    retrieveBank (state, payload) {
+      state.bank = payload
+    },
     toggleDialog (state) {
       state.showdialog = !state.showdialog
     },
-    resetMasterfileSelect (state) {
-      const reset = initialStateMasterfileSelect()
+    resetMasterfileReference (state) {
+      const reset = defaultMasterfileReference()
       Object.keys(reset).forEach(key => {
         state[key] = reset[key]
       })
     }
   },
   actions: {
+    async retrieveBank (context, payload) {
+      if (this.state.bank.length === 0) {
+        try {
+          axios.defaults.headers.common['Authorization'] = 'Bearer ' + context.state.token
+          if (context.getters.loggedIn) {
+            await new Promise((resolve, reject) => {
+              axios.get('l/helper/bank', {
+                params: {
+                  primekey: payload.primekey
+                }
+              })
+                .then(response => {
+                  this.bank = response.data
+                  context.commit('retrieveBank', this.bank)
+                  resolve(response)
+                })
+                .catch(error => {
+                  reject(error)
+                })
+            })
+          }
+        } catch (error) {
+        }
+      }
+    },
     async buildPayrollDirectory (context, payload) {
       try {
         axios.defaults.headers.common['Authorization'] = 'Bearer ' + context.state.token
@@ -216,26 +256,29 @@ export default new Vuex.Store({
       }
     },
     async retrievePayrollGroup (context, payload) {
-      try {
-        axios.defaults.headers.common['Authorization'] = 'Bearer ' + context.state.token
-        if (context.getters.loggedIn) {
-          await new Promise((resolve, reject) => {
-            axios.get('l/helper/payrollgroup', {
-              params: {
-                primekey: payload.primekey
-              }
+      // select
+      if (this.state.payrollgroup.length === 0) {
+        try {
+          axios.defaults.headers.common['Authorization'] = 'Bearer ' + context.state.token
+          if (context.getters.loggedIn) {
+            await new Promise((resolve, reject) => {
+              axios.get('l/helper/payrollgroup', {
+                params: {
+                  primekey: payload.primekey
+                }
+              })
+                .then(response => {
+                  this.payrollgroup = response.data
+                  context.commit('retrievePayrollGroup', this.payrollgroup)
+                  resolve(response)
+                })
+                .catch(error => {
+                  reject(error)
+                })
             })
-              .then(response => {
-                this.payrollgroup = response.data
-                context.commit('retrievePayrollGroup', this.payrollgroup)
-                resolve(response)
-              })
-              .catch(error => {
-                reject(error)
-              })
-          })
+          }
+        } catch (error) {
         }
-      } catch (error) {
       }
     },
     async retrieveIncomeType (context, payload) {
@@ -496,7 +539,28 @@ export default new Vuex.Store({
         }
       }
     },
+    async retrieveEmplStatData (context, payload) {
+      // data
+      try {
+        axios.defaults.headers.common['Authorization'] = 'Bearer ' + context.state.token
+        if (context.getters.loggedIn) {
+          await new Promise((resolve, reject) => {
+            axios.get(`l/helper/emplstat/data/${payload.primekey}/${payload.emp_stat}`)
+              .then(response => {
+                this.emplstatdata = response.data
+                context.commit('retrieveEmplStatData', this.emplstatdata)
+                resolve(response)
+              })
+              .catch(error => {
+                reject(error)
+              })
+          })
+        }
+      } catch (error) {
+      }
+    },
     async retrieveEmplStat (context, payload) {
+      // select
       if (this.state.emplstat.length === 0) {
         try {
           axios.defaults.headers.common['Authorization'] = 'Bearer ' + context.state.token
