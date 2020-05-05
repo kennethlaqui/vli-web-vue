@@ -186,6 +186,8 @@
             :headers="employeesWithManpowerHeader"
             :items="manpowerSchedules"
             :loading="loading"
+            :single-select="singleSelect"
+            show-select
             item-key="cntrl_no"
             class="elevation-1 font-weight-light caption"
             fixed-header
