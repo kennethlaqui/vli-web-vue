@@ -86,25 +86,25 @@
               >
             </v-avatar>
             </template>
-    <template v-slot:item.action="{ item }">
-      <v-icon
-        small
-        class="mr-2"
-        @click="editItem(item)"
-      >
-        edit
-      </v-icon>
-      <v-icon
-        small
-        @click="deleteItem(item)"
-      >
-        delete
-      </v-icon>
-    </template>
-    <template v-slot:no-data>
-      No data to retrieve
-    </template>
-  </v-data-table>
+          <template v-slot:item.action="{ item }">
+            <v-icon
+              small
+              class="mr-2"
+              @click="editItem(item)"
+            >
+              edit
+            </v-icon>
+            <v-icon
+              small
+              @click="deleteItem(item)"
+            >
+              delete
+            </v-icon>
+          </template>
+          <template v-slot:no-data>
+            No data to retrieve
+          </template>
+        </v-data-table>
 </v-card>
 <newEmployee v-if="b_show_NewEmployeeComponent" :create="b_createNew" :employeeData="editedItem"></newEmployee>
 </v-container>
@@ -112,7 +112,6 @@
 </template>
 <script>
 import axios from 'axios'
-import { mask } from 'vue-the-mask'
 import newEmployee from '@/components/maintenance/NewEmployee.vue'
 
 export default {
@@ -122,30 +121,17 @@ export default {
   },
   data () {
     return {
-      loading: false,
-      search: '',
-      date: new Date().toISOString().substr(0, 10),
-      menu: false,
-      ModalBirthday: false,
-      modalDateHired: false,
-      modalDateRglr: false,
-      modalDateRsgn: false,
-      b_show_NewEmployeeComponent: false,
-      b_createNew: false,
-      bol: true,
-      dialog: false,
       primekey: localStorage.getItem('primekey'),
-      token: localStorage.getItem('access_token'),
-      masterfile: [],
-      maskTin: '###-###-###',
-      maskSSS: '##-#######-#',
-      maskPagIbig: '####-####-####',
-      maskPhic: '##-#########-#',
+      search: '',
+      loading: false,
       singleSelect: false,
+      b_createNew: false,
+      b_show_NewEmployeeComponent: false,
       selected: [],
+      masterfile: [],
       headers: [
         { text: 'Image', value: 'avatar__', align: 'center', sortable: false },
-        { text: 'Employee #', value: 'empl_cde', align: 'left', sortable: false },
+        { text: 'Employee #', value: 'empl_cde', align: 'left', sortable: true },
         { text: 'Last Name', value: 'last_nme' },
         { text: 'First Name', value: 'frst_nme' },
         { text: 'Middle Name', value: 'midl_nme' },
@@ -154,6 +140,7 @@ export default {
       editedIndex: -1,
       editedItem: {
         primekey: '',
+        avatar__: '',
         empl_cde: '',
         empl_cd2: '',
         asso_cde: '',
@@ -162,6 +149,7 @@ export default {
         frst_nme: '',
         midl_nme: '',
         midl_ini: '',
+        nickname: '',
         birthday: '',
         sex_____: '',
         cvilstat: '',
@@ -198,10 +186,22 @@ export default {
         pag_ibig: '',
         philhlth: '',
         rate_typ: '',
-        alw_payr: ''
+        alw_payr: '',
+        paygroup: '',
+        comp_sss: '',
+        comp_med: '',
+        comp_pgi: '',
+        comp_tax: '',
+        tax_type: '',
+        tax_over: '',
+        pgbig_cd: '',
+        bankfile: '',
+        acct_typ: '',
+        acct_num: ''
       },
       defaultItem: {
         primekey: localStorage.getItem('primekey'),
+        avatar__: 'https://randomuser.me/api/portraits/lego/5.jpg',
         empl_cde: '',
         empl_cd2: '',
         asso_cde: '',
@@ -210,6 +210,7 @@ export default {
         frst_nme: '',
         midl_nme: '',
         midl_ini: '',
+        nickname: '',
         birthday: '',
         sex_____: '',
         cvilstat: '',
@@ -222,8 +223,8 @@ export default {
         dte_rsgn: '',
         dte_eoc_: '',
         pos_code: '',
-        emp_stat: '',
-        workstat: '',
+        emp_stat: 'P',
+        workstat: 'A',
         workarea: '',
         grp_lvl1: '',
         grp_lvl2: '',
@@ -233,8 +234,8 @@ export default {
         shft_cde: '',
         alw_flex: 'F',
         compweek: 'F',
-        rest_day: '6',
-        rest_da2: '7',
+        rest_day: '7',
+        rest_da2: '0',
         bio_reqd: 'T',
         tmeinout: 'T',
         earlytme: 'F',
@@ -246,50 +247,18 @@ export default {
         pag_ibig: '',
         philhlth: '',
         rate_typ: 'M',
-        alw_payr: 'T'
-      },
-      gender: [
-        {
-          id: 'M',
-          description: 'Male'
-        },
-        {
-          id: 'F',
-          description: 'Female'
-        }
-      ],
-      cvilstat: [
-        {
-          id: 'S',
-          description: 'Single'
-        },
-        {
-          id: 'M',
-          description: 'Married'
-        }
-      ],
-      empl_cde: '',
-      positions: [],
-      emplstat: [],
-      workstat: [],
-      workarea: [],
-      division: [],
-      department: [],
-      section: []
-    }
-  },
-  computed: {
-    formTitle () {
-      return this.editedIndex === -1 ? 'New Employee' : "Edit Employee's Information"
-    },
-    computedDialog: {
-      get () {
-        return this.visible
-      },
-      set (value) {
-        if (!value) {
-          this.$emit('close')
-        }
+        alw_payr: 'T',
+        paygroup: '',
+        comp_sss: 'T',
+        comp_med: 'T',
+        comp_pgi: 'T',
+        comp_tax: 'T',
+        tax_type: 'C',
+        tax_over: 'F',
+        pgbig_cd: '2',
+        bankfile: '',
+        acct_typ: 'X',
+        acct_num: ''
       }
     }
   },
@@ -297,8 +266,8 @@ export default {
     async retrieveMasterFile () {
       this.loading = true
       try {
-        axios.defaults.headers.common['Authorization'] = 'Bearer ' + this.token
-        if (this.bol) {
+        axios.defaults.headers.common['Authorization'] = 'Bearer ' + localStorage.getItem('access_token')
+        if (this.$store.getters.loggedIn) {
           await new Promise((resolve, reject) => {
             axios.get('u/maintenance/masterfile/', {
               params: {
@@ -351,95 +320,6 @@ export default {
         this.masterfile.push(this.editedItem)
       }
       this.close()
-    },
-    selectGender (id) {
-
-    },
-    selectCvlStat (id) {
-
-    },
-    selectEmplStat (descript) {
-
-    },
-    selectWorkStat (descript) {
-
-    },
-    selectWorkArea (descript) {
-
-    },
-    selectDivision (descript) {
-
-    },
-    selectDepartment (descript) {
-
-    },
-    selectSection (descript) {
-
-    },
-    selectPosition (descript) {
-
-    },
-    getMaxEmployeeCode () {
-      this.$store.dispatch('retrieveEmployeeCode', {
-        primekey: localStorage.getItem('primekey')
-      })
-        .then(response => {
-          this.empl_cde = this.$store.getters.retrieveEmployeeCode
-        })
-    },
-    getWorkStat () {
-      this.$store.dispatch('retrieveWorkStat', {
-        primekey: localStorage.getItem('primekey')
-      })
-        .then(response => {
-          this.workstat = this.$store.getters.retrieveWorkStat
-        })
-    },
-    getPositions () {
-      this.$store.dispatch('retrievePositions', {
-        primekey: localStorage.getItem('primekey')
-      })
-        .then(response => {
-          this.positions = this.$store.getters.retrievePositions
-        })
-    },
-    getEmplStat () {
-      this.$store.dispatch('retrieveEmplStat')
-        .then(response => {
-          this.emplstat = this.$store.getters.retrieveEmplStat
-        })
-    },
-    getWorkArea () {
-      this.$store.dispatch('retrieveWorkArea', {
-        primekey: localStorage.getItem('primekey')
-      })
-        .then(response => {
-          this.workarea = this.$store.getters.retrieveWorkArea
-        })
-    },
-    getDivision () {
-      this.$store.dispatch('retrieveDivision', {
-        primekey: localStorage.getItem('primekey')
-      })
-        .then(response => {
-          this.division = this.$store.getters.retrieveDivision
-        })
-    },
-    getDepartment () {
-      this.$store.dispatch('retrieveDepartment', {
-        primekey: localStorage.getItem('primekey')
-      })
-        .then(response => {
-          this.department = this.$store.getters.retrieveDepartment
-        })
-    },
-    getSection () {
-      this.$store.dispatch('retrieveSection', {
-        primekey: localStorage.getItem('primekey')
-      })
-        .then(response => {
-          this.section = this.$store.getters.retrieveSection
-        })
     }
   },
   created () {
@@ -449,14 +329,6 @@ export default {
       this.editedItem = Object.assign({}, this.defaultItem)
       this.retrieveMasterFile()
     })
-  },
-  watch: {
-    dialog (val) {
-      val || this.close()
-    }
-  },
-  directives: {
-    mask
   }
 }
 </script>
