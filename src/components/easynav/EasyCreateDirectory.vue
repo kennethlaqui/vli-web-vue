@@ -116,6 +116,7 @@
                   item-value="appl_prd"
                   label="Application Period*"
                   required
+                  v-if="done"
                 ></v-select>
               </v-col>
               <v-col cols="12" sm="6" md="6">
@@ -151,6 +152,7 @@ export default {
       showLastPicker: false,
       lb_dialog: true,
       snack: false,
+      done: true,
       snackColor: '',
       snackText: '',
       group_no: '',
@@ -190,8 +192,8 @@ export default {
       ],
       itemAppl: [
         {
-          'appl_prd': moment().format('YYYY') + '01',
-          'descript': moment().format('YYYY') + ' - January'
+          'appl_prd': this.applYear + '01',
+          'descript': this.applYear + ' - January'
         },
         {
           'appl_prd': moment().format('YYYY') + '02',
@@ -288,6 +290,12 @@ export default {
           'descript': 'December'
         }
       ]
+    }
+  },
+  computed: {
+    applYear () {
+      const applYear = this.year____ !== moment().format('YYYY') ? this.year____ : moment().format('YYYY')
+      return moment(applYear).format('YYYY')
     }
   },
   methods: {

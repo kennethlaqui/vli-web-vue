@@ -13,7 +13,7 @@
           sm="8"
           md="4"
         >
-          <v-card class="elevation-12" loading>
+          <v-card class="elevation-2" loading>
             <v-toolbar
               color="primary"
               dark

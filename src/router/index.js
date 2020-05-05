@@ -17,6 +17,7 @@ import OneTimeIncome from '../views/payroll/OneTimeIncome.vue'
 import Reference from '../components/maintenance/Holidays.vue'
 import Biometrics from '../components/maintenance/Biometrics.vue'
 import UserMasterfile from '../views/maintenance/Masterfile.vue'
+import NewEmployee from '../components/maintenance/NewEmployee.vue'
 // import EasyCreateEmployee from '../components/controller/dialog/CreateEmployee.vue'
 
 Vue.use(VueRouter)
@@ -140,6 +141,15 @@ const routes = [
     path: '/payroll/income/onetime/:cntrl_no',
     name: 'OneTimeIncome',
     component: OneTimeIncome,
+    meta: {
+      requiresAuth: true,
+      layout: 'dashboard'
+    }
+  },
+  {
+    path: '/maintenance/masterfile/new/',
+    name: 'UserNewEmployee',
+    component: NewEmployee,
     meta: {
       requiresAuth: true,
       layout: 'dashboard'
