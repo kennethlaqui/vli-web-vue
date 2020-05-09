@@ -1,8 +1,8 @@
 <template>
-  <v-container>
   <v-dialog
     v-model="dialog"
     persistent
+    :max-width="width"
   >
     <v-card>
       <v-card-title>
@@ -10,18 +10,16 @@
           {{ title }}
         </slot>
       </v-card-title>
-      <v-card-text>
-        <slot name="content">
-          {{ content }}
-        </slot>
-      </v-card-text>
+      <v-container fluid>
+        <slot name="body"></slot>
+      </v-container>
       <v-card-actions>
         <v-spacer></v-spacer>
         <slot name="b-close">
           <v-btn
             color="green darken-1"
             text
-            @click="dialog = false"
+            @click="c_dialog = false"
           >
             Close
           </v-btn>
@@ -30,7 +28,7 @@
           <v-btn
             color="green darken-1"
             text
-            @click="dialog = false"
+            @click="c_dialog = false"
           >
             Proceed
           </v-btn>
@@ -38,7 +36,6 @@
       </v-card-actions>
     </v-card>
   </v-dialog>
-  </v-container>
 </template>
 <script>
 export default {
@@ -53,7 +50,20 @@ export default {
       type: Boolean,
       default: false
     },
-    dialogsave: Boolean
+    width: {
+      type: String,
+      default: '400px'
+    }
+  },
+  computed: {
+    c_dialog: {
+      get: function () {
+        return this.dialog
+      },
+      set: function (value) {
+        this.dialog = value
+      }
+    }
   }
 }
 </script>

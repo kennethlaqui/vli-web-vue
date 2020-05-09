@@ -55,7 +55,7 @@ let Vweek = [
   },
   {
     value: '5',
-    text: 'Frvalueay'
+    text: 'Friday'
   },
   {
     value: '6',
@@ -78,4 +78,13 @@ let Vboolean = [
   }
 ]
 
-export { Vgender, Vcivilstatus, Vratetype, Vweek, Vboolean }
+function VbooleanFn (value) {
+  switch (value) {
+    case 'T':
+      return 'Yes'
+    case 'F':
+      return 'No'
+  }
+}
+
+export { Vgender, Vcivilstatus, Vratetype, Vweek, Vboolean, VbooleanFn }

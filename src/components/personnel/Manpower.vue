@@ -1,263 +1,259 @@
 <template>
-  <v-app>
-    <v-container>
-    <div>
-      <v-card>
-        <v-app-bar
-          color="primary"
-          dense
-          dark
-        >
-      <!-- <v-app-bar-nav-icon></v-app-bar-nav-icon> -->
+  <div>
+    <v-card>
+      <v-app-bar
+        color="primary"
+        dense
+        dark
+      >
+    <!-- <v-app-bar-nav-icon></v-app-bar-nav-icon> -->
 
-      <v-toolbar-title>Manpower</v-toolbar-title>
+    <v-toolbar-title>Manpower</v-toolbar-title>
 
-      <v-spacer></v-spacer>
+    <v-spacer></v-spacer>
 
+    <v-tooltip bottom>
+      <template v-slot:activator="{ on }">
+        <v-switch v-on="on" v-model="switchManpower" label="Schedule" class="pa-4 mt-5"></v-switch>
+      </template>
+      {{ switchManpower }}
+      <span>View Schedules</span>
+    </v-tooltip>
+
+    <v-btn icon>
+      <v-icon>mdi-delete-variant</v-icon>
+    </v-btn>
+
+    <v-btn icon>
       <v-tooltip bottom>
         <template v-slot:activator="{ on }">
-          <v-switch v-on="on" v-model="switchManpower" label="Schedule" class="pa-4 mt-5"></v-switch>
-        </template>
-        {{ switchManpower }}
-        <span>View Schedules</span>
-      </v-tooltip>
-
-      <v-btn icon>
-        <v-icon>mdi-delete-variant</v-icon>
-      </v-btn>
-
-      <v-btn icon>
-        <v-tooltip bottom>
-          <template v-slot:activator="{ on }">
-            <v-btn v-on="on" icon exact>
-              <v-icon>mdi-sync</v-icon>
-            </v-btn>
-          </template>
-          <span>View Schedules</span>
-        </v-tooltip>
-      </v-btn>
-
-      <v-btn icon @click="createStartEndDate()">
-        <v-icon>mdi-content-save</v-icon>
-      </v-btn>
-
-      <v-menu
-        left
-        bottom
-      >
-        <template v-slot:activator="{ on }">
-          <v-btn icon v-on="on">
-            <v-icon>mdi-dots-vertical</v-icon>
+          <v-btn v-on="on" icon exact>
+            <v-icon>mdi-sync</v-icon>
           </v-btn>
         </template>
+        <span>View Schedules</span>
+      </v-tooltip>
+    </v-btn>
 
-        <v-list>
-          <v-list-item>
-            <v-list-item-title>Download Manpower</v-list-item-title>
-          </v-list-item>
-          <v-list-item>
-            <v-list-item-title>Print Manpower</v-list-item-title>
-          </v-list-item>
-        </v-list>
-      </v-menu>
-    </v-app-bar>
-      <!-- <v-card-subtitle>Coverage</v-card-subtitle> -->
-      <v-card-actions>
-        <v-row>
-        <v-col cols="12" sm="6" md="3">
-          <v-menu
-            ref="strtMenu"
-            v-model="strtMenu"
-            :close-on-content-click="false"
-            :return-value.sync="strtDate"
-            transition="scale-transition"
-            offset-y
-            min-width="290px"
-          >
-            <template v-slot:activator="{ on }">
-              <v-text-field
-                v-model="strtDate"
-                label="Start Date"
-                prepend-icon="event"
-                readonly
-                v-on="on"
-                class="font-weight-light"
-              ></v-text-field>
-            </template>
-            <v-date-picker v-model="strtDate" no-title scrollable @change="retrieveEmployeeCode()">
-              <v-spacer></v-spacer>
-              <v-btn text color="primary" @click="strtMenu = false">Cancel</v-btn>
-              <v-btn text color="primary" @click="$refs.strtMenu.save(strtDate)">OK</v-btn>
-            </v-date-picker>
-          </v-menu>
-        </v-col>
-        <v-col cols="12" sm="6" md="3">
-          <v-menu
-            ref="endMenu_"
-            v-model="endMenu_"
-            :close-on-content-click="false"
-            :return-value.sync="endDate_"
-            transition="scale-transition"
-            offset-y
-            min-width="290px"
-          >
-            <template v-slot:activator="{ on }">
-              <v-text-field
-                v-model="endDate_"
-                label="End Date"
-                prepend-icon="event"
-                readonly
-                v-on="on"
-                class="font-weight-light"
-              ></v-text-field>
-            </template>
-            <v-date-picker v-model="endDate_" no-title scrollable @change="retrieveEmployeeCode()">
-              <v-spacer></v-spacer>
-              <v-btn text color="primary" @click="endMenu_ = false">Cancel</v-btn>
-              <v-btn text color="primary" @click="$refs.endMenu_.save(endDate_)">OK</v-btn>
-            </v-date-picker>
-          </v-menu>
-        </v-col>
-        <v-col cols="12" sm="6" md="3">
-          <v-select
-            v-model="newShft_"
-            :items="shftFile"
-            item-text="std_shft"
-            item-value="shft_cde"
-            label="Shift"
-            class="font-weight-light"
-          ></v-select>
-        </v-col>
-        <v-col cols="12" sm="6" md="3">
-          <v-text-field
-            v-model="search"
-            append-icon="search"
-            label="Search"
-            single-line
-            hide-details
-            class="font-weight-light"
-          ></v-text-field>
-        </v-col>
-        </v-row>
-      </v-card-actions>
-      </v-card>
-      <!-- deparment and employee codes section -->
+    <v-btn icon @click="createStartEndDate()">
+      <v-icon>mdi-content-save</v-icon>
+    </v-btn>
+
+    <v-menu
+      left
+      bottom
+    >
+      <template v-slot:activator="{ on }">
+        <v-btn icon v-on="on">
+          <v-icon>mdi-dots-vertical</v-icon>
+        </v-btn>
+      </template>
+
+      <v-list>
+        <v-list-item>
+          <v-list-item-title>Download Manpower</v-list-item-title>
+        </v-list-item>
+        <v-list-item>
+          <v-list-item-title>Print Manpower</v-list-item-title>
+        </v-list-item>
+      </v-list>
+    </v-menu>
+  </v-app-bar>
+    <!-- <v-card-subtitle>Coverage</v-card-subtitle> -->
+    <v-card-actions>
       <v-row>
-        <v-col cols="12" sm="4" md="4" lg="4">
-          <div>
-          <v-data-table
-            v-model="employeeWithScheduleSelect"
-            :headers="employeesWithSchedulesHeader"
-            :items="employeeWithSchedules"
-            :single-select="singleSelect"
-            :loading="loading"
-            item-key="empl_cde"
-            show-select
-            class="elevation-1 font-weight-light caption"
-            fixed-header
-            height="600px"
-            v-if="switchManpower"
-          >
+      <v-col cols="12" sm="6" md="3">
+        <v-menu
+          ref="strtMenu"
+          v-model="strtMenu"
+          :close-on-content-click="false"
+          :return-value.sync="strtDate"
+          transition="scale-transition"
+          offset-y
+          min-width="290px"
+        >
+          <template v-slot:activator="{ on }">
+            <v-text-field
+              v-model="strtDate"
+              label="Start Date"
+              prepend-icon="event"
+              readonly
+              v-on="on"
+              class="font-weight-light"
+            ></v-text-field>
+          </template>
+          <v-date-picker v-model="strtDate" no-title scrollable @change="retrieveEmployeeCode()">
+            <v-spacer></v-spacer>
+            <v-btn text color="primary" @click="strtMenu = false">Cancel</v-btn>
+            <v-btn text color="primary" @click="$refs.strtMenu.save(strtDate)">OK</v-btn>
+          </v-date-picker>
+        </v-menu>
+      </v-col>
+      <v-col cols="12" sm="6" md="3">
+        <v-menu
+          ref="endMenu_"
+          v-model="endMenu_"
+          :close-on-content-click="false"
+          :return-value.sync="endDate_"
+          transition="scale-transition"
+          offset-y
+          min-width="290px"
+        >
+          <template v-slot:activator="{ on }">
+            <v-text-field
+              v-model="endDate_"
+              label="End Date"
+              prepend-icon="event"
+              readonly
+              v-on="on"
+              class="font-weight-light"
+            ></v-text-field>
+          </template>
+          <v-date-picker v-model="endDate_" no-title scrollable @change="retrieveEmployeeCode()">
+            <v-spacer></v-spacer>
+            <v-btn text color="primary" @click="endMenu_ = false">Cancel</v-btn>
+            <v-btn text color="primary" @click="$refs.endMenu_.save(endDate_)">OK</v-btn>
+          </v-date-picker>
+        </v-menu>
+      </v-col>
+      <v-col cols="12" sm="6" md="3">
+        <v-select
+          v-model="newShft_"
+          :items="shftFile"
+          item-text="std_shft"
+          item-value="shft_cde"
+          label="Shift"
+          class="font-weight-light"
+        ></v-select>
+      </v-col>
+      <v-col cols="12" sm="6" md="3">
+        <v-text-field
+          v-model="search"
+          append-icon="search"
+          label="Search"
+          single-line
+          hide-details
+          class="font-weight-light"
+        ></v-text-field>
+      </v-col>
+      </v-row>
+    </v-card-actions>
+    </v-card>
+    <!-- deparment and employee codes section -->
+    <v-row>
+      <v-col cols="12" sm="4" md="4" lg="4">
+        <div>
+        <v-data-table
+          v-model="employeeWithScheduleSelect"
+          :headers="employeesWithSchedulesHeader"
+          :items="employeeWithSchedules"
+          :single-select="singleSelect"
+          :loading="loading"
+          item-key="empl_cde"
+          show-select
+          class="elevation-1 font-weight-light caption"
+          fixed-header
+          height="600px"
+          v-if="switchManpower"
+        >
+      </v-data-table>
+      <v-data-table
+          v-model="dprtSlct"
+          :headers="departmentHeader"
+          :items="dprtment"
+          :single-select="singleSelect"
+          :loading="loading"
+          item-key="pos_code"
+          show-select
+          class="elevation-1 font-weight-light caption"
+          fixed-header
+          height="600px"
+          v-else
+        >
+      </v-data-table>
+      <div class="text-center pt-2">
+        <v-btn v-if="switchManpower" class="primary" @click="retrieveEmployeeWithManpower()">Search</v-btn>
+        <v-btn v-else class="primary" @click="retrieveEmployees()">Search</v-btn>
+      </div>
+      </div>
+      </v-col>
+      <!-- employee and manpower schedules -->
+      <v-col cols="12" sm="12" md="8" lg="8">
+        <v-data-table
+          v-model="manpowerSlct"
+          :headers="employeesWithManpowerHeader"
+          :items="manpowerSchedules"
+          :loading="loading"
+          :single-select="singleSelect"
+          show-select
+          item-key="cntrl_no"
+          class="elevation-1 font-weight-light caption"
+          fixed-header
+          height="600px"
+          group-by="employee"
+          v-if="switchManpower"
+        >
+        <template v-slot:item.avatar__="{ item }">
+          <v-avatar size="36">
+            <img
+              :src="item.avatar__"
+              alt="John"
+            >
+          </v-avatar>
+        </template>
+        <template v-slot:item.day="{ item }">
+          {{ getDay(item.strt_dte) }}
+        </template>
+        <template v-slot:item.std_shft="{ item }">
+          <v-edit-dialog
+            @save="saveShiftFile"
+            @cancel="cancelShiftFile"
+            @open="openShiftFile"
+            @close="closeShiftFile"
+          > {{ item.std_shft }}
+            <template v-slot:input>
+              <v-select
+                v-model="item.shft_cde"
+                :items="shftFile"
+                item-text="std_shft"
+                item-value="shft_cde"
+                label="Available Shift"
+                @change="getNewShift(item)"
+              ></v-select>
+            </template>
+          </v-edit-dialog>
+        </template>
         </v-data-table>
         <v-data-table
-            v-model="dprtSlct"
-            :headers="departmentHeader"
-            :items="dprtment"
-            :single-select="singleSelect"
-            :loading="loading"
-            item-key="pos_code"
-            show-select
-            class="elevation-1 font-weight-light caption"
-            fixed-header
-            height="600px"
-            v-else
-          >
-        </v-data-table>
-        <div class="text-center pt-2">
-          <v-btn v-if="switchManpower" class="primary" @click="retrieveEmployeeWithManpower()">Search</v-btn>
-          <v-btn v-else class="primary" @click="retrieveEmployees()">Search</v-btn>
-        </div>
-        </div>
-        </v-col>
-        <!-- employee and manpower schedules -->
-        <v-col cols="12" sm="12" md="8" lg="8">
-          <v-data-table
-            v-model="manpowerSlct"
-            :headers="employeesWithManpowerHeader"
-            :items="manpowerSchedules"
-            :loading="loading"
-            :single-select="singleSelect"
-            show-select
-            item-key="cntrl_no"
-            class="elevation-1 font-weight-light caption"
-            fixed-header
-            height="600px"
-            group-by="employee"
-            v-if="switchManpower"
-          >
+          v-model="emplSlct"
+          :headers="employeesHeader"
+          :items="employees"
+          :single-select="singleSelect"
+          :loading="loading"
+          item-key="empl_cde"
+          show-select
+          :search="search"
+          class="elevation-1 font-weight-light caption"
+          fixed-header
+          height="600px"
+          v-else
+        >
           <template v-slot:item.avatar__="{ item }">
-            <v-avatar size="36">
-              <img
-                :src="item.avatar__"
-                alt="John"
-              >
-            </v-avatar>
+          <v-avatar size="36">
+            <img
+              :src="item.avatar__"
+              alt="John"
+            >
+          </v-avatar>
           </template>
-          <template v-slot:item.day="{ item }">
-            {{ getDay(item.strt_dte) }}
-          </template>
-          <template v-slot:item.std_shft="{ item }">
-            <v-edit-dialog
-              @save="saveShiftFile"
-              @cancel="cancelShiftFile"
-              @open="openShiftFile"
-              @close="closeShiftFile"
-            > {{ item.std_shft }}
-              <template v-slot:input>
-                <v-select
-                  v-model="item.shft_cde"
-                  :items="shftFile"
-                  item-text="std_shft"
-                  item-value="shft_cde"
-                  label="Available Shift"
-                  @change="getNewShift(item)"
-                ></v-select>
-              </template>
-            </v-edit-dialog>
-          </template>
-          </v-data-table>
-          <v-data-table
-            v-model="emplSlct"
-            :headers="employeesHeader"
-            :items="employees"
-            :single-select="singleSelect"
-            :loading="loading"
-            item-key="empl_cde"
-            show-select
-            :search="search"
-            class="elevation-1 font-weight-light caption"
-            fixed-header
-            height="600px"
-            v-else
-          >
-            <template v-slot:item.avatar__="{ item }">
-            <v-avatar size="36">
-              <img
-                :src="item.avatar__"
-                alt="John"
-              >
-            </v-avatar>
-            </template>
-          </v-data-table>
-        </v-col>
-      </v-row>
-      <v-snackbar v-model="snack" :timeout="3000" :color="snackColor">
-        <h3>{{ snackText }}</h3>
-      <v-btn text @click="snack = false">Close</v-btn>
-    </v-snackbar>
-    </div>
-    </v-container>
-  </v-app>
+        </v-data-table>
+      </v-col>
+    </v-row>
+    <v-snackbar v-model="snack" :timeout="3000" :color="snackColor">
+      <h3>{{ snackText }}</h3>
+    <v-btn text @click="snack = false">Close</v-btn>
+  </v-snackbar>
+  </div>
 </template>
 <script>
 import axios from 'axios'

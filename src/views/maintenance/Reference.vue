@@ -1,15 +1,15 @@
 <template>
   <div>
-    <holidays></holidays>
+    <reference></reference>
   </div>
 </template>
 <script>
-import holidays from '@/components/maintenance/Holidays.vue'
+import reference from '@/components/maintenance/Reference.vue'
 
 export default {
-  name: 'EncodeDtr',
+  name: 'reference-Component',
   components: {
-    holidays
+    reference
   }
 }
 </script>

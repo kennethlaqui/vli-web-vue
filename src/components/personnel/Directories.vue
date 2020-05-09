@@ -1,5 +1,5 @@
 <template>
-  <v-container fluid>
+  <div>
     <v-data-iterator
       :items="items"
       :items-per-page.sync="itemsPerPage"
@@ -161,7 +161,7 @@
         </v-row>
       </template>
     </v-data-iterator>
-  </v-container>
+  </div>
 </template>
 <script>
 import axios from 'axios'

@@ -45,6 +45,7 @@ export default new Vuex.Store({
     directories: [],
     payrollgroup: [],
     emplstatdata: [],
+    workstatdata: [],
     f_emplstatdata: '',
     payrolldirectorybuild: [],
     showdialog: false
@@ -79,6 +80,9 @@ export default new Vuex.Store({
     },
     retrieveEmplStat (state) {
       return state.emplstat
+    },
+    retrieveWorkStatData (state) {
+      return state.workstatdata
     },
     retrieveWorkStat (state) {
       return state.workstat
@@ -156,6 +160,9 @@ export default new Vuex.Store({
     },
     retrieveEmplStat (state, payload) {
       state.emplstat = payload
+    },
+    retrieveWorkStatData (state, payload) {
+      state.workstatdata = payload
     },
     retrieveWorkStat (state, payload) {
       state.workstat = payload
@@ -514,7 +521,30 @@ export default new Vuex.Store({
         }
       }
     },
+    async retrieveWorkStatData (context, payload) {
+      // select
+      if (this.state.workstat.length === 0) {
+        try {
+          axios.defaults.headers.common['Authorization'] = 'Bearer ' + context.state.token
+          if (context.getters.loggedIn) {
+            await new Promise((resolve, reject) => {
+              axios.get(`l/helper/workstat/data/${payload.primekey}`)
+                .then(response => {
+                  this.workstatdata = response.data
+                  context.commit('retrieveWorkStatData', this.workstatdata)
+                  resolve(response)
+                })
+                .catch(error => {
+                  reject(error)
+                })
+            })
+          }
+        } catch (error) {
+        }
+      }
+    },
     async retrieveWorkStat (context, payload) {
+      // select
       if (this.state.workstat.length === 0) {
         try {
           axios.defaults.headers.common['Authorization'] = 'Bearer ' + context.state.token
@@ -540,12 +570,12 @@ export default new Vuex.Store({
       }
     },
     async retrieveEmplStatData (context, payload) {
-      // data
+      // this api contain what query to be executed
       try {
         axios.defaults.headers.common['Authorization'] = 'Bearer ' + context.state.token
         if (context.getters.loggedIn) {
           await new Promise((resolve, reject) => {
-            axios.get(`l/helper/emplstat/data/${payload.primekey}/${payload.emp_stat}`)
+            axios.get(`l/helper/emplstat/data/${payload.primekey}/${payload.emp_stat}/${payload.query___}`)
               .then(response => {
                 this.emplstatdata = response.data
                 context.commit('retrieveEmplStatData', this.emplstatdata)
