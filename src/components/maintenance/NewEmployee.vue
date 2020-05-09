@@ -1295,7 +1295,8 @@ export default {
     loadEmplStatData () {
       this.$store.dispatch('retrieveEmplStatData', {
         primekey: this.primekey,
-        emp_stat: this.form.emp_stat
+        emp_stat: this.form.emp_stat,
+        query___: 'A'
       })
         .then(response => {
           this.emplStatData = this.$store.getters.retrieveEmplStatData
