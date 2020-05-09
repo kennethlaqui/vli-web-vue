@@ -1,8 +1,8 @@
 <template>
+  <v-container>
   <v-dialog
     v-model="dialog"
     persistent
-    max-width="400"
   >
     <v-card>
       <v-card-title>
@@ -38,6 +38,7 @@
       </v-card-actions>
     </v-card>
   </v-dialog>
+  </v-container>
 </template>
 <script>
 export default {
