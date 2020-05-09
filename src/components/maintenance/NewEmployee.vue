@@ -56,7 +56,7 @@
         size="100"
         rounded
       >
-        <v-img :src="this.form.avatar__"></v-img>
+        <v-img :src="this.form.avatar__" alt="john"></v-img>
       </v-avatar>
     </v-row>
     <v-row class="mt-n6">
@@ -562,8 +562,8 @@
                 <v-select
                   v-model="m_restday"
                   :items="restdayItem"
-                  item-value="value"
                   item-text="text"
+                  item-value="value"
                   label="Restday"
                   hint="Maximum of two restday only"
                   persistent-hint
@@ -835,8 +835,8 @@
                 <v-select
                   v-model="form.tax_type"
                   :items="taxType"
-                  item-text="descript"
-                  item-value="id"
+                  item-text="text"
+                  item-value="value"
                   label="Tax Type"
                   outlined
                   dense
@@ -861,8 +861,8 @@
                 <v-select
                   v-model="form.pgbig_cd"
                   :items="pagibigType"
-                  item-text="descript"
-                  item-value="id"
+                  item-text="text"
+                  item-value="value"
                   label="Pagibig Type"
                   outlined
                   dense
@@ -891,8 +891,8 @@
                 <v-select
                   v-model="form.acct_typ"
                   :items="bankType"
-                  item-text="descript"
-                  item-value="id"
+                  item-text="text"
+                  item-value="value"
                   label="Account Type"
                   outlined
                   dense
@@ -960,7 +960,8 @@
 import axios from 'axios'
 import { Form } from 'vform'
 import { mask } from 'vue-the-mask'
-import { Vmasterfileform } from '@/form/masterfile'
+import { masterfileForm } from '@/form/masterfile'
+import { VtrimObject, VtrimArrayObject } from '@/util/trimmer'
 import { Vgender, Vcivilstatus, Vratetype, Vweek, Vboolean } from '@/util/helper'
 import dialogSaveUpdate from '@/components/dialogs/masterfile/DialogSaveUpdate.vue'
 
@@ -1047,44 +1048,44 @@ export default {
       ],
       taxType: [
         {
-          id: 'C',
-          descript: 'Compensation'
+          value: 'C',
+          text: 'Compensation'
         },
         {
-          id: 'E',
-          descript: 'Expanded'
+          value: 'E',
+          text: 'Expanded'
         }
       ],
       pagibigType: [
         {
-          id: '1',
-          descript: 'Maximum contribution of 100'
+          value: '1',
+          text: 'Maximum contribution of 100'
         },
         {
-          id: '2',
-          descript: 'Percentage of Monthly Contribution (MC)'
+          value: '2',
+          text: 'Percentage of Monthly Contribution (MC)'
         },
         {
-          id: '3',
-          descript: 'EE % of MC + ER portion over P5000.00'
+          value: '3',
+          text: 'EE % of MC + ER portion over P5000.00'
         },
         {
-          id: '4',
-          descript: 'Input Employee/Employer contribution'
+          value: '4',
+          text: 'Input Employee/Employer contribution'
         }
       ],
       bankType: [
         {
-          id: 'X',
-          descript: 'No Account'
+          value: 'X',
+          text: 'No Account'
         },
         {
-          id: 'S',
-          descript: 'Savings'
+          value: 'S',
+          text: 'Savings'
         },
         {
-          id: 'C',
-          descript: 'Checking'
+          value: 'C',
+          text: 'Checking'
         }
       ]
     }
@@ -1150,10 +1151,13 @@ export default {
       this.civilStatus = Vcivilstatus
       this.restdayItem = Vweek
       this.TrueOrFalse = Vboolean
-      this.form = Vmasterfileform
+      this.form = masterfileForm
     },
     minWage () {
       this.form.min_wage === 'T' ? this.form.comp_tax = 'F' : this.form.comp_tax = 'T'
+    },
+    trimForm (item) {
+      VtrimObject(item)
     },
     employmentDefault () {
       this.loadEmplStatData()
@@ -1184,9 +1188,10 @@ export default {
       // this.form = { ...this.employeeData }
     },
     update () {
-      this.destructuringRestDay()
+      // this.destructuringRestDay()
     },
     save () {
+      this.destructuringRestDay()
       this.loadingSave = true
       axios.defaults.headers.common['Authorization'] = 'Bearer ' + localStorage.getItem('access_token')
       if (this.$store.getters.loggedIn) {
@@ -1200,7 +1205,7 @@ export default {
               this.snackTimeOut = 3000
               this.loadingSave = false
               this.cloneProps()
-              this.requestEmployeeCode()
+              this.create === false || this.requestEmployeeCode()
             })
             .catch(error => {
               reject(error)
@@ -1267,8 +1272,18 @@ export default {
       })
         .then(response => {
           this.shftFile = this.$store.getters.retrieveShiftFile
+          // this.objectTrimmer(this.shftFile)
+          VtrimArrayObject(this.shftFile)
         })
     },
+    // objectTrimmer (item) {
+    //   VtrimObject(item)
+    //   // item.forEach((item) => {
+    //   //   Object.entries(item).forEach(([key, value]) => {
+    //   //     item[key] = item[key].trim()
+    //   //   })
+    //   // })
+    // },
     loadWorkStat () {
       this.$store.dispatch('retrieveWorkStat', {
         primekey: this.primekey
@@ -1367,6 +1382,7 @@ export default {
     this.loadBank()
     this.loadEmplStatData()
     this.arrayRestDay()
+    this.trimForm(this.form)
   },
   directives: {
     mask
