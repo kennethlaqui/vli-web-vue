@@ -11,12 +11,14 @@ import Vuelidate from 'vuelidate'
 import VueCookies from 'vue-cookies'
 import VueTheMask from 'vue-the-mask'
 import VueRouterBackButton from 'vue-router-back-button'
+import Vuebar from 'vuebar'
 // import { makeServer } from './server'
 
 Vue.use(Vuelidate)
 Vue.use(VueCookies)
 Vue.use(VueTheMask)
 Vue.use(VueRouterBackButton, { router })
+Vue.use(Vuebar)
 
 Vue.config.productionTip = false
 
