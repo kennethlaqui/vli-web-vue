@@ -44,7 +44,8 @@ export default new Vuex.Store({
     incomeType: [],
     directories: [],
     payrollgroup: [],
-    emplstatdata: [],
+    emplstatdataa: [],
+    emplstatdatab: [],
     workstatdata: [],
     f_emplstatdata: '',
     payrolldirectorybuild: [],
@@ -75,8 +76,11 @@ export default new Vuex.Store({
     retrievePositions (state) {
       return state.positions
     },
-    retrieveEmplStatData (state) {
-      return state.emplstatdata
+    retrieveEmplStatDataB (state) {
+      return state.emplstatdatab
+    },
+    retrieveEmplStatDataA (state) {
+      return state.emplstatdataa
     },
     retrieveEmplStat (state) {
       return state.emplstat
@@ -155,8 +159,11 @@ export default new Vuex.Store({
     retrievePositions (state, payload) {
       state.positions = payload
     },
-    retrieveEmplStatData (state, payload) {
-      state.emplstatdata = payload
+    retrieveEmplStatDataB (state, payload) {
+      state.emplstatdatab = payload
+    },
+    retrieveEmplStatDataA (state, payload) {
+      state.emplstatdataa = payload
     },
     retrieveEmplStat (state, payload) {
       state.emplstat = payload
@@ -569,16 +576,38 @@ export default new Vuex.Store({
         }
       }
     },
-    async retrieveEmplStatData (context, payload) {
-      // this api contain what query to be executed
+    async retrieveEmplStatDataB (context, payload) {
+      // select all. Used in reference
+      // query section B
       try {
         axios.defaults.headers.common['Authorization'] = 'Bearer ' + context.state.token
         if (context.getters.loggedIn) {
           await new Promise((resolve, reject) => {
-            axios.get(`l/helper/emplstat/data/${payload.primekey}/${payload.emp_stat}/${payload.query___}`)
+            axios.get(`l/helper/emplstat/data/${payload.primekey}/${payload.query___}`)
               .then(response => {
-                this.emplstatdata = response.data
-                context.commit('retrieveEmplStatData', this.emplstatdata)
+                this.emplstatdatab = response.data
+                context.commit('retrieveEmplStatDataB', this.emplstatdatab)
+                resolve(response)
+              })
+              .catch(error => {
+                reject(error)
+              })
+          })
+        }
+      } catch (error) {
+      }
+    },
+    async retrieveEmplStatDataA (context, payload) {
+      // this api contain what query to be executed
+      // query section A
+      try {
+        axios.defaults.headers.common['Authorization'] = 'Bearer ' + context.state.token
+        if (context.getters.loggedIn) {
+          await new Promise((resolve, reject) => {
+            axios.get(`l/helper/emplstat/data/${payload.primekey}/${payload.cntrl_no}/${payload.query___}`)
+              .then(response => {
+                this.emplstatdataA = response.data
+                context.commit('retrieveEmplStatDataA', this.emplstatdataA)
                 resolve(response)
               })
               .catch(error => {

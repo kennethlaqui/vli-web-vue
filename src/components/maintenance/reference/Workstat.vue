@@ -9,11 +9,11 @@
     <!-- edit descript -->
     <template v-slot:item.descript="{ item }">
       <v-edit-dialog
-        :return-value.sync="item.descript"
+        v-model="item.descript"
         @save="save"
         @cancel="cancel"
         @open="open"
-        @close="close"
+        @close="close(item)"
       >
         <div>{{ item.descript }}</div>
         <template v-slot:input>
@@ -27,7 +27,7 @@
             single-line
             counter
             autofocus
-            @change="getNewDescriptValue(item)"
+            @change="getSelectedValue(item)"
           ></v-text-field>
         </template>
       </v-edit-dialog>
@@ -50,7 +50,7 @@
             :items="trueOrFalse"
             item-text="text"
             item-value="value"
-            @change="getNewDateResignValue(item)"
+            @change="getSelectedValue(item)"
           ></v-select>
         </template>
       </v-edit-dialog>
@@ -69,7 +69,7 @@
             :items="trueOrFalse"
             item-text="text"
             item-value="value"
-            @change="getNewShowMstValue(item)"
+            @change="getSelectedValue(item)"
           ></v-select>
         </template>
       </v-edit-dialog>
@@ -88,7 +88,7 @@
             :items="trueOrFalse"
             item-text="text"
             item-value="value"
-            @change="getNewDisabledValue(item)"
+            @change="getSelectedValue(item)"
           ></v-select>
         </template>
       </v-edit-dialog>
@@ -100,13 +100,13 @@
     </v-snackbar>
   </div>
 </template>
-
 <script>
 import axios from 'axios'
-import { Form } from 'vform'
+// import { Form } from 'vform'
 import { Vboolean, VbooleanFn } from '@/util/helper'
 
 export default {
+  name: 'workstat',
   props: {
     reloadWorkStat: {
       type: Boolean,
@@ -129,14 +129,14 @@ export default {
         { text: 'Show In Mastefile', value: 'show_mst' },
         { text: 'Disbled', value: 'disabled' }
       ],
-      form: new Form({
+      form: {
         primekey: '',
         cntrl_no: '',
         descript: '',
         disabled: '',
         show_mst: '',
         w_dte_rsgn: ''
-      })
+      }
     }
   },
   watch: {
@@ -145,35 +145,14 @@ export default {
     }
   },
   methods: {
-    withDateResignItem () {
+    buildBuildItem () {
       this.trueOrFalse = Vboolean
     },
     buildBoolean (value) {
       return VbooleanFn(value)
     },
-    getNewDescriptValue (value) {
-      const data = value
-      Object.keys(data).forEach(key => {
-        this.form[key] = data[key]
-      })
-    },
-    getNewDisabledValue (value) {
-      const data = value
-      Object.keys(data).forEach(key => {
-        this.form[key] = data[key]
-      })
-    },
-    getNewShowMstValue (value) {
-      const data = value
-      Object.keys(data).forEach(key => {
-        this.form[key] = data[key]
-      })
-    },
-    getNewDateResignValue (value) {
-      const data = value
-      Object.keys(data).forEach(key => {
-        this.form[key] = data[key]
-      })
+    getSelectedValue (value) {
+      this.form = { ...value }
     },
     save () {
       this.saveOrUpdate()
@@ -183,14 +162,15 @@ export default {
     },
     open () {
     },
-    close () {
+    close (value) {
+      this.form = { ...value }
     },
     async saveOrUpdate () {
       try {
         axios.defaults.headers.common['Authorization'] = 'Bearer ' + localStorage.getItem('access_token')
         if (this.$store.getters.loggedIn) {
           await new Promise((resolve, reject) => {
-            this.form.post('u/maintenance/reference/workstat/create')
+            axios.post('u/maintenance/reference/workstat/create', this.form)
               .then((response) => {
                 resolve(response)
                 this.snack = true
@@ -217,7 +197,7 @@ export default {
   },
   created () {
     this.loadWorkStatData()
-    this.withDateResignItem()
+    this.buildBuildItem()
   }
 }
 </script>
