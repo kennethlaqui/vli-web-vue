@@ -47,6 +47,10 @@ export default new Vuex.Store({
     emplstatdataa: [],
     emplstatdatab: [],
     workstatdata: [],
+    positionsdata: [],
+    divisiondata: [],
+    departmentdata: [],
+    sectiondata: [],
     f_emplstatdata: '',
     payrolldirectorybuild: [],
     showdialog: false
@@ -73,6 +77,9 @@ export default new Vuex.Store({
     employeeCodeChecker (state) {
       return state.employeecodechecker
     },
+    retrievePositionsData (state) {
+      return state.positionsdata
+    },
     retrievePositions (state) {
       return state.positions
     },
@@ -91,14 +98,26 @@ export default new Vuex.Store({
     retrieveWorkStat (state) {
       return state.workstat
     },
+    retrieveWorkAreadata (state) {
+      return state.workareadata
+    },
     retrieveWorkArea (state) {
       return state.workarea
+    },
+    retrieveDivisionData (state) {
+      return state.divisiondata
     },
     retrieveDivision (state) {
       return state.division
     },
+    retrieveDepartmentData (state) {
+      return state.departmentdata
+    },
     retrieveDepartment (state) {
       return state.department
+    },
+    retrieveSectionData (state) {
+      return state.sectiondata
     },
     retrieveSection (state) {
       return state.section
@@ -156,6 +175,9 @@ export default new Vuex.Store({
     retrieveEmployeeCode (state, payload) {
       state.maxemployee = payload
     },
+    retrievePositionsData (state, payload) {
+      state.positionsdata = payload
+    },
     retrievePositions (state, payload) {
       state.positions = payload
     },
@@ -174,14 +196,26 @@ export default new Vuex.Store({
     retrieveWorkStat (state, payload) {
       state.workstat = payload
     },
+    retrieveWorkAreaData (state, payload) {
+      state.workareadata = payload
+    },
     retrieveWorkArea (state, payload) {
       state.workarea = payload
+    },
+    retrieveDivisionData (state, payload) {
+      state.divisiondata = payload
     },
     retrieveDivision (state, payload) {
       state.division = payload
     },
+    retrieveDepartmentData (state, payload) {
+      state.departmentdata = payload
+    },
     retrieveDepartment (state, payload) {
       state.department = payload
+    },
+    retrieveSectionData (state, payload) {
+      state.sectiondata = payload
     },
     retrieveSection (state, payload) {
       state.section = payload
@@ -476,6 +510,25 @@ export default new Vuex.Store({
           }
         } catch (error) {
         }
+      }
+    },
+    async retrievePositionsData (context, payload) {
+      try {
+        axios.defaults.headers.common['Authorization'] = 'Bearer ' + context.state.token
+        if (context.getters.loggedIn) {
+          await new Promise((resolve, reject) => {
+            axios.get(`l/helper/position/data/${payload.primekey}`)
+              .then(response => {
+                this.positionsdata = response.data
+                context.commit('retrievePositionsData', this.positionsdata)
+                resolve(response)
+              })
+              .catch(error => {
+                reject(error)
+              })
+          })
+        }
+      } catch (error) {
       }
     },
     async retrievePositions (context, payload) {
