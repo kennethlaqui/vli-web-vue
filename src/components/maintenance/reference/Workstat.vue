@@ -4,6 +4,7 @@
       :headers="headers"
       :items="workStatData"
       :items-per-page="5"
+      fixed-header
       height="290px"
     >
     <!-- edit descript -->
@@ -142,6 +143,7 @@ export default {
   watch: {
     reloadWorkStat: function (value) {
       this.loadWorkStatData()
+      this.$root.$emit('reloadWorkStat', false)
     }
   },
   methods: {
