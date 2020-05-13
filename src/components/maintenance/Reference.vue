@@ -35,6 +35,16 @@
         >
           <v-icon>mdi-folder</v-icon>
         </v-btn>
+        <!-- positions -->
+        <v-btn
+          v-if="settings.panelIndex === 2"
+          v-show="settings.panelShow"
+          class="mr-4"
+          icon
+          @click="dialog.d_position = true, dialog.dialogTitle='Create Position'"
+        >
+          <v-icon>mdi-folder</v-icon>
+        </v-btn>
     </v-app-bar>
     <v-expansion-panels v-model="settings.panelIndex">
       <!-- 1st row -->
@@ -53,336 +63,67 @@
           <Employment :reloadEmployment="reloadEmployment"></Employment>
         </v-expansion-panel-content>
       </v-expansion-panel>
+            <!-- 3rd row -->
+      <v-expansion-panel>
+        <v-expansion-panel-header>Position</v-expansion-panel-header>
+        <v-expansion-panel-content>
+          <!-- Position component -->
+          <Position :reloadPosition="reloadPosition"></Position>
+          <!-- <Employment :reloadEmployment="reloadEmployment"></Employment> -->
+        </v-expansion-panel-content>
+      </v-expansion-panel>
     </v-expansion-panels>
+    <!-- dialog / create -->
     <!-- work status -->
-    <DialogReference
+    <WorkstatCreate
       v-if="dialog.d_workstat"
-      :title="dialog.dialogTitle"
       dialog
-      width="800px"
-    >
-      <template v-slot:body>
-        <v-row>
-          <!-- ID -->
-          <v-col cols="12" sm="6" md="3">
-          <v-text-field
-            v-model="f_workStat.cntrl_no"
-            label="ID"
-            hint="Must Unique and One Character Only."
-            persistent-hint
-            outlined
-            dense
-            rounded
-          >
-          </v-text-field>
-          </v-col>
-          <!-- description -->
-          <v-col cols="12" sm="6" md="3">
-          <v-text-field
-            v-model="f_workStat.descript"
-            label="Description"
-            outlined
-            dense
-            rounded
-          >
-          </v-text-field>
-          </v-col>
-          <!-- with date resign -->
-          <v-col cols="12" sm="6" md="3">
-            <v-select
-              v-model="f_workStat.w_dte_rsgn"
-              :items="trueOrFalse"
-              item-text="text"
-              item-value="value"
-              label="Date Resign"
-              hint="Enable Date Resign Field."
-              persistent-hint
-              outlined
-              dense
-              rounded
-            ></v-select>
-          </v-col>
-          <!-- show in masterfille -->
-          <v-col cols="12" sm="6" md="3">
-            <v-select
-              v-model="f_workStat.show_mst"
-              :items="trueOrFalse"
-              item-text="text"
-              item-value="value"
-              label="Masterfile"
-              hint="Display In Masterfile."
-              persistent-hint
-              outlined
-              dense
-              rounded
-            ></v-select>
-          </v-col>
-        </v-row>
-        <v-row>
-          <!-- show in masterfille -->
-          <v-col cols="12" sm="6" md="3">
-            <v-select
-              v-model="f_workStat.disabled"
-              :items="trueOrFalse"
-              item-text="text"
-              item-value="value"
-              label="Disable"
-              outlined
-              dense
-              rounded
-            ></v-select>
-          </v-col>
-        </v-row>
-      </template>
-      <template v-slot:b-close>
-        <v-btn
-          color="green darken-1"
-          text
-          @click="dialog.d_workstat = false"
-        >
-          Close
-        </v-btn>
-      </template>
-      <template v-slot:b-submit>
-        <v-btn
-          color="green darken-1"
-          text
-          @click="saveWorkStat(), dialog.d_workstat = false, reloadWorkStat = false"
-        >
-          Save
-        </v-btn>
-      </template>
-    </DialogReference>
+    />
     <!-- employment dialog -->
-    <DialogReference
+    <EmploymentCreate
       v-if="dialog.d_employment"
-      :title="dialog.dialogTitle"
       dialog
-      width="800px"
-    >
-      <template v-slot:body>
-        <v-row>
-          <!-- ID -->
-          <v-col cols="12" sm="6" md="3">
-          <v-text-field
-            v-model="f_employment.cntrl_no"
-            label="ID"
-            hint="Must Unique and One Character Only."
-            persistent-hint
-            outlined
-            dense
-            rounded
-          >
-          </v-text-field>
-          </v-col>
-          <!-- description -->
-          <v-col cols="12" sm="6" md="3">
-          <v-text-field
-            v-model="f_employment.descript"
-            label="Description"
-            outlined
-            dense
-            rounded
-          >
-          </v-text-field>
-          </v-col>
-          <!-- payroll group -->
-          <v-col cols="12" sm="6" md="3">
-            <v-select
-              v-model="f_employment.defu_paygroup"
-              :items="payrollGroup"
-              item-text="descript"
-              item-value="group_no"
-              label="Payroll Group"
-              outlined
-              dense
-              rounded
-            ></v-select>
-          </v-col>
-          <!-- rate type -->
-          <v-col cols="12" sm="6" md="3">
-            <v-select
-              v-model="f_employment.defu_rate_typ"
-              :items="rateType"
-              item-text="text"
-              item-value="value"
-              label="Rate Type"
-              outlined
-              dense
-              rounded
-            ></v-select>
-          </v-col>
-        </v-row>
-        <!-- 2nd row -->
-        <v-row>
-          <!-- tax -->
-          <v-col cols="12" sm="6" md="3">
-            <v-select
-              v-model="f_employment.defu_comp_tax"
-              :items="trueOrFalse"
-              item-text="text"
-              item-value="value"
-              label="Tax"
-              hint="Compute"
-              persistent-hint
-              outlined
-              dense
-              rounded
-            ></v-select>
-          </v-col>
-          <!-- sss -->
-          <v-col cols="12" sm="6" md="3">
-            <v-select
-              v-model="f_employment.defu_comp_sss"
-              :items="trueOrFalse"
-              item-text="text"
-              item-value="value"
-              label="SSS"
-              hint="Compute"
-              persistent-hint
-              outlined
-              dense
-              rounded
-            ></v-select>
-          </v-col>
-          <!-- tax -->
-          <v-col cols="12" sm="6" md="3">
-            <v-select
-              v-model="f_employment.defu_comp_med"
-              :items="trueOrFalse"
-              item-text="text"
-              item-value="value"
-              label="Philhealth"
-              hint="Compute"
-              persistent-hint
-              outlined
-              dense
-              rounded
-            ></v-select>
-          </v-col>
-          <!-- pagibig -->
-          <v-col cols="12" sm="6" md="3">
-            <v-select
-              v-model="f_employment.defu_comp_pgi"
-              :items="trueOrFalse"
-              item-text="text"
-              item-value="value"
-              label="Pagibig"
-              hint="Compute"
-              persistent-hint
-              outlined
-              dense
-              rounded
-            ></v-select>
-          </v-col>
-        </v-row>
-        <!-- 3rd row -->
-        <v-row>
-          <!-- minimum wage -->
-          <v-col cols="12" sm="6" md="3">
-            <v-select
-              v-model="f_employment.defu_min_wage"
-              :items="trueOrFalse"
-              item-text="text"
-              item-value="value"
-              label="Minimum Wage"
-              outlined
-              dense
-              rounded
-            ></v-select>
-          </v-col>
-          <!-- disable -->
-          <v-col cols="12" sm="6" md="3">
-            <v-select
-              v-model="f_employment.disabled"
-              :items="trueOrFalse"
-              item-text="text"
-              item-value="value"
-              label="Disable"
-              outlined
-              dense
-              rounded
-            ></v-select>
-          </v-col>
-        </v-row>
-      </template>
-      <template v-slot:b-close>
-        <v-btn
-          color="green darken-1"
-          text
-          @click="dialog.d_employment = false"
-        >
-          Close
-        </v-btn>
-      </template>
-      <template v-slot:b-submit>
-        <v-btn
-          color="green darken-1"
-          text
-          @click="saveEmployment(), dialog.d_employment = false, reloadEmployment = false"
-        >
-          Save
-        </v-btn>
-      </template>
-    </DialogReference>
+    />
+        <!-- employment dialog -->
+    <PositionCreate
+      v-if="dialog.d_position"
+      dialog
+    />
   </div>
 </template>
 <script>
-import axios from 'axios'
-// import { Form } from 'vform'
-import { Vboolean, Vratetype } from '@/util/helper'
-import Employment from '@/components/maintenance/reference/Employment'
 import Workstat from '@/components/maintenance/reference/Workstat'
-import DialogReference from '@/components/maintenance/dialog/Reference'
+import Employment from '@/components/maintenance/reference/Employment'
+import Position from '@/components/maintenance/reference/Position'
+import WorkstatCreate from '@/components/maintenance/dialog/WorkstatCreate'
+import EmploymentCreate from '@/components/maintenance/dialog/EmploymentCreate'
+import PositionCreate from '@/components/maintenance/dialog/PositionCreate'
 
 export default {
   name: 'Reference',
   components: {
     Workstat,
-    DialogReference,
-    Employment
+    Employment,
+    Position,
+    WorkstatCreate,
+    EmploymentCreate,
+    PositionCreate
   },
   data () {
     return {
-      primekey: localStorage.getItem('primekey'),
-      f_workStatDefault: '',
-      f_employmentDefault: '',
       reloadWorkStat: false,
       reloadEmployment: false,
-      rateType: [],
-      trueOrFalse: [],
-      payrollGroup: [],
+      reloadPosition: false,
       dialog: {
         dialogTitle: '',
         d_workstat: false,
-        d_employment: false
+        d_employment: false,
+        d_position: false
       },
       settings: {
         panelIndex: -1,
         panelShow: false
-      },
-      f_workStat: {
-        primekey: '',
-        cntrl_no: '',
-        descript: '',
-        show_mst: 'F',
-        disabled: 'F',
-        w_dte_rsgn: 'F'
-      },
-      f_employment: {
-        primekey: '',
-        cntrl_no: '',
-        descript: '',
-        disabled: 'F',
-        defu_paygroup: '',
-        defu_rate_typ: 'M',
-        defu_comp_tax: 'T',
-        defu_comp_sss: 'T',
-        defu_comp_med: 'T',
-        defu_comp_pgi: 'T',
-        defu_min_wage: 'F'
       }
-
     }
   },
   watch: {
@@ -390,76 +131,40 @@ export default {
       typeof this.settings.panelIndex === 'undefined' ? this.settings.panelShow = false : this.settings.panelShow = true
     }
   },
-  methods: {
-    setWorkStatDefault (value) {
-      this.f_workStat = { ...value }
-      this.f_workStat.primekey = this.primekey
-      this.reloadWorkStat = true
-    },
-    setEmploymentDefault (value) {
-      this.f_employment = { ...value }
-      this.f_employment.primekey = this.primekey
-      this.reloadEmployment = true
-    },
-    async saveWorkStat () {
-      try {
-        axios.defaults.headers.common['Authorization'] = 'Bearer ' + localStorage.getItem('access_token')
-        if (this.$store.getters.loggedIn) {
-          await new Promise((resolve, reject) => {
-            axios.post('u/maintenance/reference/workstat/create', this.f_workStat)
-              .then((response) => {
-                resolve(response)
-                this.snack = true
-                this.snackColor = 'success'
-                this.snackText = 'Successfully Saved'
-                this.setWorkStatDefault(this.f_workStatDefault)
-              })
-              .catch(error => {
-                reject(error)
-              })
-          })
-        }
-      } catch (error) {
-      }
-    },
-    async saveEmployment () {
-      try {
-        axios.defaults.headers.common['Authorization'] = 'Bearer ' + localStorage.getItem('access_token')
-        if (this.$store.getters.loggedIn) {
-          await new Promise((resolve, reject) => {
-            axios.post('u/maintenance/reference/employment/create', this.f_employment)
-              .then((response) => {
-                resolve(response)
-                this.snack = true
-                this.snackColor = 'success'
-                this.snackText = 'Successfully Saved'
-                this.setEmploymentDefault(this.f_employmentDefault)
-              })
-              .catch(error => {
-                reject(error)
-              })
-          })
-        }
-      } catch (error) {
-      }
-    },
-    loadPayrollGroup () {
-      this.$store.dispatch('retrievePayrollGroup', {
-        primekey: this.primekey
-      })
-        .then(response => {
-          this.payrollGroup = this.$store.getters.retrievePayrollGroup
-        })
-    }
-  },
   created () {
-    this.f_workStatDefault = { ...this.f_workStat } // make a copy of work status empty object / default value
-    this.f_employmentDefault = { ...this.f_employment }
-    this.f_workStat.primekey = this.primekey
-    this.f_employment.primekey = this.primekey
-    this.trueOrFalse = Vboolean
-    this.rateType = Vratetype
-    this.loadPayrollGroup()
+    this.$root.$on('closeWorkstaDialog', () => {
+      this.dialog.d_workstat = false
+    })
+    this.$root.$on('reloadWorkStat', () => {
+      this.reloadWorkStat = true
+    })
+    this.$root.$on('reloadWorkStat', (payload) => {
+      if (payload === false) {
+        this.reloadWorkStat = false
+      }
+    })
+    this.$root.$on('closeEmploymentDialog', () => {
+      this.dialog.d_employment = false
+    })
+    this.$root.$on('reloadEmployment', () => {
+      this.reloadEmployment = true
+    })
+    this.$root.$on('reloadEmployment', (payload) => {
+      if (payload === false) {
+        this.reloadEmployment = false
+      }
+    })
+    this.$root.$on('closePositionDialog', () => {
+      this.dialog.d_position = false
+    })
+    this.$root.$on('reloadPosition', () => {
+      this.reloadPosition = true
+    })
+    this.$root.$on('reloadPosition', (payload) => {
+      if (payload === false) {
+        this.reloadPosition = false
+      }
+    })
   }
 }
 </script>
