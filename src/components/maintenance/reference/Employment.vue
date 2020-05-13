@@ -5,7 +5,7 @@
       :items="emplStatDataB"
       :items-per-page="5"
       fixed-header
-      class="elevation-1"
+      height="290px"
     >
         <!-- edit descript -->
       <template v-slot:item.descript="{ item }">
@@ -244,6 +244,7 @@ export default {
   watch: {
     reloadEmployment: function (value) {
       this.loadEmplStatData()
+      this.$root.$emit('reloadEmployment', false)
     }
   },
   methods: {
