@@ -1010,7 +1010,7 @@ export default {
       restdayItem: [],
       TrueOrFalse: [],
       payrollGroup: [],
-      emplStatData: [],
+      emplStatDataA: [],
       snackTimeOut: 3000,
       maskTin: '###-###-###',
       maskSss: '##-#######-#',
@@ -1160,7 +1160,7 @@ export default {
       VtrimObject(item)
     },
     employmentDefault () {
-      this.loadEmplStatData()
+      this.loadEmplStatDataA()
     },
     destructuringRestDay () {
       let restDay, restDa2
@@ -1257,7 +1257,6 @@ export default {
         })
     },
     loadPayrollGroup () {
-      // display all day type
       this.$store.dispatch('retrievePayrollGroup', {
         primekey: this.primekey
       })
@@ -1292,15 +1291,16 @@ export default {
           this.workStat = this.$store.getters.retrieveWorkStat
         })
     },
-    loadEmplStatData () {
-      this.$store.dispatch('retrieveEmplStatData', {
+    loadEmplStatDataA () {
+      // select all default value only.
+      this.$store.dispatch('retrieveEmplStatDataA', {
         primekey: this.primekey,
-        emp_stat: this.form.emp_stat,
+        cntrl_no: this.form.emp_stat,
         query___: 'A'
       })
         .then(response => {
-          this.emplStatData = this.$store.getters.retrieveEmplStatData
-          const obj = Object.assign({}, this.emplStatData)
+          this.emplStatDataA = this.$store.getters.retrieveEmplStatDataA
+          const obj = Object.assign({}, this.emplStatDataA)
           this.form.paygroup = obj[0].defu_paygroup
           this.form.rate_typ = obj[0].defu_rate_typ
           this.form.comp_tax = obj[0].defu_comp_tax
@@ -1381,9 +1381,9 @@ export default {
     this.loadShiftFile()
     this.loadPayrollGroup()
     this.loadBank()
-    this.loadEmplStatData()
+    this.loadEmplStatDataA()
     this.arrayRestDay()
-    this.trimForm(this.form)
+    // this.trimForm(this.form)
   },
   directives: {
     mask

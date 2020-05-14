@@ -44,8 +44,13 @@ export default new Vuex.Store({
     incomeType: [],
     directories: [],
     payrollgroup: [],
-    emplstatdata: [],
+    emplstatdataa: [],
+    emplstatdatab: [],
     workstatdata: [],
+    positionsdata: [],
+    divisiondata: [],
+    departmentdata: [],
+    sectiondata: [],
     f_emplstatdata: '',
     payrolldirectorybuild: [],
     showdialog: false
@@ -72,11 +77,17 @@ export default new Vuex.Store({
     employeeCodeChecker (state) {
       return state.employeecodechecker
     },
+    retrievePositionsData (state) {
+      return state.positionsdata
+    },
     retrievePositions (state) {
       return state.positions
     },
-    retrieveEmplStatData (state) {
-      return state.emplstatdata
+    retrieveEmplStatDataB (state) {
+      return state.emplstatdatab
+    },
+    retrieveEmplStatDataA (state) {
+      return state.emplstatdataa
     },
     retrieveEmplStat (state) {
       return state.emplstat
@@ -87,14 +98,26 @@ export default new Vuex.Store({
     retrieveWorkStat (state) {
       return state.workstat
     },
+    retrieveWorkAreadata (state) {
+      return state.workareadata
+    },
     retrieveWorkArea (state) {
       return state.workarea
+    },
+    retrieveDivisionData (state) {
+      return state.divisiondata
     },
     retrieveDivision (state) {
       return state.division
     },
+    retrieveDepartmentData (state) {
+      return state.departmentdata
+    },
     retrieveDepartment (state) {
       return state.department
+    },
+    retrieveSectionData (state) {
+      return state.sectiondata
     },
     retrieveSection (state) {
       return state.section
@@ -152,11 +175,17 @@ export default new Vuex.Store({
     retrieveEmployeeCode (state, payload) {
       state.maxemployee = payload
     },
+    retrievePositionsData (state, payload) {
+      state.positionsdata = payload
+    },
     retrievePositions (state, payload) {
       state.positions = payload
     },
-    retrieveEmplStatData (state, payload) {
-      state.emplstatdata = payload
+    retrieveEmplStatDataB (state, payload) {
+      state.emplstatdatab = payload
+    },
+    retrieveEmplStatDataA (state, payload) {
+      state.emplstatdataa = payload
     },
     retrieveEmplStat (state, payload) {
       state.emplstat = payload
@@ -167,14 +196,26 @@ export default new Vuex.Store({
     retrieveWorkStat (state, payload) {
       state.workstat = payload
     },
+    retrieveWorkAreaData (state, payload) {
+      state.workareadata = payload
+    },
     retrieveWorkArea (state, payload) {
       state.workarea = payload
+    },
+    retrieveDivisionData (state, payload) {
+      state.divisiondata = payload
     },
     retrieveDivision (state, payload) {
       state.division = payload
     },
+    retrieveDepartmentData (state, payload) {
+      state.departmentdata = payload
+    },
     retrieveDepartment (state, payload) {
       state.department = payload
+    },
+    retrieveSectionData (state, payload) {
+      state.sectiondata = payload
     },
     retrieveSection (state, payload) {
       state.section = payload
@@ -471,6 +512,25 @@ export default new Vuex.Store({
         }
       }
     },
+    async retrievePositionsData (context, payload) {
+      try {
+        axios.defaults.headers.common['Authorization'] = 'Bearer ' + context.state.token
+        if (context.getters.loggedIn) {
+          await new Promise((resolve, reject) => {
+            axios.get(`l/helper/position/data/${payload.primekey}`)
+              .then(response => {
+                this.positionsdata = response.data
+                context.commit('retrievePositionsData', this.positionsdata)
+                resolve(response)
+              })
+              .catch(error => {
+                reject(error)
+              })
+          })
+        }
+      } catch (error) {
+      }
+    },
     async retrievePositions (context, payload) {
       if (this.state.positions.length === 0) {
         try {
@@ -569,16 +629,38 @@ export default new Vuex.Store({
         }
       }
     },
-    async retrieveEmplStatData (context, payload) {
-      // this api contain what query to be executed
+    async retrieveEmplStatDataB (context, payload) {
+      // select all. Used in reference
+      // query section B
       try {
         axios.defaults.headers.common['Authorization'] = 'Bearer ' + context.state.token
         if (context.getters.loggedIn) {
           await new Promise((resolve, reject) => {
-            axios.get(`l/helper/emplstat/data/${payload.primekey}/${payload.emp_stat}/${payload.query___}`)
+            axios.get(`l/helper/emplstat/data/${payload.primekey}/${payload.query___}`)
               .then(response => {
-                this.emplstatdata = response.data
-                context.commit('retrieveEmplStatData', this.emplstatdata)
+                this.emplstatdatab = response.data
+                context.commit('retrieveEmplStatDataB', this.emplstatdatab)
+                resolve(response)
+              })
+              .catch(error => {
+                reject(error)
+              })
+          })
+        }
+      } catch (error) {
+      }
+    },
+    async retrieveEmplStatDataA (context, payload) {
+      // this api contain what query to be executed
+      // query section A
+      try {
+        axios.defaults.headers.common['Authorization'] = 'Bearer ' + context.state.token
+        if (context.getters.loggedIn) {
+          await new Promise((resolve, reject) => {
+            axios.get(`l/helper/emplstat/data/${payload.primekey}/${payload.cntrl_no}/${payload.query___}`)
+              .then(response => {
+                this.emplstatdataA = response.data
+                context.commit('retrieveEmplStatDataA', this.emplstatdataA)
                 resolve(response)
               })
               .catch(error => {

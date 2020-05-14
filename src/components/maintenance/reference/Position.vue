@@ -2,7 +2,7 @@
   <div>
     <v-data-table
       :headers="headers"
-      :items="workStatData"
+      :items="positions"
       :items-per-page="5"
       fixed-header
       height="290px"
@@ -23,55 +23,12 @@
         <template v-slot:input>
           <v-text-field
             v-model="item.descript"
-            :rules="[maximumChar]"
             label="Edit"
             single-line
             counter
             autofocus
             @change="getSelectedValue(item)"
           ></v-text-field>
-        </template>
-      </v-edit-dialog>
-    </template>
-    <!-- build T or F to True or False -->
-    <template v-slot:item.w_dte_rsgn="{ item }">
-      {{ buildBoolean(item.w_dte_rsgn) }}
-    </template>
-    <!-- edit with date resign -->
-    <template v-slot:item.w_dte_rsgn="{ item }">
-      <v-edit-dialog
-        @save="save"
-        @cancel="cancel"
-        @open="open"
-        @close="close"
-      > {{ buildBoolean(item.w_dte_rsgn) }}
-        <template v-slot:input>
-          <v-select
-            v-model="item.w_dte_rsgn"
-            :items="trueOrFalse"
-            item-text="text"
-            item-value="value"
-            @change="getSelectedValue(item)"
-          ></v-select>
-        </template>
-      </v-edit-dialog>
-    </template>
-    <!-- edit show masterfile -->
-    <template v-slot:item.show_mst="{ item }">
-      <v-edit-dialog
-        @save="save"
-        @cancel="cancel"
-        @open="open"
-        @close="close"
-      > {{ buildBoolean(item.show_mst) }}
-        <template v-slot:input>
-          <v-select
-            v-model="item.show_mst"
-            :items="trueOrFalse"
-            item-text="text"
-            item-value="value"
-            @change="getSelectedValue(item)"
-          ></v-select>
         </template>
       </v-edit-dialog>
     </template>
@@ -109,7 +66,7 @@ import { Vboolean, VbooleanFn } from '@/util/helper'
 export default {
   name: 'workstat',
   props: {
-    reloadWorkStat: {
+    reloadPosition: {
       type: Boolean,
       default: false
     }
@@ -122,28 +79,24 @@ export default {
       snackColor: '',
       snack: false,
       trueOrFalse: [],
-      workStatData: [],
+      positions: [],
       headers: [
-        { text: 'Code', value: 'cntrl_no', sortable: true },
+        { text: 'Code', value: 'pos_code', sortable: true },
         { text: 'Description', value: 'descript', sortable: true },
-        { text: 'With Date Resign', value: 'w_dte_rsgn' },
-        { text: 'Show In Mastefile', value: 'show_mst' },
-        { text: 'Disbled', value: 'disabled' }
+        { text: 'Disabled', value: 'disabled' }
       ],
       form: {
         primekey: '',
-        cntrl_no: '',
+        pos_code: '',
         descript: '',
-        disabled: '',
-        show_mst: '',
-        w_dte_rsgn: ''
+        disabled: ''
       }
     }
   },
   watch: {
-    reloadWorkStat: function (value) {
-      this.loadWorkStatData()
-      this.$root.$emit('reloadWorkStat', false)
+    reloadPosition: function (value) {
+      this.loadPostionsData()
+      this.$root.$emit('reloadPosition', false)
     }
   },
   methods: {
@@ -172,13 +125,13 @@ export default {
         axios.defaults.headers.common['Authorization'] = 'Bearer ' + localStorage.getItem('access_token')
         if (this.$store.getters.loggedIn) {
           await new Promise((resolve, reject) => {
-            axios.post('u/maintenance/reference/workstat/create', this.form)
+            axios.post('u/maintenance/reference/position/create', this.form)
               .then((response) => {
                 resolve(response)
                 this.snack = true
                 this.snackColor = 'success'
                 this.snackText = 'Successfully Saved'
-                this.loadWorkStatData()
+                this.loadPostionsData()
               })
               .catch(error => {
                 reject(error)
@@ -188,17 +141,17 @@ export default {
       } catch (error) {
       }
     },
-    loadWorkStatData () {
-      this.$store.dispatch('retrieveWorkStatData', {
+    loadPostionsData () {
+      this.$store.dispatch('retrievePositionsData', {
         primekey: this.primekey
       })
         .then(() => {
-          this.workStatData = this.$store.getters.retrieveWorkStatData
+          this.positions = this.$store.getters.retrievePositionsData
         })
     }
   },
   created () {
-    this.loadWorkStatData()
+    this.loadPostionsData()
     this.buildBuildItem()
   }
 }

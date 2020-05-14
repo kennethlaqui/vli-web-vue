@@ -31,7 +31,17 @@
           v-show="settings.panelShow"
           class="mr-4"
           icon
-          @click="dialog.d_emplymnt = true, dialog.dialogTitle='Create Employment Status'"
+          @click="dialog.d_employment = true, dialog.dialogTitle='Create Employment Status'"
+        >
+          <v-icon>mdi-folder</v-icon>
+        </v-btn>
+        <!-- positions -->
+        <v-btn
+          v-if="settings.panelIndex === 2"
+          v-show="settings.panelShow"
+          class="mr-4"
+          icon
+          @click="dialog.d_position = true, dialog.dialogTitle='Create Position'"
         >
           <v-icon>mdi-folder</v-icon>
         </v-btn>
@@ -50,169 +60,78 @@
         <v-expansion-panel-header>Employment</v-expansion-panel-header>
         <v-expansion-panel-content>
           <!-- Employment status component -->
-          <Employment></Employment>
+          <Employment :reloadEmployment="reloadEmployment"></Employment>
+        </v-expansion-panel-content>
+      </v-expansion-panel>
+            <!-- 3rd row -->
+      <v-expansion-panel>
+        <v-expansion-panel-header>Position</v-expansion-panel-header>
+        <v-expansion-panel-content>
+          <!-- Position component -->
+          <Position :reloadPosition="reloadPosition"></Position>
+          <!-- <Employment :reloadEmployment="reloadEmployment"></Employment> -->
         </v-expansion-panel-content>
       </v-expansion-panel>
     </v-expansion-panels>
+    <!-- dialog / create -->
     <!-- work status -->
-    <DialogReference
+    <WorkstatCreate
       v-if="dialog.d_workstat"
-      :title="dialog.dialogTitle"
       dialog
-      width="800px"
-    >
-      <template v-slot:body>
-        <v-row>
-          <!-- ID -->
-          <v-col cols="12" sm="6" md="3">
-          <v-text-field
-            v-model="f_workStat.cntrl_no"
-            label="ID"
-            hint="Must Unique and One Character Only."
-            persistent-hint
-            outlined
-            dense
-            rounded
-          >
-          </v-text-field>
-          </v-col>
-          <!-- description -->
-          <v-col cols="12" sm="6" md="3">
-          <v-text-field
-            v-model="f_workStat.descript"
-            label="Description"
-            outlined
-            dense
-            rounded
-          >
-          </v-text-field>
-          </v-col>
-          <!-- with date resign -->
-          <v-col cols="12" sm="6" md="3">
-            <v-select
-              v-model="f_workStat.w_dte_rsgn"
-              :items="trueOrFalse"
-              item-text="text"
-              item-value="value"
-              label="Date Resign"
-              hint="Enable Date Resign Field."
-              persistent-hint
-              outlined
-              dense
-              rounded
-            ></v-select>
-          </v-col>
-          <!-- show in masterfille -->
-          <v-col cols="12" sm="6" md="3">
-            <v-select
-              v-model="f_workStat.show_mst"
-              :items="trueOrFalse"
-              item-text="text"
-              item-value="value"
-              label="Masterfile"
-              hint="Display In Masterfile."
-              persistent-hint
-              outlined
-              dense
-              rounded
-            ></v-select>
-          </v-col>
-        </v-row>
-        <v-row>
-          <!-- show in masterfille -->
-          <v-col cols="12" sm="6" md="3">
-            <v-select
-              v-model="f_workStat.disabled"
-              :items="trueOrFalse"
-              item-text="text"
-              item-value="value"
-              label="Disable"
-              outlined
-              dense
-              rounded
-            ></v-select>
-          </v-col>
-        </v-row>
-      </template>
-      <template v-slot:b-close>
-        <v-btn
-          color="green darken-1"
-          text
-          @click="dialog.d_workstat = false"
-        >
-          Close
-        </v-btn>
-      </template>
-      <template v-slot:b-submit>
-        <v-btn
-          color="green darken-1"
-          text
-          @click="saveWorkStat(), dialog.d_workstat = false, reloadWorkStat = false"
-        >
-          Save
-        </v-btn>
-      </template>
-    </DialogReference>
-    <!-- employment -->
-    <DialogReference
-      v-if="dialog.d_emplymnt"
-      :title="dialog.dialogTitle"
+    />
+    <!-- employment dialog -->
+    <EmploymentCreate
+      v-if="dialog.d_employment"
       dialog
-      width="800px"
-    >
-      <template v-slot:body>
-        <v-row>
-          <v-col
-            cols="12"
-            md="4"
-          >
-          <v-text-field
-          >
-          </v-text-field>
-          </v-col>
-        </v-row>
-      </template>
-    </DialogReference>
+    />
+        <!-- employment dialog -->
+    <PositionCreate
+      v-if="dialog.d_position"
+      dialog
+    />
   </div>
 </template>
 <script>
-import axios from 'axios'
-import { Form } from 'vform'
-import { Vboolean } from '@/util/helper'
-import Employment from '@/components/maintenance/reference/Employment'
 import Workstat from '@/components/maintenance/reference/Workstat'
-import DialogReference from '@/components/maintenance/dialog/Reference'
+import Employment from '@/components/maintenance/reference/Employment'
+import Position from '@/components/maintenance/reference/Position'
+import WorkstatCreate from '@/components/maintenance/reference/create/Workstat'
+import EmploymentCreate from '@/components/maintenance/reference/create/Employment'
+import PositionCreate from '@/components/maintenance/reference/create/Position'
 
 export default {
   name: 'Reference',
   components: {
     Workstat,
-    DialogReference,
-    Employment
+    Employment,
+    Position,
+    WorkstatCreate,
+    EmploymentCreate,
+    PositionCreate
   },
   data () {
     return {
-      primekey: localStorage.getItem('primekey'),
-      f_workStatDefault: '',
       reloadWorkStat: false,
-      trueOrFalse: [],
+      reloadEmployment: false,
+      reloadPosition: false,
+      reloadWorkarea: false,
+      reloadDivision: false,
+      reloadDepartment: false,
+      reloadSection: false,
       dialog: {
         dialogTitle: '',
         d_workstat: false,
-        d_emplymnt: false
+        d_employment: false,
+        d_position: false,
+        d_workarea: false,
+        d_division: false,
+        d_department: false,
+        d_section: false
       },
       settings: {
         panelIndex: -1,
         panelShow: false
-      },
-      f_workStat: new Form({
-        primekey: '',
-        cntrl_no: '',
-        descript: '',
-        show_mst: 'F',
-        disabled: 'F',
-        w_dte_rsgn: 'F'
-      })
+      }
     }
   },
   watch: {
@@ -220,51 +139,91 @@ export default {
       typeof this.settings.panelIndex === 'undefined' ? this.settings.panelShow = false : this.settings.panelShow = true
     }
   },
-  methods: {
-    loadPrimekeys () {
-      this.f_workStat.primekey = this.primekey
-    },
-    setWorkStatDefault (value) {
-      const data = value
-      Object.keys(data).forEach(key => {
-        this.f_workStat[key] = data[key]
-      })
-      this.f_workStat.primekey = this.primekey
-      this.reloadWorkStat = true
-    },
-    setEmploymentDefault (value) {
-      const data = value
-      Object.keys(data).forEach(key => {
-        this.f_workStat[key] = data[key]
-      })
-    },
-    async saveWorkStat () {
-      try {
-        axios.defaults.headers.common['Authorization'] = 'Bearer ' + localStorage.getItem('access_token')
-        if (this.$store.getters.loggedIn) {
-          await new Promise((resolve, reject) => {
-            this.f_workStat.post('u/maintenance/reference/workstat/create')
-              .then((response) => {
-                resolve(response)
-                this.snack = true
-                this.snackColor = 'success'
-                this.snackText = 'Successfully Saved'
-                this.reloadWorkStat = true
-                this.setWorkStatDefault(this.f_workStatDefault)
-              })
-              .catch(error => {
-                reject(error)
-              })
-          })
-        }
-      } catch (error) {
-      }
-    }
-  },
   created () {
-    this.f_workStatDefault = { ...this.f_workStat } // make a copy of work status empty object / default value
-    this.loadPrimekeys()
-    this.trueOrFalse = Vboolean
+    // workstat
+    this.$root.$on('closeWorkstaDialog', () => {
+      this.dialog.d_workstat = false
+    })
+    this.$root.$on('reloadWorkStat', () => {
+      this.reloadWorkStat = true
+    })
+    this.$root.$on('reloadWorkStat', (payload) => {
+      if (payload === false) {
+        this.reloadWorkStat = false
+      }
+    })
+    // employment
+    this.$root.$on('closeEmploymentDialog', () => {
+      this.dialog.d_employment = false
+    })
+    this.$root.$on('reloadEmployment', () => {
+      this.reloadEmployment = true
+    })
+    this.$root.$on('reloadEmployment', (payload) => {
+      if (payload === false) {
+        this.reloadEmployment = false
+      }
+    })
+    // position
+    this.$root.$on('closePositionDialog', () => {
+      this.dialog.d_position = false
+    })
+    this.$root.$on('reloadPosition', () => {
+      this.reloadPosition = true
+    })
+    this.$root.$on('reloadPosition', (payload) => {
+      if (payload === false) {
+        this.reloadPosition = false
+      }
+    })
+    // workarea
+    this.$root.$on('closeWorkareaDialog', () => {
+      this.dialog.d_Workarea = false
+    })
+    this.$root.$on('reloadWorkarea', () => {
+      this.reloadWorkarea = true
+    })
+    this.$root.$on('reloadWorkarea', (payload) => {
+      if (payload === false) {
+        this.reloadWorkarea = false
+      }
+    })
+    // division
+    this.$root.$on('closeDivisionDialog', () => {
+      this.dialog.d_division = false
+    })
+    this.$root.$on('reloadDivision', () => {
+      this.reloadDivision = true
+    })
+    this.$root.$on('reloadDivision', (payload) => {
+      if (payload === false) {
+        this.reloadDivision = false
+      }
+    })
+    // department
+    this.$root.$on('closeDepartmentDialog', () => {
+      this.dialog.d_department = false
+    })
+    this.$root.$on('reloadDepartment', () => {
+      this.reloadDepartment = true
+    })
+    this.$root.$on('reloadDepartment', (payload) => {
+      if (payload === false) {
+        this.reloadDepartment = false
+      }
+    })
+    // section
+    this.$root.$on('closeSectionDialog', () => {
+      this.dialog.d_section = false
+    })
+    this.$root.$on('reloadSection', () => {
+      this.reloadSection = true
+    })
+    this.$root.$on('reloadSection', (payload) => {
+      if (payload === false) {
+        this.reloadSection = false
+      }
+    })
   }
 }
 </script>
