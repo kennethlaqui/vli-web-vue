@@ -95,7 +95,7 @@ export default {
   },
   watch: {
     reloadPosition: function (value) {
-      this.loadWorkStatData()
+      this.loadPostionsData()
       this.$root.$emit('reloadPosition', false)
     }
   },

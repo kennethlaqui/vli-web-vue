@@ -95,9 +95,9 @@
 import Workstat from '@/components/maintenance/reference/Workstat'
 import Employment from '@/components/maintenance/reference/Employment'
 import Position from '@/components/maintenance/reference/Position'
-import WorkstatCreate from '@/components/maintenance/dialog/WorkstatCreate'
-import EmploymentCreate from '@/components/maintenance/dialog/EmploymentCreate'
-import PositionCreate from '@/components/maintenance/dialog/PositionCreate'
+import WorkstatCreate from '@/components/maintenance/reference/create/Workstat'
+import EmploymentCreate from '@/components/maintenance/reference/create/Employment'
+import PositionCreate from '@/components/maintenance/reference/create/Position'
 
 export default {
   name: 'Reference',
@@ -114,11 +114,19 @@ export default {
       reloadWorkStat: false,
       reloadEmployment: false,
       reloadPosition: false,
+      reloadWorkarea: false,
+      reloadDivision: false,
+      reloadDepartment: false,
+      reloadSection: false,
       dialog: {
         dialogTitle: '',
         d_workstat: false,
         d_employment: false,
-        d_position: false
+        d_position: false,
+        d_workarea: false,
+        d_division: false,
+        d_department: false,
+        d_section: false
       },
       settings: {
         panelIndex: -1,
@@ -132,6 +140,7 @@ export default {
     }
   },
   created () {
+    // workstat
     this.$root.$on('closeWorkstaDialog', () => {
       this.dialog.d_workstat = false
     })
@@ -143,6 +152,7 @@ export default {
         this.reloadWorkStat = false
       }
     })
+    // employment
     this.$root.$on('closeEmploymentDialog', () => {
       this.dialog.d_employment = false
     })
@@ -154,6 +164,7 @@ export default {
         this.reloadEmployment = false
       }
     })
+    // position
     this.$root.$on('closePositionDialog', () => {
       this.dialog.d_position = false
     })
@@ -163,6 +174,54 @@ export default {
     this.$root.$on('reloadPosition', (payload) => {
       if (payload === false) {
         this.reloadPosition = false
+      }
+    })
+    // workarea
+    this.$root.$on('closeWorkareaDialog', () => {
+      this.dialog.d_Workarea = false
+    })
+    this.$root.$on('reloadWorkarea', () => {
+      this.reloadWorkarea = true
+    })
+    this.$root.$on('reloadWorkarea', (payload) => {
+      if (payload === false) {
+        this.reloadWorkarea = false
+      }
+    })
+    // division
+    this.$root.$on('closeDivisionDialog', () => {
+      this.dialog.d_division = false
+    })
+    this.$root.$on('reloadDivision', () => {
+      this.reloadDivision = true
+    })
+    this.$root.$on('reloadDivision', (payload) => {
+      if (payload === false) {
+        this.reloadDivision = false
+      }
+    })
+    // department
+    this.$root.$on('closeDepartmentDialog', () => {
+      this.dialog.d_department = false
+    })
+    this.$root.$on('reloadDepartment', () => {
+      this.reloadDepartment = true
+    })
+    this.$root.$on('reloadDepartment', (payload) => {
+      if (payload === false) {
+        this.reloadDepartment = false
+      }
+    })
+    // section
+    this.$root.$on('closeSectionDialog', () => {
+      this.dialog.d_section = false
+    })
+    this.$root.$on('reloadSection', () => {
+      this.reloadSection = true
+    })
+    this.$root.$on('reloadSection', (payload) => {
+      if (payload === false) {
+        this.reloadSection = false
       }
     })
   }

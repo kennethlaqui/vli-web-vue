@@ -49,7 +49,7 @@
         <v-btn
           color="green darken-1"
           text
-          @click="$root.$emit('closeEmploymentDialog')"
+          @click="$root.$emit('closePositionDialog')"
         >
           Close
         </v-btn>
@@ -58,7 +58,7 @@
         <v-btn
           color="green darken-1"
           text
-          @click="save(), $root.$emit('closeEmploymentDialog')"
+          @click="save(), $root.$emit('closePositionDialog')"
         >
           Save
         </v-btn>
@@ -68,7 +68,7 @@
 </template>
 <script>
 import axios from 'axios'
-import { Vboolean, Vratetype } from '@/util/helper'
+import { Vboolean } from '@/util/helper'
 import DialogReference from '@/components/maintenance/dialog/Reference'
 
 export default {
@@ -90,9 +90,7 @@ export default {
     return {
       primekey: localStorage.getItem('primekey'),
       formDefault: '',
-      rateType: [],
       trueOrFalse: [],
-      payrollGroup: [],
       form: {
         primekey: '',
         pos_code: '',
@@ -102,23 +100,23 @@ export default {
     }
   },
   methods: {
-    setEmploymentDefault (value) {
+    setDefault (value) {
       this.form = { ...value }
       this.form.primekey = this.primekey
-      this.$root.$emit('reloadEmployment')
+      this.$root.$emit('reloadPosition')
     },
     async save () {
       try {
         axios.defaults.headers.common['Authorization'] = 'Bearer ' + localStorage.getItem('access_token')
         if (this.$store.getters.loggedIn) {
           await new Promise((resolve, reject) => {
-            axios.post('u/maintenance/reference/employment/create', this.form)
+            axios.post('u/maintenance/reference/position/create', this.form)
               .then((response) => {
                 resolve(response)
                 this.snack = true
                 this.snackColor = 'success'
                 this.snackText = 'Successfully Saved'
-                this.setEmploymentDefault(this.formDefault)
+                this.setDefault(this.formDefault)
               })
               .catch(error => {
                 reject(error)
@@ -127,22 +125,12 @@ export default {
         }
       } catch (error) {
       }
-    },
-    loadPayrollGroup () {
-      this.$store.dispatch('retrievePayrollGroup', {
-        primekey: this.primekey
-      })
-        .then(response => {
-          this.payrollGroup = this.$store.getters.retrievePayrollGroup
-        })
     }
   },
   created () {
     this.formDefault = { ...this.form }
     this.form.primekey = this.primekey
     this.trueOrFalse = Vboolean
-    this.rateType = Vratetype
-    this.loadPayrollGroup()
   }
 }
 </script>

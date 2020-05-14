@@ -253,7 +253,8 @@ export default {
     },
     buildPayrollGroup (value, descript) {
       // credit: https://stackoverflow.com/questions/7364150/find-object-by-id-in-an-array-of-javascript-objects
-      return this.payrollGroup.find(item => item.group_no === value).descript
+      const paygroup = this.payrollGroup.find(item => item.group_no === value)
+      return paygroup.descript
     },
     buildBoolean (value) {
       return VbooleanFn(value)

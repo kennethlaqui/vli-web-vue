@@ -111,7 +111,7 @@
 <script>
 import axios from 'axios'
 import { masterfileDefaultForm, masterfileEditForm } from '@/form/masterfile'
-import newEmployee from '@/components/maintenance/masterfile/Create.vue'
+import newEmployee from '@/components/maintenance/masterfile/create/Masterfile.vue'
 
 export default {
   name: 'Masterfile',
