@@ -72,14 +72,14 @@ import { Vboolean } from '@/util/helper'
 import DialogReference from '@/components/maintenance/dialog/Reference'
 
 export default {
-  name: 'Employment-Create',
+  name: 'Position-Create',
   components: {
     DialogReference
   },
   props: {
     title: {
       type: String,
-      default: 'Create Employment'
+      default: 'Create Position'
     },
     dialog: {
       type: Boolean,
