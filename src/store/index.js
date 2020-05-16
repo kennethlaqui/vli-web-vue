@@ -48,6 +48,7 @@ export default new Vuex.Store({
     emplstatdatab: [],
     workstatdata: [],
     positionsdata: [],
+    workareadata: [],
     divisiondata: [],
     departmentdata: [],
     sectiondata: [],
@@ -98,7 +99,7 @@ export default new Vuex.Store({
     retrieveWorkStat (state) {
       return state.workstat
     },
-    retrieveWorkAreadata (state) {
+    retrieveWorkAreaData (state) {
       return state.workareadata
     },
     retrieveWorkArea (state) {
@@ -437,6 +438,25 @@ export default new Vuex.Store({
       } catch (error) {
       }
     },
+    async retrieveSectionData (context, payload) {
+      try {
+        axios.defaults.headers.common['Authorization'] = 'Bearer ' + context.state.token
+        if (context.getters.loggedIn) {
+          await new Promise((resolve, reject) => {
+            axios.get(`l/helper/section/data/${payload.primekey}`)
+              .then(response => {
+                this.sectiondata = response.data
+                context.commit('retrieveSectionData', this.sectiondata)
+                resolve(response)
+              })
+              .catch(error => {
+                reject(error)
+              })
+          })
+        }
+      } catch (error) {
+      }
+    },
     async retrieveSection (context, payload) {
       if (this.state.section.length === 0) {
         try {
@@ -451,6 +471,27 @@ export default new Vuex.Store({
                 .then(response => {
                   this.section = response.data
                   context.commit('retrieveSection', this.section)
+                  resolve(response)
+                })
+                .catch(error => {
+                  reject(error)
+                })
+            })
+          }
+        } catch (error) {
+        }
+      }
+    },
+    async retrieveDepartmentData (context, payload) {
+      if (this.state.department.length === 0) {
+        try {
+          axios.defaults.headers.common['Authorization'] = 'Bearer ' + context.state.token
+          if (context.getters.loggedIn) {
+            await new Promise((resolve, reject) => {
+              axios.get(`l/helper/department/data/${payload.primekey}`)
+                .then(response => {
+                  this.departmentdata = response.data
+                  context.commit('retrieveDepartmentData', this.departmentdata)
                   resolve(response)
                 })
                 .catch(error => {
@@ -485,6 +526,25 @@ export default new Vuex.Store({
           }
         } catch (error) {
         }
+      }
+    },
+    async retrieveDivisionData (context, payload) {
+      try {
+        axios.defaults.headers.common['Authorization'] = 'Bearer ' + context.state.token
+        if (context.getters.loggedIn) {
+          await new Promise((resolve, reject) => {
+            axios.get(`l/helper/division/data/${payload.primekey}`)
+              .then(response => {
+                this.divisiondata = response.data
+                context.commit('retrieveDivisionData', this.divisiondata)
+                resolve(response)
+              })
+              .catch(error => {
+                reject(error)
+              })
+          })
+        }
+      } catch (error) {
       }
     },
     async retrieveDivision (context, payload) {
@@ -554,6 +614,25 @@ export default new Vuex.Store({
           }
         } catch (error) {
         }
+      }
+    },
+    async retrieveWorkAreaData (context, payload) {
+      try {
+        axios.defaults.headers.common['Authorization'] = 'Bearer ' + context.state.token
+        if (context.getters.loggedIn) {
+          await new Promise((resolve, reject) => {
+            axios.get(`l/helper/workarea/data/${payload.primekey}`)
+              .then(response => {
+                this.workareadata = response.data
+                context.commit('retrieveWorkAreaData', this.workareadata)
+                resolve(response)
+              })
+              .catch(error => {
+                reject(error)
+              })
+          })
+        }
+      } catch (error) {
       }
     },
     async retrieveWorkArea (context, payload) {
