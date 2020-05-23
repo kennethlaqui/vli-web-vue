@@ -1,0 +1,10 @@
+version: '3.7'
+
+services:
+    vli-web:
+        container_name: vli-vue-production
+        build:
+            context: .
+            dockerfile: prod.Dockerfile
+        ports:
+            - '80:80'
