@@ -40,6 +40,7 @@ export default new Vuex.Store({
     positions: [],
     companies: [],
     shiftfile: [],
+    parameters: [],
     department: [],
     incomeType: [],
     directories: [],
@@ -147,6 +148,9 @@ export default new Vuex.Store({
     retrieveBank (state) {
       return state.bank
     },
+    retrieveParameters (state) {
+      return state.parameters
+    },
     showDialog (state) {
       return state.showdialog
     }
@@ -245,6 +249,9 @@ export default new Vuex.Store({
     retrieveBank (state, payload) {
       state.bank = payload
     },
+    retrieveParameters (state, payload) {
+      state.parameters = payload
+    },
     toggleDialog (state) {
       state.showdialog = !state.showdialog
     },
@@ -256,6 +263,29 @@ export default new Vuex.Store({
     }
   },
   actions: {
+    async retrieveParameters (context, payload) {
+      try {
+        axios.defaults.headers.common['Authorization'] = 'Bearer ' + context.state.token
+        if (context.getters.loggedIn) {
+          await new Promise((resolve, reject) => {
+            axios.get('l/helper/common/parameters/', {
+              params: {
+                primekey: payload.primekey
+              }
+            })
+              .then(response => {
+                this.parameters = response.data
+                context.commit('retrieveParameters', this.parameters)
+                resolve(response)
+              })
+              .catch(error => {
+                reject(error)
+              })
+          })
+        }
+      } catch (error) {
+      }
+    },
     async retrieveBank (context, payload) {
       if (this.state.bank.length === 0) {
         try {
