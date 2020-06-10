@@ -11,9 +11,16 @@
     :loading="loading"
     :items-per-page="15"
     :search="search"
+    fixed-header
+    height="500px"
   >
     <template v-slot:top>
-      <v-toolbar color="white" dense class="elevation-2">
+      <v-toolbar
+        color="primary"
+        dense
+        dark
+        elevation="1"
+      >
         <v-tooltip bottom>
           <template v-slot:activator="{ on }">
             <v-btn v-if="$routerHistory.hasPrevious()" :to="{ path: $routerHistory.previous().path }" v-on="on" icon exact>

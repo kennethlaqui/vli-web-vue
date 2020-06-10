@@ -95,8 +95,8 @@ export default {
   },
   methods: {
     selectedFile () {
-      console.log('selected a file')
-      console.log(this.$refs.myFile.files[0])
+      // console.log('selected a file')
+      // console.log(this.$refs.myFile.files[0])
       let file = this.$refs.myFile.files[0]
       if (!file || file.type !== 'text/plain') return
       // Credit: https://stackoverflow.com/a/754398/52160
@@ -117,7 +117,7 @@ export default {
         if (this.allNames[this.allNames.length - 1] === '') this.allNames.pop()
       }
       reader.onerror = evt => {
-        console.error(evt)
+        // console.error(evt)
       }
     },
     async uploadBio () {
@@ -132,7 +132,7 @@ export default {
           })
             .then(response => {
               resolve(response)
-              console.log(response)
+              // console.log(response)
             })
             .catch(error => {
               reject(error)

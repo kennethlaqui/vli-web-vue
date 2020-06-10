@@ -15,7 +15,8 @@ import manPower from '../views/personnel/Manpower.vue'
 import PayrollHeader from '../views/payroll/Header.vue'
 import OneTimeIncome from '../views/payroll/OneTimeIncome.vue'
 import Reference from '../views/maintenance/Reference.vue'
-import Biometrics from '../components/maintenance/Biometrics.vue'
+import BioDevice from '../components/biometrics/Device.vue'
+import BioOnline from '../views/biometrics/Online.vue'
 import UserMasterfile from '../views/maintenance/Masterfile.vue'
 // import NewEmployee from '../components/maintenance/NewEmployee.vue'
 // import EasyCreateEmployee from '../components/controller/dialog/CreateEmployee.vue'
@@ -174,9 +175,18 @@ const routes = [
     }
   },
   {
-    path: '/biometrics',
-    name: 'biometrics',
-    component: Biometrics,
+    path: '/biometrics/device',
+    name: 'biometricsDevice',
+    component: BioDevice,
+    meta: {
+      requiresAuth: true,
+      layout: 'dashboard'
+    }
+  },
+  {
+    path: '/biometrics/online',
+    name: 'biometricsOnline',
+    component: BioOnline,
     meta: {
       requiresAuth: true,
       layout: 'dashboard'

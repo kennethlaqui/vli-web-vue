@@ -12,9 +12,9 @@
     >
       <template v-slot:header>
         <v-toolbar
+          color="primary"
           dark
-          color="blue darken-3"
-          class="mb-1"
+          elevation="1"
           dense
         >
           <v-text-field

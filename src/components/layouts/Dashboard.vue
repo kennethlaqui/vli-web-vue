@@ -405,8 +405,9 @@ export default {
           title: 'Personnel',
           active: true,
           items: [
-            { action: 'mdi-calendar-plus', title: 'Encode DTR', url: { name: 'directory' } },
-            { action: 'mdi-calendar-clock', title: 'Manpower', url: { name: 'manPower' } }
+            { action: 'mdi-calendar-plus', title: 'Compute DTR', url: { name: 'directory' } },
+            { action: 'mdi-calendar-clock', title: 'Manpower', url: { name: 'manPower' } },
+            { action: 'mdi-beach', title: 'Leaves', url: 'about' }
           ]
         },
         {
@@ -414,12 +415,8 @@ export default {
           title: 'Payroll',
           active: false,
           items: [
-            { action: 'mdi-cached', title: 'Compute Payroll', url: 'about' },
-            { action: 'mdi-currency-usd', title: 'Salaries', url: 'about' },
-            { action: 'mdi-currency-usd', title: 'One-Time Income', url: { name: 'PayrollHeader' } },
-            { action: 'mdi-currency-usd', title: 'Other Income', url: 'about' },
-            { action: 'mdi-currency-usd', title: 'One-Time Deduct', url: 'about' },
-            { action: 'mdi-currency-usd', title: 'Other Deduct', url: 'about' }
+            { action: 'mdi-calculator', title: 'Compute', url: 'about' },
+            { action: 'mdi-currency-usd', title: 'Others', url: { name: 'PayrollHeader' } }
           ]
         },
         {
@@ -427,8 +424,7 @@ export default {
           title: 'Reports',
           active: false,
           items: [
-            { action: 'mdi-beach', title: 'Leave Summary', url: 'about' },
-            { action: 'mdi-coin', title: 'Salaries', url: 'about' }
+            { action: 'mdi-beach', title: 'Leave Summary', url: 'about' }
           ]
         },
         {
@@ -437,8 +433,16 @@ export default {
           active: false,
           items: [
             { action: 'mdi-account-multiple-outline', title: 'Masterfile', url: { name: 'UserMasterfile' } },
-            { action: 'mdi-animation', title: 'Reference File', url: { name: 'reference' } },
-            { action: 'mdi-upload', title: 'Upload Bio', url: { name: 'biometrics' } }
+            { action: 'mdi-animation', title: 'Reference File', url: { name: 'reference' } }
+          ]
+        },
+        {
+          action: 'mdi-fingerprint',
+          title: 'Biometrics',
+          active: false,
+          items: [
+            { action: 'mdi-upload', title: 'Device', url: { name: 'biometricsDevice' } },
+            { action: 'mdi-upload', title: 'Online', url: { name: 'biometricsOnline' } }
           ]
         }
       ],
@@ -544,6 +548,12 @@ export default {
   created () {
     this.getCurrentUser()
     this.retrieveSubscriber()
+    this.$root.$on('closeDrawer', (payload) => {
+      if (payload === true) {
+        this.drawer = false
+        this.drawerRight = false
+      }
+    })
   },
   props: [
     'item'

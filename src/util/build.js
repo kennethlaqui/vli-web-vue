@@ -1,5 +1,13 @@
-function buildDescription (item = [], key, value, text) {
-  return item.find(item => item.concat(key) === value).concat(text)
+// this module is responsible for replacing corresponding value in the table.
+
+function buildRateTypeFn (value) {
+  // console.log(value)
+  switch (value) {
+    case 'M':
+      return 'Monthly'
+    case 'D':
+      return 'Daily'
+  }
 }
 
-export { buildDescription }
+export { buildRateTypeFn }

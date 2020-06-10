@@ -914,6 +914,10 @@
           </v-container>
         </v-card>
       </v-tab-item>
+      <!-- salary -->
+      <v-tab-item>
+        <Salary :employee="form.empl_cde.toString()"></Salary>
+      </v-tab-item>
     </v-tabs-items>
     <v-row justify="center">
       <dialogSaveUpdate
@@ -963,12 +967,14 @@ import { mask } from 'vue-the-mask'
 import { masterfileForm } from '@/form/masterfile'
 import { VtrimObject, VtrimArrayObject } from '@/util/trimmer'
 import { Vgender, Vcivilstatus, Vratetype, Vweek, Vboolean } from '@/util/helper'
+import Salary from '@/components/maintenance/masterfile/salary/Salary'
 import dialogSaveUpdate from '@/components/dialogs/masterfile/DialogSaveUpdate.vue'
 
 export default {
   name: 'NewEmployee',
   components: {
-    dialogSaveUpdate
+    dialogSaveUpdate,
+    Salary
   },
   props: {
     employeeData: Object,
@@ -1044,7 +1050,7 @@ export default {
       },
       restday: [],
       tabHeaders: [
-        'Personal', 'General', 'Government', 'Payroll'
+        'Personal', 'General', 'Government', 'Payroll', 'Salary'
       ],
       taxType: [
         {
@@ -1367,6 +1373,7 @@ export default {
       // run once
       this.cloneProps()
       this.requestEmployeeCode()
+      // this.$root.$emit('createEmployee', true) // indicator that this module is either create or edit
     } else {
       // run once
       this.cloneProps()

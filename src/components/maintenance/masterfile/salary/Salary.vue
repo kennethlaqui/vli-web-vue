@@ -3,11 +3,30 @@
     <v-container
       fluid
     >
+      <v-row>
+        <v-col
+        cols="12"
+        align="end"
+        >
+          <v-btn
+            small
+            @click="addNewSalary"
+          >
+            Add New
+          </v-btn>
+        </v-col>
+      </v-row>
       <v-data-table
         :headers="headers"
         :items="salaryFile"
         class="elevation-1"
       >
+      <!-- data -->
+      <!-- <template v-slot:item="{ item, index }">
+        <tr>
+          <td :value="index">{{ item.}}</td>
+        </tr>
+      </template> -->
       <!-- position -->
       <template v-slot:item.pos_code="{ item }">
         <v-edit-dialog
@@ -53,11 +72,11 @@
           @save="save"
           @cancel="cancel"
           @open="open"
-          @close="close(item)"
+          @close="closeMonthlyRate(item)"
         >
           {{ toNumber(item.mrate___) }}
           <template v-slot:input>
-            <div class="mt-4 title">Update Descript</div>
+            <div class="mt-4 title">Monthly Rate</div>
           </template>
           <template v-slot:input>
             <v-text-field
@@ -66,14 +85,37 @@
               single-line
               counter
               autofocus
-              @change="computeDailyHourlyRate(item.mrate___)"
+              clearable
+              :disabled="disabled"
+              @change="computeDailyHourlyRateMonthly(item.mrate___)"
             ></v-text-field>
           </template>
         </v-edit-dialog>
       </template>
-      <!-- hourly rate -->
+      <!-- daily rate -->
       <template v-slot:item.drate___="{ item }">
-        {{ toNumber(item.drate___) }}
+        <v-edit-dialog
+          v-model="item.drate___"
+          @save="save"
+          @cancel="cancel"
+          @open="open"
+          @close="closeDailyRate(item)"
+        >
+          {{ toNumber(item.drate___) }}
+          <template v-slot:input>
+            <div class="mt-4 title">Daily Rate</div>
+          </template>
+          <template v-slot:input>
+            <v-text-field
+              v-model="item.drate___"
+              label="Edit"
+              single-line
+              counter
+              autofocus
+              @change="computeDailyHourlyRateDaily(item.drate___)"
+            ></v-text-field>
+          </template>
+        </v-edit-dialog>
       </template>
       <!-- edit description -->
       <template v-slot:item.remarks_="{ item }">
@@ -86,7 +128,7 @@
         >
           {{ item.remarks_ }}
           <template v-slot:input>
-            <div class="mt-4 title">Update Description</div>
+            <div class="mt-4 title">Description</div>
           </template>
           <template v-slot:input>
             <v-text-field
@@ -102,18 +144,16 @@
       </template>
       <!-- effective date -->
       <template v-slot:item.effectve="{ item }">
+        <!-- menu v-model owns every index of the items -->
         <v-menu
-          v-model="effectiveMenu"
+          v-model="item.effective"
           :close-on-content-click="false"
           transition="scale-transition"
         >
         <template v-slot:activator="{ on }">
           <v-text-field
             v-model="item.effectve"
-            label="Date Hired"
-            outlined
             dense
-            rounded
             v-on="on"
           ></v-text-field>
         </template>
@@ -126,6 +166,10 @@
       </template>
       </v-data-table>
     </v-container>
+    <v-snackbar v-model="snack" :color="snackColor">
+        <h3>{{ snackText }}</h3>
+      <v-btn text @click="snack = false">Close</v-btn>
+    </v-snackbar>
   </div>
 </template>
 <script>
@@ -136,16 +180,19 @@ import { buildRateTypeFn } from '@/util/build'
 
 export default {
   props: {
-    employee: {
-      type: String
-    }
+    employee: String
   },
   data () {
     return {
       primekey: localStorage.getItem('primekey'),
-      effectivePicker: false,
-      effectiveMenu: false,
       drate___: '',
+      dailyRate: '',
+      snackText: '',
+      snackColor: '',
+      hourlyRate: '',
+      snack: false,
+      disabled: false,
+      effectivePicker: false,
       params__: [],
       rateType: [],
       position: [],
@@ -158,16 +205,39 @@ export default {
         { text: 'Daily Rate', value: 'drate___' },
         { text: 'Hourly Rate', value: 'hrate___' },
         { text: 'Description', value: 'remarks_' }
+      ],
+      defaultItem: [
+        {
+          effectve: '',
+          pos_code: 0,
+          rate_typ: '',
+          mrate___: '',
+          drate___: '',
+          hrate___: '',
+          remarks_: ''
+        }
       ]
     }
   },
   methods: {
-    computeDailyHourlyRate (mrate___) {
+    computeDailyHourlyRateMonthly (rate____) {
+      // global parameters
       let params__ = this.params__.map(item => ({
         yrwrkday: `${item.yrwrkday}`
       }))
-      let dailyRate = mrate___ * 12 / params__[0].yrwrkday
-      this.drate___ = dailyRate
+      // get the daily rate base on monthly salary
+      let dailyRate = rate____ * 12 / params__[0].yrwrkday
+      this.dailyRate = dailyRate.toFixed(2)
+      // get the hourly rate base on monthly salary
+      let hourlyRate = (rate____ * 12) / params__[0].yrwrkday / 8
+      this.hourlyRate = hourlyRate.toFixed(2)
+    },
+    computeDailyHourlyRateDaily (rate____) {
+      // get the hourly rate base on daily rate
+      let hourlyRate = rate____ / 8
+      this.hourlyRate = hourlyRate.toFixed(2)
+    },
+    setDefault () {
     },
     buildRateType (value) {
       return buildRateTypeFn(value)
@@ -216,11 +286,35 @@ export default {
           this.params__ = this.$store.getters.retrieveParameters
         })
     },
+    addNewSalary () {
+      if (this.salaryFile.length !== 0) {
+        this.snack = true
+        this.snackColor = 'warning'
+        this.snackText = 'One entry at a time.'
+      }
+      this.salaryFile = [ ...this.defaultItem ]
+      this.$set(this.salaryFile, 'effectve', '')
+      this.$set(this.salaryFile, 'pos_code', '')
+      this.$set(this.salaryFile, 'rate_typ', '')
+      this.$set(this.salaryFile, 'mrate___', '')
+      this.$set(this.salaryFile, 'drate___', '')
+      this.$set(this.salaryFile, 'hrate___', '')
+      this.$set(this.salaryFile, 'remarks_', '')
+    },
     save () {
     },
     cancel () {
     },
     close () {
+    },
+    closeMonthlyRate (item) {
+      const itemIndex = this.salaryFile.indexOf(item)
+      this.$set(this.salaryFile[itemIndex], 'drate___', this.dailyRate)
+      this.$set(this.salaryFile[itemIndex], 'hrate___', this.hourlyRate)
+    },
+    closeDailyRate (item) {
+      const itemIndex = this.salaryFile.indexOf(item)
+      this.$set(this.salaryFile[itemIndex], 'hrate___', this.hourlyRate)
     },
     open () {
     }
@@ -228,6 +322,12 @@ export default {
   created () {
     this.loadParameters()
     this.retrieveSalary()
+    // this.$root.$on('createEmployee', (payload) => {
+    //   console.log(payload)
+    //   if (payload === false) {
+    //     this.retrieveSalary()
+    //   }
+    // })
     this.loadPosition()
     this.rateType = Vratetype
   }

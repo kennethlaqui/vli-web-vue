@@ -1,78 +1,80 @@
 <template>
-  <v-app>
-    <v-container
-      fluid
-    >
-    <div>
-      <v-row>
-        <v-col cols="12" md="12" lg="12">
-          <v-data-table
-            v-model="selected"
-            :headers="headers_"
-            :items="employees"
-            item-key="empl_cde"
-            class="elevation-2 table"
-            :items-per-page="5"
-            :search="search"
+  <div>
+    <v-row>
+      <v-col cols="12" md="8">
+        <v-card>
+          <v-app-bar
+            color="primary"
+            dense
+            dark
           >
-            <template v-slot:top>
-              <v-text-field
-                v-model="search"
-                append-icon="search"
-                label="Search"
-                single-line
-                hide-details
-                :full-width="true"
-                dense
-              ></v-text-field>
-            </template>
-            <template v-slot:item="{ item }">
-              <tr @click="getEmployeeCode(item)" :class="{'primary': item.empl_cde === selectRow}">
-                <td>
-                  <v-layout justify-center>
-                    <v-avatar size="36">
-                        <img
-                          :src="item.avatar__"
-                          alt="John"
-                        >
-                      </v-avatar>
-                  </v-layout>
-                </td>
-                <td>
-                  <v-layout justify-center>
-                    {{ item.empl_cde }}
-                  </v-layout>
-                </td>
-                <td>
-                  <v-layout justify-center>
-                    {{ item.last_nme.trim() }}
-                  </v-layout>
-                </td>
-                <td>
-                  <v-layout justify-center>
-                    {{ item.frst_nme.trim() }}
-                  </v-layout>
-                </td>
-                <td>
-                  <v-layout justify-center>
-                    {{ item.midl_nme.trim() }}
-                  </v-layout>
-                </td>
-              </tr>
-            </template>
-          </v-data-table>
-        </v-col>
-      </v-row>
-    </div>
-    <div>
-      <v-row>
-        <v-col cols="12" md="3" lg="3">
+          <v-toolbar-title>Verified Employees</v-toolbar-title>
+          </v-app-bar>
+        <v-data-table
+          v-model="selected"
+          :headers="headers_"
+          :items="employees"
+          item-key="empl_cde"
+          :items-per-page="5"
+          fixed-header
+          height="250px"
+          class="elavation-1"
+        >
+          <template v-slot:item="{ item }">
+            <tr @click="getEmployeeCode(item)" :class="{'primary': item.empl_cde === selectRow}">
+              <td>
+                <v-layout>
+                  <v-avatar size="36">
+                      <img
+                        :src="item.avatar__"
+                        alt="John"
+                      >
+                    </v-avatar>
+                </v-layout>
+              </td>
+              <td>
+                <v-layout>
+                  {{ item.empl_cde }}
+                </v-layout>
+              </td>
+              <td>
+                <v-layout>
+                  {{ item.last_nme }}
+                </v-layout>
+              </td>
+              <td>
+                <v-layout>
+                  {{ item.frst_nme }}
+                </v-layout>
+              </td>
+              <td>
+                <v-layout>
+                  {{ item.midl_nme }}
+                </v-layout>
+              </td>
+            </tr>
+          </template>
+        </v-data-table>
+        </v-card>
+      </v-col>
+      <!-- bio -->
+      <v-col cols="12" md="4">
+        <v-card>
+          <v-app-bar
+            color="primary"
+            dense
+            dark
+          >
+          <v-toolbar-title>Logs: {{ this.dtrDate }}</v-toolbar-title>
+          </v-app-bar>
           <v-data-table
             :headers="bioHeadr"
             :items="bio"
-            class="elevation-2"
             :loading="loading"
             :items-per-page="5"
+            fixed-header
+            height="250px"
+            class="elavation-1"
           >
             <!-- <template v-slot:top>
               <v-switch v-model="singleSelect" label="Single select" class="pa-3"></v-switch>
@@ -85,133 +87,136 @@
               </tr>
             </template>
           </v-data-table>
-        </v-col>
-      <v-col cols="12" md="9" lg="9">
-        <v-card>
-          <v-card-title>
-            <v-avatar size="36">
-              <img
-                :src="employeeInfo.avatar__"
-                alt="John"
-              >
-            </v-avatar>{{ employeeInfo.last_nme }}, {{ employeeInfo.frst_nme }} {{ employeeInfo.midl_nme }}</v-card-title>
-          <v-card-subtitle>{{ employeeInfo.position }} - {{ rateType(employeeInfo.rate_typ) }}</v-card-subtitle>
-          <v-card-actions><v-btn class="primary" @click="computeRegularHours()">Calculate</v-btn></v-card-actions>
-          <v-divider></v-divider>
-          <v-form>
-            <v-container>
-              <v-row>
-                <v-col cols="12" sm="6" md="3">
-                  <v-select
-                    v-if="clickedDone"
-                    :items="whyNoDtr"
-                    item-text="descript"
-                    item-value="cntrl_no"
-                    label="DTR Type"
-                    outlined
-                    dense
-                  ></v-select>
-                </v-col>
-                <v-col cols="12" sm="6" md="3">
-                  <v-select
-                    v-if="fromPresent"
-                    :items="whyNoDtr"
-                    label="Holidays"
-                    outlined
-                    dense
-                  ></v-select>
-                </v-col>
-              </v-row>
-              <v-row>
-                <v-col cols="12" sm="6" md="3">
-                  <v-text-field
-                    v-if="clickedDone"
-                    v-model="todayShift"
-                    label="Shift"
-                    placeholder="Shift Schedule"
-                    outlined
-                    dense
-                    readonly
-                  ></v-text-field>
-                </v-col>
-                <v-col cols="12" sm="6" md="3">
-                  <v-text-field
-                    v-if="clickedDone"
-                    v-model="timeIn_c"
-                    v-mask="maskTimeIn__"
-                    label="In"
-                    placeholder="First In"
-                    outlined
-                    dense
-                    clearable
-                  ></v-text-field>
-                </v-col>
-                <v-col cols="12" sm="6" md="3">
-                  <v-text-field
-                    v-if="clickedDone"
-                    v-model="timeOutc"
-                    v-mask="maskTimeOut_"
-                    label="Out"
-                    placeholder="Last Out"
-                    outlined
-                    dense
-                    clearable
-                  ></v-text-field>
-                </v-col>
-              </v-row>
-              <!-- hours output -->
-              <v-row>
-                <v-col cols="12" sm="6" md="3">
-                  <v-text-field
-                    v-if="clickedDone"
-                    v-model="rglrHour"
-                    label="Regular"
-                    placeholder="Regular"
-                    outlined
-                    dense
-                    clearable
-                  ></v-text-field>
-                </v-col>
-                <v-col cols="12" sm="6" md="3">
-                  <v-text-field
-                    v-if="clickedDone"
-                    v-model="rglrOt__"
-                    label="Overtime"
-                    placeholder="Overtime"
-                    outlined
-                    dense
-                    clearable
-                  ></v-text-field>
-                </v-col>
-                <v-col cols="12" sm="6" md="3">
-                  <v-text-field
-                    v-if="clickedDone"
-                    v-model="rglrLate"
-                    label="Late"
-                    placeholder="Late"
-                    outlined
-                    dense
-                    clearable
-                  ></v-text-field>
-                </v-col>
-                <v-col cols="12" sm="6" md="3">
-                  <v-text-field
-                    v-if="clickedDone"
-                    v-model="rglrUndr"
-                    label="Undertime"
-                    placeholder="Undertime"
-                    outlined
-                    dense
-                    clearable
-                  ></v-text-field>
-                </v-col>
-              </v-row>
-            </v-container>
-          </v-form>
         </v-card>
       </v-col>
-      </v-row>
-    </div>
+    </v-row>
+    <v-row>
+    <v-col cols="12">
+      <v-card>
+        <v-card-title>
+          <v-avatar size="36">
+            <img
+              :src="employeeInfo.avatar__"
+              alt="John"
+            >
+          </v-avatar>{{ employeeInfo.last_nme }}, {{ employeeInfo.frst_nme }} {{ employeeInfo.midl_nme }}</v-card-title>
+        <v-card-subtitle>{{ employeeInfo.position }} - {{ rateType(employeeInfo.rate_typ) }}</v-card-subtitle>
+        <v-card-actions><v-btn class="primary" @click="computeRegularHours()">Calculate</v-btn></v-card-actions>
+        <v-divider></v-divider>
+        <v-form>
+          <v-container>
+            <v-row>
+              <v-col cols="12" sm="6" md="3">
+                <v-select
+                  v-if="clickedDone"
+                  :items="whyNoDtr"
+                  item-text="descript"
+                  item-value="cntrl_no"
+                  label="DTR Type"
+                  outlined
+                  dense
+                ></v-select>
+              </v-col>
+              <v-col cols="12" sm="6" md="3">
+                <v-select
+                  v-if="fromPresent"
+                  :items="whyNoDtr"
+                  label="Holidays"
+                  outlined
+                  dense
+                ></v-select>
+              </v-col>
+            </v-row>
+            <v-row>
+              <v-col cols="12" sm="6" md="3">
+                <v-text-field
+                  v-if="clickedDone"
+                  v-model="todayShift"
+                  label="Shift"
+                  placeholder="Shift Schedule"
+                  outlined
+                  dense
+                  readonly
+                ></v-text-field>
+              </v-col>
+              <v-col cols="12" sm="6" md="3">
+                <v-text-field
+                  v-if="clickedDone"
+                  v-model="timeIn_c"
+                  v-mask="maskTimeIn__"
+                  label="In"
+                  placeholder="First In"
+                  outlined
+                  dense
+                  clearable
+                ></v-text-field>
+              </v-col>
+              <v-col cols="12" sm="6" md="3">
+                <v-text-field
+                  v-if="clickedDone"
+                  v-model="timeOutc"
+                  v-mask="maskTimeOut_"
+                  label="Out"
+                  placeholder="Last Out"
+                  outlined
+                  dense
+                  clearable
+                ></v-text-field>
+              </v-col>
+            </v-row>
+            <!-- hours output -->
+            <v-row>
+              <v-col cols="12" sm="6" md="3">
+                <v-text-field
+                  v-if="clickedDone"
+                  v-model="rglrHour"
+                  label="Regular"
+                  placeholder="Regular"
+                  outlined
+                  dense
+                  clearable
+                ></v-text-field>
+              </v-col>
+              <v-col cols="12" sm="6" md="3">
+                <v-text-field
+                  v-if="clickedDone"
+                  v-model="rglrOt__"
+                  label="Overtime"
+                  placeholder="Overtime"
+                  outlined
+                  dense
+                  clearable
+                ></v-text-field>
+              </v-col>
+              <v-col cols="12" sm="6" md="3">
+                <v-text-field
+                  v-if="clickedDone"
+                  v-model="rglrLate"
+                  label="Late"
+                  placeholder="Late"
+                  outlined
+                  dense
+                  clearable
+                ></v-text-field>
+              </v-col>
+              <v-col cols="12" sm="6" md="3">
+                <v-text-field
+                  v-if="clickedDone"
+                  v-model="rglrUndr"
+                  label="Undertime"
+                  placeholder="Undertime"
+                  outlined
+                  dense
+                  clearable
+                ></v-text-field>
+              </v-col>
+            </v-row>
+          </v-container>
+        </v-form>
+      </v-card>
+    </v-col>
+    </v-row>
+  </div>
     <!-- <v-data-table
       v-model="selected"
       :headers="headers"
@@ -225,8 +230,6 @@
         <v-switch v-model="singleSelect" label="Single select" class="pa-3"></v-switch>
       </template>
     </v-data-table> -->
-    </v-container>
-  </v-app>
 </template>
 <script>
 import axios from 'axios'
@@ -262,16 +265,15 @@ export default {
       dayType: [],
       bio: [],
       headers_: [
-        { text: 'Image', value: 'avatar__', align: 'center', sortable: false },
+        { text: 'Avatar', value: 'avatar__', sortable: false },
         {
           text: 'Employee ID',
-          align: 'center',
-          sortable: false,
-          value: 'empl_cde'
+          value: 'empl_cde',
+          sortable: true
         },
-        { text: 'Last Name', value: 'last_nme', justifty: 'center' },
-        { text: 'First Name', value: 'frst_nme', align: 'center' },
-        { text: 'Middle Name', value: 'midl_nme', align: 'center' }
+        { text: 'Last Name', value: 'last_nme', sortable: true },
+        { text: 'First Name', value: 'frst_nme', sortable: true },
+        { text: 'Middle Name', value: 'midl_nme', sortable: true }
       ],
       bioHeadr: [
         {
@@ -363,7 +365,7 @@ export default {
       this.selectRow = item.empl_cde
       this.$set(item, 'selected', true)
       this.employeeInfo = item
-      this.retrieveBio(item.empl_cde.trim())
+      this.retrieveBio(item.empl_cde)
     },
     convertTimeToMinutes (timeFrtA) {
       if (timeFrtA.indexOf(':') < 0) {
@@ -476,7 +478,7 @@ export default {
       try {
         axios.defaults.headers.common['Authorization'] = 'Bearer ' + localStorage.getItem('access_token')
         await new Promise((resolve, reject) => {
-          axios.get(`u/personne/directory/folder/uploaddtremployee/shift/${this.primekey}/${emplCode}/${this.dtrDate}`)
+          axios.get(`u/personne/directory/folder/dtr/shift/${this.primekey}/${emplCode}/${this.dtrDate}`)
             .then(response => {
               this.employeeShift = response.data
               resolve(response)
@@ -496,7 +498,7 @@ export default {
         axios.defaults.headers.common['Authorization'] = 'Bearer ' + localStorage.getItem('access_token')
         if (this.bol) {
           await new Promise((resolve, reject) => {
-            axios.get(`u/personnel/directory/uploaddtremployee/${this.primekey}`)
+            axios.get(`u/personnel/directory/folder/dtr/employees/${this.primekey}`)
               .then(response => {
                 this.employees = response.data
                 resolve(response)
@@ -513,7 +515,7 @@ export default {
       try {
         axios.defaults.headers.common['Authorization'] = 'Bearer ' + localStorage.getItem('access_token')
         await new Promise((resolve, reject) => {
-          axios.get(`u/personnel/directory/folder/uploaddtremployee/dtrdate/${this.primekey}/${this.$route.params.folder}`)
+          axios.get(`u/personnel/directory/folder/dtr/date/${this.primekey}/${this.$route.params.folder}`)
             .then(response => {
               this.dtrDate = response.data
               resolve(response)
@@ -530,7 +532,7 @@ export default {
         this.loading = true
         axios.defaults.headers.common['Authorization'] = 'Bearer ' + localStorage.getItem('access_token')
         await new Promise((resolve, reject) => {
-          axios.get(`u/personnel/directory/folder/uploaddtremployee/bio/${this.primekey}/${emplCode}/${this.dtrDate}`)
+          axios.get(`u/personnel/directory/folder/dtr/bio/${this.primekey}/${emplCode}/${this.dtrDate}`)
             .then(response => {
               this.bio = response.data
               resolve(response)
@@ -556,6 +558,7 @@ export default {
     this.retrieveEmployees()
     this.retrieveDtrDate()
     this.retrieveDayType()
+    this.$root.$emit('closeDrawer', true)
   }
 }
 </script>

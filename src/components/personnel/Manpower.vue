@@ -593,6 +593,7 @@ export default {
     this.$on('retrieveEmployeeWithManpower', () => {
       this.retrieveEmployeeWithManpower()
     })
+    this.$root.$emit('closeDrawer', true)
   }
 }
 </script>
