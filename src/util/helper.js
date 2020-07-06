@@ -1,4 +1,5 @@
 // non-function
+// common use: Select/Dropdown
 let Vgender = [
   {
     value: 'M',

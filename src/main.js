@@ -21,6 +21,7 @@ Vue.use(VueRouterBackButton, { router })
 Vue.use(Vuebar)
 
 Vue.config.productionTip = false
+export const bus = new Vue()
 
 // if (process.env.NODE_ENV === 'development') {
 //   makeServer()

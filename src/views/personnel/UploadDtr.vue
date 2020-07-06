@@ -1,12 +1,10 @@
 <template>
-  <div>
-    <uploadDtrDaily v-if="daily"></uploadDtrDaily>
-    <UploadDtrEmployee v-else-if="daily"></UploadDtrEmployee>
-  </div>
+  <uploadDtrDaily></uploadDtrDaily>
+  <!-- <UploadDtrEmployee></UploadDtrEmployee> -->
 </template>
 <script>
 import uploadDtrDaily from '@/components/personnel/UploadDtrDaily.vue'
-import uploadDtrEmployee from '@/components/personnel/UploadDtrEmployee.vue'
+// import uploadDtrEmployee from '@/components/personnel/UploadDtrEmployee.vue'
 
 export default {
   name: 'uploadDtr',
@@ -16,8 +14,8 @@ export default {
     }
   },
   components: {
-    uploadDtrDaily,
-    uploadDtrEmployee
+    uploadDtrDaily
+    // uploadDtrEmployee
   }
 }
 </script>

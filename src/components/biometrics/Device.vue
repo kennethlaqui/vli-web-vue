@@ -104,9 +104,15 @@ export default {
       reader.readAsText(file, 'UTF-8')
       reader.onload = evt => {
         let text = evt.target.result
-        this.allNames = text.split('\n').map(function (el) { return el.split(/\s+/) })
+        this.allNames = text.split('\n').map(el => {
+          return el.split(/\s+/)
+        })
         // var headings = this.allNames.shift()
-        let obj = this.allNames.map(function (el) {
+        let filtered = this.allNames.filter(el => {
+          return (el[2] >= this.strtDate && el[2] <= this.endDate_)
+        })
+        console.log(filtered)
+        let obj = this.allNames.map(el => {
           obj = {}
           for (var i = 0, l = el.length; i < l; i++) {
             obj = isNaN(Number(el[i])) ? el[i] : +el[i]

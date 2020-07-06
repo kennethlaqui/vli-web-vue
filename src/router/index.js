@@ -10,6 +10,7 @@ import ClientRegister from '../components/client/Register.vue'
 import Directory from '../views/personnel/Directory.vue'
 import Folder from '../components/personnel/Folder.vue'
 import FolderEmployees from '../components/personnel/Employees.vue'
+import Api from '../components/biometrics/Api.vue'
 import UploadDtr from '../views/personnel/UploadDtr.vue'
 import manPower from '../views/personnel/Manpower.vue'
 import PayrollHeader from '../views/payroll/Header.vue'
@@ -187,6 +188,15 @@ const routes = [
     path: '/biometrics/online',
     name: 'biometricsOnline',
     component: BioOnline,
+    meta: {
+      requiresAuth: true,
+      layout: 'dashboard'
+    }
+  },
+  {
+    path: '/biometrics/api',
+    name: 'biometricsApi',
+    component: Api,
     meta: {
       requiresAuth: true,
       layout: 'dashboard'

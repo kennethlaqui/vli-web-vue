@@ -1,7 +1,6 @@
 // this module is responsible for replacing corresponding value in the table.
 
 function buildRateTypeFn (value) {
-  // console.log(value)
   switch (value) {
     case 'M':
       return 'Monthly'
@@ -10,4 +9,13 @@ function buildRateTypeFn (value) {
   }
 }
 
-export { buildRateTypeFn }
+function VbuildRateTypeFn (value) {
+  switch (value) {
+    case 'M':
+      return 'Monthly'
+    case 'D':
+      return 'Daily'
+  }
+}
+
+export { VbuildRateTypeFn, buildRateTypeFn }

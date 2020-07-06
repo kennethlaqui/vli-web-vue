@@ -53,6 +53,7 @@ export default new Vuex.Store({
     divisiondata: [],
     departmentdata: [],
     sectiondata: [],
+    directoryDate: [],
     f_emplstatdata: '',
     payrolldirectorybuild: [],
     showdialog: false
@@ -123,6 +124,9 @@ export default new Vuex.Store({
     },
     retrieveSection (state) {
       return state.section
+    },
+    retrieveDirectoryDate (state) {
+      return state.directoryDate
     },
     retrieveDirectories (state) {
       return state.directories
@@ -224,6 +228,9 @@ export default new Vuex.Store({
     },
     retrieveSection (state, payload) {
       state.section = payload
+    },
+    retrieveDirectoryDate (state, payload) {
+      state.directoryDate = payload
     },
     retrieveDirectories (state, payload) {
       state.directories = payload
@@ -435,6 +442,30 @@ export default new Vuex.Store({
               .then(response => {
                 this.folder = response.data
                 context.commit('retrieveFolder', this.folder)
+                resolve(response)
+              })
+              .catch(error => {
+                reject(error)
+              })
+          })
+        }
+      } catch (error) {
+      }
+    },
+    async retrieveDirectoryDate (context, payload) {
+      try {
+        axios.defaults.headers.common['Authorization'] = 'Bearer ' + context.state.token
+        if (context.getters.loggedIn) {
+          await new Promise((resolve, reject) => {
+            axios.get('l/helper/directory/date/', {
+              params: {
+                primekey: payload.primekey,
+                cntrl_no: payload.cntrl_no
+              }
+            })
+              .then(response => {
+                this.directoryDate = response.data
+                context.commit('retrieveDirectoryDate', this.directoryDate)
                 resolve(response)
               })
               .catch(error => {

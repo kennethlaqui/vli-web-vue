@@ -1,238 +1,350 @@
 <template>
   <div>
-    <v-row>
-      <v-col cols="12" md="8">
-        <v-card>
-          <v-app-bar
-            color="primary"
-            dense
-            dark
-          >
-          <v-toolbar-title>Verified Employees</v-toolbar-title>
-          </v-app-bar>
+
+    <v-card>
+
+      <v-app-bar
+        color="primary"
+        dense
+        dark
+        elevation="1"
+      >
+
+        <v-toolbar-title>Verified Employees</v-toolbar-title>
+
+        <v-spacer></v-spacer>
+
+          <!-- edit manpower -->
+          <v-tooltip bottom>
+            <template v-slot:activator="{ on }">
+              <v-btn
+                icon
+                v-on="on"
+              >
+                <v-icon>
+                  mdi-calendar-clock
+                </v-icon>
+              </v-btn>
+            </template>
+            <span>Edit Manpower</span>
+          </v-tooltip>
+
+          <!-- single select -->
+          <v-tooltip bottom>
+            <template v-slot:activator="{ on }">
+              <v-switch v-on="on" v-model="singleSelect" class="pa-4 mt-5"></v-switch>
+            </template>
+            <span>Single Select</span>
+          </v-tooltip>
+
+          <!-- show employees table -->
+          <v-tooltip bottom>
+            <template v-slot:activator="{ on }">
+              <v-switch v-on="on" v-model="showEmployees" class="pa-4 mt-5"></v-switch>
+            </template>
+            <span>Hide Employees</span>
+          </v-tooltip>
+
+      </v-app-bar>
+
+        <!-- employees -->
         <v-data-table
-          v-model="selected"
+          v-if="showEmployees"
+          v-model="dt1Selected"
           :headers="headers_"
           :items="employees"
           item-key="empl_cde"
           :items-per-page="5"
+          :single-select="singleSelect"
+          show-select
           fixed-header
-          height="250px"
-          class="elavation-1"
+          height="300px"
+          class="elavation-1 font-weight-light caption"
+          @item-selected="singleItemSelect"
+        />
+
+    </v-card>
+    <!-- bio log -->
+    <!-- <v-card>
+      <v-app-bar
+        color="primary"
+        dense
+        dark
+      >
+      <v-toolbar-title>Logs: {{ this.dtrDate }}</v-toolbar-title>
+      </v-app-bar>
+      <v-data-table
+        :headers="bioHeadr"
+        :items="bio"
+        :loading="loading"
+        :items-per-page="5"
+        fixed-header
+        height="250px"
+        class="elavation-1"
+      >
+        <template v-slot:top>
+          <v-switch v-model="singleSelect" label="Single select" class="pa-3"></v-switch>
+        </template>
+        <template v-slot:item="{ item }">
+          <tr>
+            <td>{{ item.empl_cde }}</td>
+            <td>{{ item.dtr_date }}</td>
+            <td>{{ timeFrmt(item.dtr_time) }}</td>
+            <td>{{ entryTyp(item.tran_typ) }}</td>
+          </tr>
+        </template>
+      </v-data-table>
+    </v-card> -->
+    <v-row v-if="dt1Selected.length > 0">
+
+      <v-col cols="12">
+
+        <v-card
+          v-if="showDtrEntry"
         >
-          <template v-slot:item="{ item }">
-            <tr @click="getEmployeeCode(item)" :class="{'primary': item.empl_cde === selectRow}">
-              <td>
-                <v-layout>
-                  <v-avatar size="36">
-                      <img
-                        :src="item.avatar__"
-                        alt="John"
-                      >
-                    </v-avatar>
-                </v-layout>
-              </td>
-              <td>
-                <v-layout>
-                  {{ item.empl_cde }}
-                </v-layout>
-              </td>
-              <td>
-                <v-layout>
-                  {{ item.last_nme }}
-                </v-layout>
-              </td>
-              <td>
-                <v-layout>
-                  {{ item.frst_nme }}
-                </v-layout>
-              </td>
-              <td>
-                <v-layout>
-                  {{ item.midl_nme }}
-                </v-layout>
-              </td>
-            </tr>
-          </template>
-        </v-data-table>
-        </v-card>
-      </v-col>
-      <!-- bio -->
-      <v-col cols="12" md="4">
-        <v-card>
-          <v-app-bar
-            color="primary"
-            dense
-            dark
+
+          <v-row
+            class="py-3"
+            justify="center"
           >
-          <v-toolbar-title>Logs: {{ this.dtrDate }}</v-toolbar-title>
-          </v-app-bar>
-          <v-data-table
-            :headers="bioHeadr"
-            :items="bio"
-            :loading="loading"
-            :items-per-page="5"
-            fixed-header
-            height="250px"
-            class="elavation-1"
-          >
-            <!-- <template v-slot:top>
-              <v-switch v-model="singleSelect" label="Single select" class="pa-3"></v-switch>
-            </template> -->
-            <template v-slot:item="{ item }">
-              <tr>
-                <td>{{ item.dtr_date }}</td>
-                <td class="text-xs-center">{{ timeFrmt(item.dtr_time) }}</td>
-                <td class="text-xs-center">{{ entryTyp(item.tran_typ) }}</td>
-              </tr>
-            </template>
-          </v-data-table>
-        </v-card>
-      </v-col>
-    </v-row>
-    <v-row>
-    <v-col cols="12">
-      <v-card>
-        <v-card-title>
-          <v-avatar size="36">
-            <img
-              :src="employeeInfo.avatar__"
-              alt="John"
+
+            <v-avatar
+              class="profile"
+              color="grey"
+              size="100"
+              rounded
             >
-          </v-avatar>{{ employeeInfo.last_nme }}, {{ employeeInfo.frst_nme }} {{ employeeInfo.midl_nme }}</v-card-title>
-        <v-card-subtitle>{{ employeeInfo.position }} - {{ rateType(employeeInfo.rate_typ) }}</v-card-subtitle>
-        <v-card-actions><v-btn class="primary" @click="computeRegularHours()">Calculate</v-btn></v-card-actions>
-        <v-divider></v-divider>
-        <v-form>
-          <v-container>
-            <v-row>
-              <v-col cols="12" sm="6" md="3">
-                <v-select
-                  v-if="clickedDone"
-                  :items="whyNoDtr"
-                  item-text="descript"
-                  item-value="cntrl_no"
-                  label="DTR Type"
-                  outlined
-                  dense
-                ></v-select>
-              </v-col>
-              <v-col cols="12" sm="6" md="3">
-                <v-select
-                  v-if="fromPresent"
-                  :items="whyNoDtr"
-                  label="Holidays"
-                  outlined
-                  dense
-                ></v-select>
-              </v-col>
-            </v-row>
-            <v-row>
-              <v-col cols="12" sm="6" md="3">
-                <v-text-field
-                  v-if="clickedDone"
-                  v-model="todayShift"
-                  label="Shift"
-                  placeholder="Shift Schedule"
-                  outlined
-                  dense
-                  readonly
-                ></v-text-field>
-              </v-col>
-              <v-col cols="12" sm="6" md="3">
-                <v-text-field
-                  v-if="clickedDone"
-                  v-model="timeIn_c"
-                  v-mask="maskTimeIn__"
-                  label="In"
-                  placeholder="First In"
-                  outlined
-                  dense
-                  clearable
-                ></v-text-field>
-              </v-col>
-              <v-col cols="12" sm="6" md="3">
-                <v-text-field
-                  v-if="clickedDone"
-                  v-model="timeOutc"
-                  v-mask="maskTimeOut_"
-                  label="Out"
-                  placeholder="Last Out"
-                  outlined
-                  dense
-                  clearable
-                ></v-text-field>
-              </v-col>
-            </v-row>
-            <!-- hours output -->
-            <v-row>
-              <v-col cols="12" sm="6" md="3">
-                <v-text-field
-                  v-if="clickedDone"
-                  v-model="rglrHour"
-                  label="Regular"
-                  placeholder="Regular"
-                  outlined
-                  dense
-                  clearable
-                ></v-text-field>
-              </v-col>
-              <v-col cols="12" sm="6" md="3">
-                <v-text-field
-                  v-if="clickedDone"
-                  v-model="rglrOt__"
-                  label="Overtime"
-                  placeholder="Overtime"
-                  outlined
-                  dense
-                  clearable
-                ></v-text-field>
-              </v-col>
-              <v-col cols="12" sm="6" md="3">
-                <v-text-field
-                  v-if="clickedDone"
-                  v-model="rglrLate"
-                  label="Late"
-                  placeholder="Late"
-                  outlined
-                  dense
-                  clearable
-                ></v-text-field>
-              </v-col>
-              <v-col cols="12" sm="6" md="3">
-                <v-text-field
-                  v-if="clickedDone"
-                  v-model="rglrUndr"
-                  label="Undertime"
-                  placeholder="Undertime"
-                  outlined
-                  dense
-                  clearable
-                ></v-text-field>
-              </v-col>
-            </v-row>
-          </v-container>
-        </v-form>
-      </v-card>
-    </v-col>
+
+              <v-img :src="this.employee.avatar__" alt="john" />
+
+            </v-avatar>
+
+          </v-row>
+
+          <!-- full name -->
+          <v-row class="mt-n6">
+
+            <v-col cols="12" md="12">
+
+              <v-card-title class="justify-center font-weight-light">
+
+                {{ employee.last_nme }} {{ employee.frst_nme }} {{ employee.midl_nme }}
+
+              </v-card-title >
+
+            </v-col>
+
+          </v-row>
+
+          <!-- position and rate type -->
+          <v-row class="mt-n12">
+
+            <v-col cols="12" md="12">
+
+              <v-card-subtitle align="center">
+
+                {{ employee.position }} - {{ rateType(employee.rate_typ) }}
+
+              </v-card-subtitle>
+
+            </v-col>
+
+          </v-row>
+
+          <!-- <v-card-actions>
+            <v-btn class="primary" @click="computeRegularHours()">Calculate</v-btn>
+            <v-btn class="primary" @click="retrieveBio()">Bio</v-btn>
+          </v-card-actions> -->
+          <v-divider></v-divider>
+
+          <!-- dtr entry -->
+          <v-form>
+
+            <v-container>
+
+              <v-row>
+
+                <!-- dtr type -->
+                <v-col cols="12" md="3">
+
+                  <v-select
+                    v-if="dataRetrieved"
+                    :items="whyNoDtr"
+                    item-text="descript"
+                    item-value="cntrl_no"
+                    label="DTR Type"
+                    outlined
+                    dense
+                    rounded
+                  />
+
+                </v-col>
+
+                <!-- shift -->
+                <v-col cols="12" md="3">
+
+                  <v-text-field
+                    v-if="dataRetrieved"
+                    v-model="todayShift"
+                    label="Shift"
+                    placeholder="Shift Schedule"
+                    outlined
+                    dense
+                    readonly
+                    rounded
+                  />
+
+                </v-col>
+
+                <!-- Time-In -->
+                <v-col cols="12" md="3">
+
+                  <v-text-field
+                    v-if="dataRetrieved"
+                    v-model="timeIn_c"
+                    v-mask="maskTimeIn__"
+                    label="Time In"
+                    placeholder="Time In"
+                    outlined
+                    dense
+                    rounded
+                  />
+
+                </v-col>
+
+                <!-- Time out -->
+                <v-col cols="12" md="3">
+
+                  <v-text-field
+                    v-if="dataRetrieved"
+                    v-model="timeOutc"
+                    v-mask="maskTimeOut_"
+                    label="Time Out"
+                    placeholder="Time Out"
+                    outlined
+                    dense
+                    rounded
+                  />
+
+                </v-col>
+
+                <!-- <v-col cols="12" sm="6" md="3">
+
+                  <v-select
+                    v-if="fromPresent"
+                    :items="whyNoDtr"
+                    label="Holidays"
+                    outlined
+                    dense
+                  />
+
+                </v-col> -->
+
+              </v-row>
+
+              <!-- hours output -->
+              <v-row>
+
+                <v-col cols="12" md="3">
+
+                  <!-- regular hours -->
+                  <v-text-field
+                    v-if="dataRetrieved"
+                    v-model="rglrHour"
+                    label="Regular"
+                    placeholder="Regular"
+                    outlined
+                    dense
+                    rounded
+                  />
+
+                </v-col>
+
+                <v-col cols="12" md="3">
+
+                  <!-- overtime -->
+                  <v-text-field
+                    v-if="dataRetrieved"
+                    v-model="rglrOt__"
+                    label="Overtime"
+                    placeholder="Overtime"
+                    outlined
+                    dense
+                    rounded
+                  />
+
+                </v-col>
+
+                <v-col cols="12" md="3">
+
+                  <!-- late -->
+                  <v-text-field
+                    v-if="dataRetrieved"
+                    v-model="rglrLate"
+                    label="Late"
+                    placeholder="Late"
+                    outlined
+                    dense
+                    rounded
+                  />
+
+                </v-col>
+
+                <v-col cols="12" md="3">
+
+                  <!-- undertime -->
+                  <v-text-field
+                    v-if="dataRetrieved"
+                    v-model="rglrUndr"
+                    label="Undertime"
+                    placeholder="Undertime"
+                    outlined
+                    dense
+                    rounded
+                  />
+
+                </v-col>
+
+              </v-row>
+
+            </v-container>
+
+          </v-form>
+
+          <v-card-actions>
+
+            <v-spacer></v-spacer>
+
+            <v-btn text>Save</v-btn>
+
+            <!-- <v-btn v-if="!create" @click.stop="dialog = true" text>Update</v-btn> -->
+
+            <v-btn text>Cancel</v-btn>
+
+          </v-card-actions>
+
+          <!-- <v-snackbar v-model="snack" :timeout="snackTimeOut" :color="snackColor">
+
+              <h3>{{ snackText }}</h3>
+
+            <v-btn text @click="snack = false">Close</v-btn>
+
+          </v-snackbar> -->
+
+        </v-card>
+
+      </v-col>
+
     </v-row>
+
   </div>
-    <!-- <v-data-table
-      v-model="selected"
-      :headers="headers"
-      :items="desserts"
-      :single-select="singleSelect"
-      item-key="name"
-      show-select
-      class="elevation-2"
-    >
-      <template v-slot:top>
-        <v-switch v-model="singleSelect" label="Single select" class="pa-3"></v-switch>
-      </template>
-    </v-data-table> -->
+
 </template>
+
 <script>
+// import { bus } from '@/main.js'
 import axios from 'axios'
+import { VbuildRateTypeFn } from '@/util/build'
 
 export default {
   data () {
@@ -241,14 +353,20 @@ export default {
       route: this.$route.params.folder,
       maskTimeIn__: '##:##',
       maskTimeOut_: '##:##',
-      singleSelect: false,
-      clickedDone: false,
+      temporaryData: false,
+      showEmployees: true,
+      showDtrEntry: true,
+      singleSelect: true,
+      dataRetrieved: false,
       fromPresent: false,
       loading: false,
       show: false,
       bol: true,
       employeeInfo: '',
       employeeOut: '',
+      snackColor: '',
+      snackText: '',
+      employee: '',
       rglrHour: '',
       rglrLate: '',
       rglrUndr: '',
@@ -258,30 +376,37 @@ export default {
       selectRow: '',
       dtrDate: '',
       search: '',
+      snackTimeOut: 3000,
+      emplCodeArray: [],
       onThisDateBio: [],
       employeeShift: [],
       employees: [],
-      selected: [],
+      dt1Selected: [],
       dayType: [],
       bio: [],
       headers_: [
-        { text: 'Avatar', value: 'avatar__', sortable: false },
         {
-          text: 'Employee ID',
+          text: 'System ID',
           value: 'empl_cde',
+          width: '180px',
           sortable: true
         },
-        { text: 'Last Name', value: 'last_nme', sortable: true },
-        { text: 'First Name', value: 'frst_nme', sortable: true },
-        { text: 'Middle Name', value: 'midl_nme', sortable: true }
+        { text: 'Last Name', value: 'last_nme', width: '180px', sortable: true },
+        { text: 'First Name', value: 'frst_nme', width: '180px', sortable: true },
+        { text: 'Middle Name', value: 'midl_nme', width: '180px', sortable: true },
+        { text: 'Division', value: 'division', width: '180px', sortable: true },
+        { text: 'Department', value: 'department', width: '180px', sortable: true },
+        { text: 'Section', value: 'section', width: '180px', sortable: true },
+        { text: 'Position', value: 'position', width: '180px', sortable: true }
       ],
       bioHeadr: [
         {
-          text: 'DTR Date',
+          text: 'Employee ID',
           align: 'left',
-          sortable: false,
-          value: 'dtr_date'
+          sortable: true,
+          value: 'empl_cde'
         },
+        { text: 'Date', align: 'left', sortable: true, value: 'dtr_date' },
         { text: 'Time', value: 'dtr_time' },
         { text: 'Description', value: 'tran_typ' }
       ],
@@ -309,7 +434,18 @@ export default {
       ]
     }
   },
+  watch: {
+    dt1Selected () {
+      this.dt1Selected.length > 1 ? this.showDtrEntry = false : this.showDtrEntry = true
+      this.dt1Selected.length > 1 ? this.employee = null : this.temporaryData = true
+      this.dt1Selected.length === 1 ? this.retrieveBio() : this.temporaryData = true
+    }
+  },
   computed: {
+    selectedRow () {
+      const selectRow = this.selected[0]
+      return selectRow ? `${selectRow.empl_cde}` : 'no data selected'
+    },
     timeIn_c: {
       get: function () {
         const timeIn__ = this.onThisDateBio.map(e => ({
@@ -342,13 +478,17 @@ export default {
     }
   },
   methods: {
+    clearTextField () {
+      this.rglrHour = null
+      this.rglrLate = null
+      this.rglrUndr = null
+      this.rglrOt__ = null
+    },
+    singleItemSelect (item) {
+      this.employee = item.item
+    },
     rateType (rateType) {
-      switch (rateType) {
-        case 'M':
-          return 'Monthly'
-        case 'D':
-          return 'Daily'
-      }
+      return VbuildRateTypeFn(rateType)
     },
     entryTyp (entryTyp) {
       switch (entryTyp) {
@@ -356,15 +496,18 @@ export default {
           return 'In'
         case '2':
           return 'Out'
+        default:
+          return 'Unknown'
       }
     },
     timeFrmt (timeFrmt) {
       return timeFrmt.substr(0, 2) + ':' + timeFrmt.substr(2, 2)
     },
     getEmployeeCode (item) {
-      this.selectRow = item.empl_cde
-      this.$set(item, 'selected', true)
-      this.employeeInfo = item
+      console.log(item)
+      // this.selectRow = item.empl_cde
+      // this.$set(item, 'selected', true)
+      // this.employeeInfo = item
       this.retrieveBio(item.empl_cde)
     },
     convertTimeToMinutes (timeFrtA) {
@@ -433,7 +576,7 @@ export default {
           diffrnts = parseFloat(minutes1 - minutes2)
           hours___ = parseFloat(diffrnts / 60)
           rglrUndr = hours___ + (diffrnts - (hours___ * 60)) / 60
-          this.rglrUndr = rglrUndr
+          this.rglrUndr = rglrUndr.toFixed(2)
       }
       // compute regular hours
       if (timeIn__ < employeeShift[0].cstrt_hr) {
@@ -445,16 +588,16 @@ export default {
       diffrnts = parseFloat(minutes2 - minutes1)
       hours___ = parseFloat(diffrnts / 60)
       rglrHour = hours___ + (diffrnts - (hours___ * 60)) / 60
-      this.rglrHour = rglrHour
+      this.rglrHour = rglrHour.toFixed(2)
       // pm
       minutes1 = this.convertTimeToMinutes(employeeShift[0].cstrt_pm)
       minutes2 = this.convertTimeToMinutes(timeOut_)
       diffrnts = parseFloat(minutes2 - minutes1)
       hours___ = parseFloat(diffrnts / 60)
       rglrHour += hours___ + (diffrnts - (hours___ * 60)) / 60
-      this.rglrHour = rglrHour
+      this.rglrHour = rglrHour.toFixed(2)
       if ((parseFloat(this.rglrHour + this.rglrLate)) > employeeShift[0].basichrs) {
-        this.rglrHour = employeeShift[0].basichrs - this.rglrLate - this.rglrUndr
+        this.rglrHour = employeeShift[0].basichrs - this.rglrLate - this.rglrUndr.toFixed(2)
       }
       // compute overtime
       if (timeOut_ > employeeShift[0].ot_strt_) {
@@ -482,7 +625,7 @@ export default {
             .then(response => {
               this.employeeShift = response.data
               resolve(response)
-              this.clickedDone = true
+              this.dataRetrieved = true
               this.computeRegularHours()
             })
             .catch(error => {
@@ -527,22 +670,39 @@ export default {
       } catch (error) {
       }
     },
-    async retrieveBio (emplCode, dtrDate) {
+    async retrieveBio () {
       try {
         this.loading = true
+        // time in / out
+        const emplCodeArray = this.dt1Selected.map((item) => {
+          return item.empl_cde
+        })
+        let request = {
+          primekey: this.primekey,
+          empl_cde: emplCodeArray,
+          dtr_date: this.dtrDate
+        }
         axios.defaults.headers.common['Authorization'] = 'Bearer ' + localStorage.getItem('access_token')
         await new Promise((resolve, reject) => {
-          axios.get(`u/personnel/directory/folder/dtr/bio/${this.primekey}/${emplCode}/${this.dtrDate}`)
+          axios.post('u/personnel/directory/folder/dtr/bio/', request)
             .then(response => {
               this.bio = response.data
               resolve(response)
-              this.onThisDateBio = this.bio.filter(obj => {
-                return obj.dtr_date === this.dtrDate
-              })
-              if (this.onThisDateBio.length !== 0) {
-                this.retrieveEmployeeShift(emplCode)
+              // check if bio exist
+              if (this.bio.length === 0) {
+                this.clearTextField()
+                this.dataRetrieved = true
               } else {
-                this.clickedDone = false
+                // retrieve only bion based on dtr date
+                this.onThisDateBio = this.bio.filter(obj => {
+                  return obj.dtr_date === this.dtrDate
+                })
+                if (this.onThisDateBio.length !== 0) {
+                  // accept first element only
+                  this.retrieveEmployeeShift(emplCodeArray[0])
+                } else {
+                  this.dataRetrieved = true
+                }
               }
               this.loading = false
             })

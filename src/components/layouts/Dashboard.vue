@@ -442,7 +442,8 @@ export default {
           active: false,
           items: [
             { action: 'mdi-upload', title: 'Device', url: { name: 'biometricsDevice' } },
-            { action: 'mdi-upload', title: 'Online', url: { name: 'biometricsOnline' } }
+            { action: 'mdi-upload', title: 'Online', url: { name: 'biometricsOnline' } },
+            { action: 'mdi-upload', title: 'API', url: { name: 'biometricsApi' } }
           ]
         }
       ],

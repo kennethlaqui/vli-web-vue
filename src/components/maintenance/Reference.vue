@@ -163,6 +163,15 @@
           <!-- <Employment :reloadEmployment="reloadEmployment"></Employment> -->
         </v-expansion-panel-content>
       </v-expansion-panel>
+      <!-- 8th row -->
+      <v-expansion-panel>
+        <v-expansion-panel-header>Holidays</v-expansion-panel-header>
+        <v-expansion-panel-content>
+          <!-- Holidays component -->
+          <Section :reloadSection="reloadSection"></Section>
+          <!-- <Employment :reloadEmployment="reloadEmployment"></Employment> -->
+        </v-expansion-panel-content>
+      </v-expansion-panel>
     </v-expansion-panels>
     <!-- dialog / create -->
     <!-- work status -->
