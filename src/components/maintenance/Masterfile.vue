@@ -75,7 +75,7 @@
         show-select
         fixed-header
         height="500px"
-        class="elavation-1"
+        class="elavation-1 font-weight-light caption"
       >
         <template v-slot:item.avatar__="{ item }">
           <v-avatar size="36">

@@ -14,11 +14,11 @@ COPY package*.json ./
 # install project dependencies
 RUN npm install
 
+# install vue-cli
+RUN npm install -g @vue/cli
+
 # copy project files and folders to the current working directory (i.e. 'app' folder)
 COPY . .
-
-# install vue-cli
-#RUN npm install -g @vue/cli
 
 # build app for production with minification
 #RUN npm run build

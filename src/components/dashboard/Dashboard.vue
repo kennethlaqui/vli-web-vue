@@ -199,6 +199,9 @@ export default {
       else if (calories > 200) return 'orange'
       else return 'green'
     }
+  },
+  created () {
+    this.$root.$emit('moduleName', 'Dashboard')
   }
 }
 </script>

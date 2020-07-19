@@ -12,9 +12,9 @@
     >
       <template v-slot:header>
         <v-toolbar
+          color="primary"
           dark
-          color="blue darken-3"
-          class="mb-1"
+          elevation="1"
           dense
         >
           <v-text-field
@@ -94,7 +94,7 @@
               <v-card-actions>
                 <v-spacer></v-spacer>
                 <div class="text-xs-center">
-                  <v-btn :disabled="item.status == 'Payroll Sent To Bank' || item.status == 'Payroll Computed' || item.status == '13th Month Computed'" color="blue darken-1" text>Modify</v-btn>
+                  <v-btn :disabled="item.status == 'Payroll Sent To Bank' || item.status == 'Payroll Computed' || item.status == '13th Month Computed'" color="blue darken-1" text>Edit</v-btn>
                   <v-btn :disabled="item.status == 'Payroll Sent To Bank' || item.status == 'Payroll Computed' || item.status == '13th Month Computed'" v-if="item.havefolder == 'No'" @click="createDtrFolder(item)" color="blue darken-1" text>Create DTR</v-btn>
                   <v-btn :disabled="item.status == 'Payroll Sent To Bank' || item.status == 'Payroll Computed' || item.status == '13th Month Computed'" v-else-if="item.havefolder == 'Yes'" :to="`/personnel/directory/folder/${item.directory}`" color="blue darken-1" text>Upload DTR</v-btn>
                 </div>
@@ -170,6 +170,7 @@ var moment = require('moment')
 export default {
   data () {
     return {
+      primekey: localStorage.getItem('primekey'),
       search: '',
       dateArray: [],
       jsonDirectories: [],
@@ -190,7 +191,9 @@ export default {
         'W2 Year',
         'SSS Period',
         'Status',
-        'Have Folder'
+        'Days',
+        'Have Folder',
+        'Processed'
       ]
     }
   },
@@ -219,7 +222,7 @@ export default {
       //   this.$router.push({ name: 'userLogout' })
       // }
       this.$store.dispatch('retrieveDirectories', {
-        primekey: localStorage.getItem('primekey')
+        primekey: this.primekey
       })
         .then(response => {
           this.jsonDirectories = this.$store.getters.retrieveDirectories
@@ -232,7 +235,9 @@ export default {
             w2year: e.w2_year_,
             sssperiod: e.appl_prd,
             status: `${this.payrollStatus(e.status__)}`,
-            havefolder: `${e.dtr_fldr === 'T' ? 'Yes' : 'No'}`
+            days: `${moment(e.last_dte).diff(`${moment(e.strt_dte)}`, 'days') + 1}`,
+            havefolder: `${e.dtr_fldr === 'T' ? 'Yes' : 'No'}`,
+            processed: `${e.ttl_empl}`
           }))
           this.items = this.directories
         })
@@ -251,8 +256,9 @@ export default {
         axios.defaults.headers.common['Authorization'] = 'Bearer ' + localStorage.getItem('access_token')
         axios.post('u/personnel/directory/create/folder', {
           dateArray: this.dateArray,
-          primekey: localStorage.getItem('primekey'),
-          cntrl_no: item.directory
+          primekey: this.primekey,
+          cntrl_no: item.directory,
+          userName: this.$store.getters.retrieveUser.user_nme
         })
           .then(response => {
             resolve(response)
@@ -290,6 +296,7 @@ export default {
     this.$on('getDirectories', () => {
       this.getDirectories()
     })
+    // this.countDays()
   },
   mounted () {
     this.$root.$on('saved', () => {

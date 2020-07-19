@@ -40,6 +40,7 @@ export default new Vuex.Store({
     positions: [],
     companies: [],
     shiftfile: [],
+    parameters: [],
     department: [],
     incomeType: [],
     directories: [],
@@ -52,6 +53,7 @@ export default new Vuex.Store({
     divisiondata: [],
     departmentdata: [],
     sectiondata: [],
+    directoryDate: [],
     f_emplstatdata: '',
     payrolldirectorybuild: [],
     showdialog: false
@@ -123,6 +125,9 @@ export default new Vuex.Store({
     retrieveSection (state) {
       return state.section
     },
+    retrieveDirectoryDate (state) {
+      return state.directoryDate
+    },
     retrieveDirectories (state) {
       return state.directories
     },
@@ -146,6 +151,9 @@ export default new Vuex.Store({
     },
     retrieveBank (state) {
       return state.bank
+    },
+    retrieveParameters (state) {
+      return state.parameters
     },
     showDialog (state) {
       return state.showdialog
@@ -221,6 +229,9 @@ export default new Vuex.Store({
     retrieveSection (state, payload) {
       state.section = payload
     },
+    retrieveDirectoryDate (state, payload) {
+      state.directoryDate = payload
+    },
     retrieveDirectories (state, payload) {
       state.directories = payload
     },
@@ -245,6 +256,9 @@ export default new Vuex.Store({
     retrieveBank (state, payload) {
       state.bank = payload
     },
+    retrieveParameters (state, payload) {
+      state.parameters = payload
+    },
     toggleDialog (state) {
       state.showdialog = !state.showdialog
     },
@@ -256,6 +270,29 @@ export default new Vuex.Store({
     }
   },
   actions: {
+    async retrieveParameters (context, payload) {
+      try {
+        axios.defaults.headers.common['Authorization'] = 'Bearer ' + context.state.token
+        if (context.getters.loggedIn) {
+          await new Promise((resolve, reject) => {
+            axios.get('l/helper/common/parameters/', {
+              params: {
+                primekey: payload.primekey
+              }
+            })
+              .then(response => {
+                this.parameters = response.data
+                context.commit('retrieveParameters', this.parameters)
+                resolve(response)
+              })
+              .catch(error => {
+                reject(error)
+              })
+          })
+        }
+      } catch (error) {
+      }
+    },
     async retrieveBank (context, payload) {
       if (this.state.bank.length === 0) {
         try {
@@ -405,6 +442,30 @@ export default new Vuex.Store({
               .then(response => {
                 this.folder = response.data
                 context.commit('retrieveFolder', this.folder)
+                resolve(response)
+              })
+              .catch(error => {
+                reject(error)
+              })
+          })
+        }
+      } catch (error) {
+      }
+    },
+    async retrieveDirectoryDate (context, payload) {
+      try {
+        axios.defaults.headers.common['Authorization'] = 'Bearer ' + context.state.token
+        if (context.getters.loggedIn) {
+          await new Promise((resolve, reject) => {
+            axios.get('l/helper/directory/date/', {
+              params: {
+                primekey: payload.primekey,
+                cntrl_no: payload.cntrl_no
+              }
+            })
+              .then(response => {
+                this.directoryDate = response.data
+                context.commit('retrieveDirectoryDate', this.directoryDate)
                 resolve(response)
               })
               .catch(error => {

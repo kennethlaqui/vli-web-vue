@@ -21,6 +21,7 @@ Vue.use(VueRouterBackButton, { router })
 Vue.use(Vuebar)
 
 Vue.config.productionTip = false
+export const bus = new Vue()
 
 // if (process.env.NODE_ENV === 'development') {
 //   makeServer()
@@ -50,7 +51,7 @@ router.beforeEach((to, from, next) => {
   } else if (to.matched.some(record => record.meta.requiresPrimekey)) {
     // this route requires primekey, check if not exist
     if (localStorage.getItem('primekey') === null) {
-      console.log(localStorage.getItem('primekey'))
+      // console.log(localStorage.getItem('primekey'))
       next({
         name: 'userLogout'
       })
@@ -58,7 +59,7 @@ router.beforeEach((to, from, next) => {
       next({
         name: 'userLogout'
       })
-      console.log(localStorage.getItem('primekey'))
+      // console.log(localStorage.getItem('primekey'))
     }
   } else {
     next() // make sure to always call next()!

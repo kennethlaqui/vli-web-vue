@@ -1,17 +1,19 @@
 <template>
 <!-- App.vue -->
-
 <v-app>
-  <v-app-bar :clipped-left="primaryDrawer.clipped" color="white" dense app elevation="2">
+  <v-app-bar :clipped-left="primaryDrawer.clipped" color="white" app elevation="2">
     <v-toolbar-title>Virtual Logic Inc.</v-toolbar-title>
     <v-spacer></v-spacer>
     <v-toolbar-items>
-      <v-btn to="/" text>Home</v-btn>
-      <v-btn to="/about" text>About</v-btn>
-      <v-btn v-if="!loggedIn" :to="{ name: 'userLogin' }" text>Login</v-btn>
-      <v-btn v-if="!loggedIn" :to="{ name: 'clientRegister' }" text>Register</v-btn>
-      <v-btn v-if="loggedIn" :to="{ name: 'UserAssignedCompany' }" text>Dashboard</v-btn>
-      <v-btn v-if="loggedIn" :to="{ name: 'userLogout' }" text>Logout</v-btn>
+      <v-btn to="/" class="font-weight-regular" text>PRODUCT</v-btn>
+      <v-btn to="/about" class="font-weight-regular" text>SUPPORT</v-btn>
+      <v-btn to="/about" class="font-weight-regular" text>PLANS</v-btn>
+      <v-btn to="/about" class="font-weight-regular" text>DOCS</v-btn>
+      <v-btn v-if="!loggedIn" :to="{ name: 'userLogin' }" class="font-weight-regular" text>Login</v-btn>
+
+      <!-- <v-btn v-if="!loggedIn" :to="{ name: 'clientRegister' }" text>Register</v-btn> -->
+      <v-btn v-if="loggedIn" :to="{ name: 'UserAssignedCompany' }" class="font-weight-regular" text>Dashboard</v-btn>
+      <v-btn v-if="loggedIn" :to="{ name: 'userLogout' }" class="font-weight-regular" text>Logout</v-btn>
     </v-toolbar-items>
   </v-app-bar>
 

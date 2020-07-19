@@ -95,8 +95,8 @@ export default {
   },
   methods: {
     selectedFile () {
-      console.log('selected a file')
-      console.log(this.$refs.myFile.files[0])
+      // console.log('selected a file')
+      // console.log(this.$refs.myFile.files[0])
       let file = this.$refs.myFile.files[0]
       if (!file || file.type !== 'text/plain') return
       // Credit: https://stackoverflow.com/a/754398/52160
@@ -104,9 +104,15 @@ export default {
       reader.readAsText(file, 'UTF-8')
       reader.onload = evt => {
         let text = evt.target.result
-        this.allNames = text.split('\n').map(function (el) { return el.split(/\s+/) })
+        this.allNames = text.split('\n').map(el => {
+          return el.split(/\s+/)
+        })
         // var headings = this.allNames.shift()
-        let obj = this.allNames.map(function (el) {
+        let filtered = this.allNames.filter(el => {
+          return (el[2] >= this.strtDate && el[2] <= this.endDate_)
+        })
+        console.log(filtered)
+        let obj = this.allNames.map(el => {
           obj = {}
           for (var i = 0, l = el.length; i < l; i++) {
             obj = isNaN(Number(el[i])) ? el[i] : +el[i]
@@ -117,7 +123,7 @@ export default {
         if (this.allNames[this.allNames.length - 1] === '') this.allNames.pop()
       }
       reader.onerror = evt => {
-        console.error(evt)
+        // console.error(evt)
       }
     },
     async uploadBio () {
@@ -132,7 +138,7 @@ export default {
           })
             .then(response => {
               resolve(response)
-              console.log(response)
+              // console.log(response)
             })
             .catch(error => {
               reject(error)

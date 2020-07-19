@@ -35,7 +35,7 @@
       dense
     >
       <v-app-bar-nav-icon @click.stop="drawer = !drawer" />
-      <v-toolbar-title>Dashboard</v-toolbar-title>
+      <v-toolbar-title>{{ moduleName !== '' ? moduleName : 'Dashboard' }}</v-toolbar-title>
       <v-spacer />
         <v-btn icon>
           <v-icon>mdi-bell</v-icon>
@@ -297,9 +297,9 @@
           <v-btn
             icon
             small
-            @click="themes = 'dark'"
+            @click="toggleTheme"
           >
-            <v-icon v-if="dark">mdi-brightness-4</v-icon>
+            <v-icon v-if="theme == 'dark'">mdi-brightness-4</v-icon>
             <v-icon v-else>mdi-brightness-7</v-icon>
           </v-btn>
         </div>
@@ -379,6 +379,7 @@ export default {
       username: 'Kenneth Laqui',
       companyName: '',
       companyPrex: '',
+      moduleName: '',
       vli_subs: '',
       user_num: '',
       user_id_: '',
@@ -405,8 +406,9 @@ export default {
           title: 'Personnel',
           active: true,
           items: [
-            { action: 'mdi-calendar-plus', title: 'Encode DTR', url: { name: 'directory' } },
-            { action: 'mdi-calendar-clock', title: 'Manpower', url: { name: 'manPower' } }
+            { action: 'mdi-calendar-plus', title: 'Compute DTR', url: { name: 'directory' } },
+            { action: 'mdi-calendar-clock', title: 'Manpower', url: { name: 'manPower' } },
+            { action: 'mdi-beach', title: 'Leaves', url: 'about' }
           ]
         },
         {
@@ -414,12 +416,8 @@ export default {
           title: 'Payroll',
           active: false,
           items: [
-            { action: 'mdi-cached', title: 'Compute Payroll', url: 'about' },
-            { action: 'mdi-currency-usd', title: 'Salaries', url: 'about' },
-            { action: 'mdi-currency-usd', title: 'One-Time Income', url: { name: 'PayrollHeader' } },
-            { action: 'mdi-currency-usd', title: 'Other Income', url: 'about' },
-            { action: 'mdi-currency-usd', title: 'One-Time Deduct', url: 'about' },
-            { action: 'mdi-currency-usd', title: 'Other Deduct', url: 'about' }
+            { action: 'mdi-calculator', title: 'Compute', url: 'about' },
+            { action: 'mdi-currency-usd', title: 'Others', url: { name: 'PayrollHeader' } }
           ]
         },
         {
@@ -427,8 +425,7 @@ export default {
           title: 'Reports',
           active: false,
           items: [
-            { action: 'mdi-beach', title: 'Leave Summary', url: 'about' },
-            { action: 'mdi-coin', title: 'Salaries', url: 'about' }
+            { action: 'mdi-beach', title: 'Leave Summary', url: 'about' }
           ]
         },
         {
@@ -437,8 +434,17 @@ export default {
           active: false,
           items: [
             { action: 'mdi-account-multiple-outline', title: 'Masterfile', url: { name: 'UserMasterfile' } },
-            { action: 'mdi-animation', title: 'Reference File', url: { name: 'reference' } },
-            { action: 'mdi-upload', title: 'Upload Bio', url: { name: 'biometrics' } }
+            { action: 'mdi-animation', title: 'Reference File', url: { name: 'reference' } }
+          ]
+        },
+        {
+          action: 'mdi-fingerprint',
+          title: 'Biometrics',
+          active: false,
+          items: [
+            { action: 'mdi-upload', title: 'Device', url: { name: 'biometricsDevice' } },
+            { action: 'mdi-upload', title: 'Online', url: { name: 'biometricsOnline' } },
+            { action: 'mdi-upload', title: 'API', url: { name: 'biometricsApi' } }
           ]
         }
       ],
@@ -459,6 +465,9 @@ export default {
     }
   },
   computed: {
+    theme () {
+      return this.$vuetify.theme.dark ? 'dark' : 'light'
+    },
     loggedIn () {
       return this.$store.getters.loggedIn
     },
@@ -478,6 +487,9 @@ export default {
     }
   },
   methods: {
+    toggleTheme () {
+      this.$vuetify.theme.dark = !this.$vuetify.theme.dark
+    },
     async retrieveSubscriber () {
       this.loading = true
       try {
@@ -542,8 +554,18 @@ export default {
     }
   },
   created () {
+    this.$root.$on('moduleName', (payload) => {
+      console.log(payload)
+      this.moduleName = payload
+    })
     this.getCurrentUser()
     this.retrieveSubscriber()
+    this.$root.$on('closeDrawer', (payload) => {
+      if (payload === true) {
+        this.drawer = false
+        this.drawerRight = false
+      }
+    })
   },
   props: [
     'item'
