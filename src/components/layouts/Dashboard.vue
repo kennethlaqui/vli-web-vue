@@ -35,7 +35,7 @@
       dense
     >
       <v-app-bar-nav-icon @click.stop="drawer = !drawer" />
-      <v-toolbar-title>Dashboard</v-toolbar-title>
+      <v-toolbar-title>{{ moduleName !== '' ? moduleName : 'Dashboard' }}</v-toolbar-title>
       <v-spacer />
         <v-btn icon>
           <v-icon>mdi-bell</v-icon>
@@ -297,9 +297,9 @@
           <v-btn
             icon
             small
-            @click="themes = 'dark'"
+            @click="toggleTheme"
           >
-            <v-icon v-if="dark">mdi-brightness-4</v-icon>
+            <v-icon v-if="theme == 'dark'">mdi-brightness-4</v-icon>
             <v-icon v-else>mdi-brightness-7</v-icon>
           </v-btn>
         </div>
@@ -379,6 +379,7 @@ export default {
       username: 'Kenneth Laqui',
       companyName: '',
       companyPrex: '',
+      moduleName: '',
       vli_subs: '',
       user_num: '',
       user_id_: '',
@@ -464,6 +465,9 @@ export default {
     }
   },
   computed: {
+    theme () {
+      return this.$vuetify.theme.dark ? 'dark' : 'light'
+    },
     loggedIn () {
       return this.$store.getters.loggedIn
     },
@@ -483,6 +487,9 @@ export default {
     }
   },
   methods: {
+    toggleTheme () {
+      this.$vuetify.theme.dark = !this.$vuetify.theme.dark
+    },
     async retrieveSubscriber () {
       this.loading = true
       try {
@@ -547,6 +554,10 @@ export default {
     }
   },
   created () {
+    this.$root.$on('moduleName', (payload) => {
+      console.log(payload)
+      this.moduleName = payload
+    })
     this.getCurrentUser()
     this.retrieveSubscriber()
     this.$root.$on('closeDrawer', (payload) => {

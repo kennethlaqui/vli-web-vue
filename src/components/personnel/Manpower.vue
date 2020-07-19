@@ -5,10 +5,9 @@
     <v-card>
 
       <v-app-bar
-        color="primary"
-        dense
+        color="blue darken-3"
         dark
-        elevation="1"
+        dense
       >
 
         <v-toolbar-title>Manpower Schedule</v-toolbar-title>
@@ -53,9 +52,9 @@
         <!-- save  -->
         <v-btn
           icon
-          @click="createStartEndDate()"
+          @click.stop="dialog = true"
         >
-
+        <!-- @click="createStartEndDate()" -->
           <v-icon>mdi-content-save</v-icon>
 
         </v-btn>
@@ -247,19 +246,20 @@
 
           </v-col>
 
-          <!-- search -->
-          <!-- <v-col cols="12" md="3" v-if="switchEmployees">
+          <!-- payroll group -->
+          <v-col cols="12" md="3">
 
-            <v-text-field
-              v-model="search"
-              append-icon="search"
-              label="Search"
-              single-line
-              hide-details
+            <v-select
+              v-model="payGroup"
+              :items="payrollGroup"
+              item-text="descript"
+              item-value="group_no"
+              label="Sort By"
               class="font-weight-light"
+              dense
             />
 
-          </v-col> -->
+          </v-col>
 
         </v-row>
 
@@ -431,6 +431,18 @@
               class="elevation-1 font-weight-light caption"
               height="600px"
             >
+              <template v-slot:item.data-table-select="{ item, isSelected, select }">
+
+                <v-simple-checkbox
+                  :value="isSelected"
+                  :readonly="item.uploaded === 'T'"
+                  :disabled="item.uploaded === 'T'"
+                  @input="select($event)"
+                  :ripple=false
+                />
+
+              </template>
+
               <template v-slot:item.avatar__="{ item }">
 
                 <!-- slot-avatar -->
@@ -487,59 +499,105 @@
       </v-col>
 
     </v-row>
+
+    <!-- snack bar -->
     <v-snackbar v-model="snack" :timeout="3000" :color="snackColor">
+
       <h3>{{ snackText }}</h3>
-    <v-btn text @click="snack = false">Close</v-btn>
-  </v-snackbar>
+
+      <v-btn text @click="snack = false">Close</v-btn>
+
+    </v-snackbar>
+
+    <!-- dialog save -->
+    <v-row justify="center" align="center">
+
+      <dialogSaveUpdate
+        v-if="dialog"
+        dialog
+        title="Save Employee/s Shift?"
+        content="You are about to save shift schedule on these employees"
+        :dialogsave="this.dialogSave"
+      >
+
+        <template v-slot:b-close>
+
+          <v-btn
+            color="green darken-1"
+            text
+            @click="dialog = false"
+          >
+            Disagree
+          </v-btn>
+
+        </template>
+
+        <template v-slot:b-submit>
+
+          <v-btn
+            color="green darken-1"
+            text
+            @click="createStartEndDate(); dialog = false"
+          >
+            Agree
+          </v-btn>
+
+        </template>
+
+      </dialogSaveUpdate>
+
+    </v-row>
+
   </div>
 </template>
 <script>
 import axios from 'axios'
 import { Form } from 'vform'
+import dialogSaveUpdate from '@/components/dialogs/masterfile/DialogSaveUpdate.vue'
 var moment = require('moment')
 
 export default {
   name: 'Manpower',
+  components: {
+    dialogSaveUpdate
+  },
   data () {
     return {
       primekey: localStorage.getItem('primekey'),
-      message: 'Hello',
+      endDateMessage: '0 Day/s',
+      employeeSchedSearch: '',
+      dprtmentSearch: '',
+      employeeSearch: '',
+      manpowerSearch: '',
+      snackColor: '',
+      snackText: '',
+      payGroup: '00',
+      newShft_: '',
       date: new Date().toISOString().substr(0, 10),
-      x: [],
-      menu: false,
-      modal: false,
-      menu2: false,
+      strtDate: new Date().toISOString().substr(0, 10),
+      endDate_: new Date().toISOString().substr(0, 10),
+      switchEmployees: true,
+      searchManpower: false,
+      singleSelect: false,
+      doNotProcess: false,
+      dialogSave: false,
       strtMenu: false,
       endMenu_: false,
       loading: false,
+      dialog: false,
       snack: false,
-      doNotProcess: false,
-      switchEmployees: true,
-      searchManpower: false,
-      shftFile: [],
-      dprtmentSearch: '',
-      employeeSearch: '',
-      employeeSchedSearch: '',
-      manpowerSearch: '',
-      endDateMessage: '0 Day/s',
-      newShft_: '',
-      snackColor: '',
-      snackText: '',
-      search: '',
-      dprtment: [],
-      singleSelect: false,
-      checkbox: true,
-      bol: true,
-      emplSlct: [],
-      dprtSlct: [],
-      employees: [],
-      dteArray: [],
-      employeeSched: [],
       employeeSchedSelect: [],
       manpowerSchedules: [],
       manpowerSelect: [],
-      strtDate: new Date().toISOString().substr(0, 10),
-      endDate_: new Date().toISOString().substr(0, 10),
+      employeeSched: [],
+      payrollGroup: [],
+      dateArray: [],
+      employees: [],
+      emplSlct: [],
+      dprtSlct: [],
+      shftFile: [],
+      dteArray: [],
+      dprtment: [],
       form: new Form({
         primekey: '',
         cntrl_no: '',
@@ -627,6 +685,7 @@ export default {
         this.strtDate = this.date
       }
       this.countDays()
+      this.dprtSlct.length > 0 && this.retrieveEmployees()
     },
     endDate_ (value) {
       if (value < this.strtDate) {
@@ -637,6 +696,13 @@ export default {
         this.endDate_ = this.date
       }
       this.countDays()
+      this.dprtSlct.length > 0 && this.retrieveEmployees()
+    },
+    payGroup (value) {
+      console.log(value)
+      if (this.dprtSlct.length > 0) {
+        value && this.retrieveEmployees()
+      }
     },
     switchEmployees (value) {
       value ? this.doNotProcess = true : this.doNotProcess = false
@@ -653,7 +719,7 @@ export default {
       var count = moment(this.endDate_).diff(moment(this.strtDate), 'days') + 1
       this.endDateMessage = count + ' Day/s'
     },
-    retrieveDepartment () {
+    loadDepartment () {
       this.loading = true
       this.$store.dispatch('retrieveDepartment', {
         primekey: this.primekey
@@ -685,7 +751,21 @@ export default {
       this.snackColor = 'success'
       this.snackText = 'Data saved'
     },
-    retrieveShiftFile () {
+    loadPayrollGroup () {
+      this.$store.dispatch('retrievePayrollGroup', {
+        primekey: this.primekey
+      })
+        .then(response => {
+          this.payrollGroup = this.$store.getters.retrievePayrollGroup
+          this.payrollGroup.push(
+            {
+              group_no: '00',
+              descript: 'All'
+            }
+          )
+        })
+    },
+    loadShiftFile () {
       // display all day type
       this.$store.dispatch('retrieveShiftFile', {
         primekey: this.primekey
@@ -753,16 +833,31 @@ export default {
       const dprtSlct = this.dprtSlct.map(e => {
         return e.pos_code
       })
+      this.dateArray.length = 0
+      var startDate = new Date(this.strtDate)
+      var endDate = new Date(this.endDate_)
+      var currentDate = moment(startDate)
+      var stopDate = moment(endDate)
+      while (currentDate <= stopDate) {
+        this.dateArray.push(moment(currentDate).format('YYYY-MM-DD'))
+        currentDate = moment(currentDate).add(1, 'days')
+      }
+      // let request = {
+      //   primekey: this.primekey,
+      //   dprtment: dprtSlct,
+      //   group_no: this.payGroup.split(', ')
+      // }
+      let request = {
+        primekey: this.primekey,
+        coverage: this.dateArray,
+        dprtment: dprtSlct,
+        group_no: this.payGroup.split(', ')
+      }
       try {
         axios.defaults.headers.common['Authorization'] = 'Bearer ' + localStorage.getItem('access_token')
-        if (this.bol) {
+        if (this.$store.getters.loggedIn) {
           await new Promise((resolve, reject) => {
-            axios.get('u/personnel/manpower/employees/', {
-              params: {
-                primekey: this.primekey,
-                dprtment: dprtSlct
-              }
-            })
+            axios.post('u/personnel/manpower/employees/', request)
               .then(response => {
                 this.employees = response.data
                 resolve(response)
@@ -777,6 +872,12 @@ export default {
       }
     },
     async createStartEndDate () {
+      if (this.emplSlct.length === 0) {
+        this.snack = true
+        this.snackColor = 'error'
+        this.snackText = 'Please Select Employee'
+        return
+      }
       if (this.newShft_.length === 0) {
         this.snack = true
         this.snackColor = 'error'
@@ -791,27 +892,29 @@ export default {
         strtDate = moment(strtDate).add(1, 'days').format('YYYY-MM-DD')
       }
       try {
-        await new Promise((resolve, reject) => {
-          axios.defaults.headers.common['Authorization'] = 'Bearer ' + localStorage.getItem('access_token')
-          axios.post('u/personnel/manpower/create', {
-            primekey: this.primekey,
-            employees: this.emplSlct,
-            dteArray: this.dteArray,
-            shiftCde: this.newShft_
+        axios.defaults.headers.common['Authorization'] = 'Bearer ' + localStorage.getItem('access_token')
+        if (this.$store.getters.loggedIn) {
+          await new Promise((resolve, reject) => {
+            axios.post('u/personnel/manpower/create', {
+              primekey: this.primekey,
+              employees: this.emplSlct,
+              dteArray: this.dteArray,
+              shiftCde: this.newShft_
+            })
+              .then(response => {
+                resolve(response)
+                this.snack = true
+                this.snackColor = 'success'
+                this.snackText = 'Data save'
+              })
+              .catch(error => {
+                reject(error)
+                this.snack = true
+                this.snackColor = 'error'
+                this.snackText = 'Error in data'
+              })
           })
-            .then(response => {
-              resolve(response)
-              this.snack = true
-              this.snackColor = 'success'
-              this.snackText = 'Data save'
-            })
-            .catch(error => {
-              reject(error)
-              this.snack = true
-              this.snackColor = 'error'
-              this.snackText = 'Error in data'
-            })
-        })
+        }
       } catch (error) {
         this.snack = true
         this.snackColor = 'error'
@@ -860,12 +963,14 @@ export default {
   },
   created () {
     this.countDays()
-    this.retrieveShiftFile()
-    this.retrieveDepartment()
+    this.loadPayrollGroup()
+    this.loadShiftFile()
+    this.loadDepartment()
     this.$on('retrieveEmployeeWithManpower', () => {
       this.retrieveEmployeeWithManpower()
     })
     this.$root.$emit('closeDrawer', true)
+    this.$root.$emit('moduleName', 'Personnel')
   }
 }
 </script>

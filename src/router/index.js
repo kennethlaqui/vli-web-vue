@@ -67,6 +67,10 @@ const routes = [
     meta: { layout: 'default' }
   },
   {
+    path: '/system/admin',
+    name: 'systemAdmin'
+  },
+  {
     path: '/user/dashboard',
     name: 'userDashboard',
     component: Dashboard,
