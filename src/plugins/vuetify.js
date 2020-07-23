@@ -1,3 +1,4 @@
+import '@mdi/font/css/materialdesignicons.css'
 import Vue from 'vue'
 import Vuetify from 'vuetify/lib'
 import colors from 'vuetify/lib/util/colors'
@@ -11,5 +12,9 @@ export default new Vuetify({
         primary: colors.shades.black
       }
     }
+  },
+  // remove in production
+  icons: {
+    iconfont: 'mdi' // default - only for display purposes
   }
 })
