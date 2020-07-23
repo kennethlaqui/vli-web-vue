@@ -558,6 +558,21 @@ var moment = require('moment')
 
 export default {
   name: 'Manpower',
+  props: {
+    propPrimekey: {
+
+    },
+    propStartDate: {
+      type: String
+    },
+    propEndDate: {
+      type: String
+    },
+    fromDirectories: {
+      type: Boolean,
+      default: false
+    }
+  },
   components: {
     dialogSaveUpdate
   },
@@ -623,7 +638,7 @@ export default {
         { text: 'Last Name', value: 'last_nme', align: 'left', width: '200px', divider: true },
         { text: 'First Name', value: 'frst_nme', align: 'left', width: '200px', divider: true },
         { text: 'Payroll Group', value: 'paygroupdescript', align: 'left', width: '200px', divider: true },
-        { text: 'Status', value: 'workstatdescript', align: 'left', width: '200px', divider: true },
+        { text: 'Status', value: 'workstatDescript', align: 'left', width: '200px', divider: true },
         { text: 'Position', value: 'position', sortable: false, align: 'left', width: '200px', divider: true },
         { text: 'Division', value: 'division', align: 'left', width: '200px', divider: true },
         { text: 'Department', value: 'department', align: 'left', width: '200px', divider: true },
@@ -715,6 +730,11 @@ export default {
     }
   },
   methods: {
+    setDtrDate () {
+      this.primekey = this.propPrimekey
+      this.strtDate = this.propStartDate
+      this.endDate_ = this.propEndDate
+    },
     countDays () {
       var count = moment(this.endDate_).diff(moment(this.strtDate), 'days') + 1
       this.endDateMessage = count + ' Day/s'
@@ -962,6 +982,7 @@ export default {
     }
   },
   created () {
+    this.fromDirectories && this.setDtrDate()
     this.countDays()
     this.loadPayrollGroup()
     this.loadShiftFile()
