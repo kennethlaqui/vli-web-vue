@@ -10,7 +10,7 @@
         elevation="1"
       >
 
-        <v-toolbar-title>Verified Employees</v-toolbar-title>
+        <v-toolbar-title>Employees With Manpower</v-toolbar-title>
 
         <v-spacer></v-spacer>
 
@@ -377,6 +377,7 @@ export default {
       dtrDate: '',
       search: '',
       snackTimeOut: 3000,
+      payGroup: [],
       emplCodeArray: [],
       onThisDateBio: [],
       employeeShift: [],
@@ -637,11 +638,16 @@ export default {
       }
     },
     async retrieveEmployees () {
+      let request = {
+        primekey: this.primekey,
+        coverage: ['2019-11-01'],
+        group_no: ['01']
+      }
       try {
         axios.defaults.headers.common['Authorization'] = 'Bearer ' + localStorage.getItem('access_token')
-        if (this.bol) {
+        if (this.$store.getters.loggedIn) {
           await new Promise((resolve, reject) => {
-            axios.get(`u/personnel/directory/folder/dtr/employees/${this.primekey}`)
+            axios.post('u/personnel/directory/folder/dtr/employees/', request)
               .then(response => {
                 this.employees = response.data
                 resolve(response)
@@ -715,8 +721,8 @@ export default {
     }
   },
   created () {
-    this.retrieveEmployees()
     this.retrieveDtrDate()
+    this.retrieveEmployees()
     this.retrieveDayType()
     this.$root.$emit('closeDrawer', true)
   }

@@ -164,6 +164,7 @@ export default {
       dt1Selected: [],
       directoryDate: [],
       dateArray: [],
+      folderPayrollGroup: [],
       loading: false,
       snack: false,
       singleSelect: false,
