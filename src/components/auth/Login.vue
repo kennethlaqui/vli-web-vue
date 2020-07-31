@@ -1,6 +1,6 @@
 <template>
 <div>
-  <v-content>
+  <v-main>
     <v-container
       fluid
     >
@@ -35,7 +35,6 @@
                     class="profile"
                     color="grey"
                     size="60"
-                    rounded
                   >
                     <v-img :src="this.images.logo" alt="john"></v-img>
                   </v-avatar>
@@ -112,7 +111,7 @@
         </v-col>
       </v-row>
     </v-container>
-  </v-content>
+  </v-main>
   <router-view></router-view>
 </div>
 </template>

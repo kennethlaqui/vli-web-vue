@@ -128,7 +128,7 @@
                 <v-text-field
                   v-model="strtDate"
                   label="Start Date"
-                  prepend-icon="event"
+                  prepend-icon="mdi-calendar-outline"
                   readonly
                   v-on="on"
                   class="font-weight-light"
@@ -187,7 +187,7 @@
                 <v-text-field
                   v-model="endDate_"
                   label="End Date"
-                  prepend-icon="event"
+                  prepend-icon="mdi-calendar-outline"
                   :hint="endDateMessage"
                   persistent-hint
                   readonly
@@ -505,7 +505,19 @@
 
       <h3>{{ snackText }}</h3>
 
-      <v-btn text @click="snack = false">Close</v-btn>
+      <template v-slot:action="{ attrs }">
+
+        <v-btn
+          v-bind="attrs"
+          text
+          @click="snack = false"
+        >
+
+          Close
+
+        </v-btn>
+
+      </template>
 
     </v-snackbar>
 

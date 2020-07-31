@@ -54,7 +54,6 @@
         class="profile"
         color="grey"
         size="100"
-        rounded
       >
         <v-img :src="this.form.avatar__" alt="john"></v-img>
       </v-avatar>

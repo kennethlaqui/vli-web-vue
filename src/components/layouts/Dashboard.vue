@@ -129,7 +129,7 @@
         link
       >
         <v-list-item-action>
-          <v-icon>mdi-view-dashboard</v-icon>
+          <v-icon>mdi-view-dashboard-outline</v-icon>
         </v-list-item-action>
         <v-list-item-content>
           <v-list-item-title>Dashboard</v-list-item-title>
@@ -284,7 +284,7 @@
                   @click="logout()"
                 >
                   <v-list-item-icon>
-                    <v-icon>logout</v-icon>
+                    <v-icon>mdi-logout-variant</v-icon>
                   </v-list-item-icon>
                   <v-list-item-content>
                     <v-list-item-title>Logout</v-list-item-title>
@@ -332,7 +332,7 @@
     /> -->
 
     <!-- Sizes your content based upon application components -->
-    <v-content>
+    <v-main>
 
       <!-- Provides the application the proper gutter -->
       <v-container fluid>
@@ -342,7 +342,7 @@
         <!-- If using vue-router -->
         <router-view></router-view>
       </v-container>
-    </v-content>
+    </v-main>
 
     <!-- <v-navigation-drawer
       v-model="right"
@@ -402,7 +402,7 @@ export default {
       },
       items: [
         {
-          action: 'mdi-folder-plus',
+          action: 'mdi-folder-plus-outline',
           title: 'Personnel',
           active: true,
           items: [
@@ -421,7 +421,7 @@ export default {
           ]
         },
         {
-          action: 'mdi-newspaper',
+          action: 'mdi-file-chart',
           title: 'Reports',
           active: false,
           items: [
@@ -429,12 +429,12 @@ export default {
           ]
         },
         {
-          action: 'settings',
+          action: 'mdi-cog-outline',
           title: 'Maintenance',
           active: false,
           items: [
-            { action: 'mdi-account-multiple-outline', title: 'Masterfile', url: { name: 'UserMasterfile' } },
-            { action: 'mdi-animation', title: 'Reference File', url: { name: 'reference' } }
+            { action: 'mdi-account-group-outline', title: 'Masterfile', url: { name: 'UserMasterfile' } },
+            { action: 'mdi-animation-outline', title: 'Reference File', url: { name: 'reference' } }
           ]
         },
         {
@@ -459,8 +459,8 @@ export default {
         // { text: 'Events', icon: 'mdi-flag', url: { name: 'easyEvents' } }
       ],
       accounts: [
-        { text: 'Switch Company', icon: 'sync', url: { name: 'UserAssignedCompany' } },
-        { text: 'Settings and admin', icon: 'settings' }
+        { text: 'Switch Company', icon: 'mdi-sync', url: { name: 'UserAssignedCompany' } },
+        { text: 'Settings and admin', icon: 'mdi-cog-outline' }
       ]
     }
   },
@@ -555,7 +555,6 @@ export default {
   },
   created () {
     this.$root.$on('moduleName', (payload) => {
-      console.log(payload)
       this.moduleName = payload
     })
     this.getCurrentUser()

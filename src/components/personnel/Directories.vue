@@ -39,7 +39,7 @@
               flat
               solo-inverted
               hide-details
-              prepend-inner-icon="search"
+              prepend-inner-icon="mdi-magnify"
               label="Search"
               dense
             />
@@ -55,7 +55,7 @@
                   solo-inverted
                   hide-details
                   :items="keys"
-                  prepend-inner-icon="search"
+                  prepend-inner-icon="mdi-magnify"
                   label="Sort by"
                   dense
                 />
