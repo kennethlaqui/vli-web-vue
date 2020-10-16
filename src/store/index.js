@@ -23,6 +23,7 @@ export default new Vuex.Store({
   state: {
     defaultMasterfileReference,
     token: localStorage.getItem('access_token') || null,
+    systemToken: localStorage.getItem('system_token') || null,
     user: '',
     primekey: [],
     vli_subs: [], // no getters
@@ -61,6 +62,9 @@ export default new Vuex.Store({
   getters: {
     loggedIn (state) {
       return state.token !== null
+    },
+    systemLoggedIn (state) {
+      return state.systemToken !== null
     },
     UserID (state) {
       return state.username
@@ -163,8 +167,14 @@ export default new Vuex.Store({
     retrieveToken (state, token) {
       state.token = token
     },
+    requestSystemToken (state, systemToken) {
+      state.systemToken = systemToken
+    },
     destroyToken (state) {
       state.token = null
+    },
+    destroySystemToken (state) {
+      state.systemToken = null
     },
     UserID (state, username) {
       state.username = username
@@ -1002,6 +1012,30 @@ export default new Vuex.Store({
       } catch (error) {
       }
     },
+    // -- system logout
+    async destroySystemToken (context) {
+      try {
+        axios.defaults.headers.common['Authorization'] = 'Bearer ' + context.state.systemToken
+        if (context.getters.systemLoggedIn) {
+          await new Promise((resolve, reject) => {
+            axios.post('s/logout')
+              .then(response => {
+                localStorage.removeItem('system_token')
+                localStorage.removeItem('primekey')
+                context.commit('destroySystemToken')
+                resolve(response)
+              })
+              .catch(error => {
+                localStorage.removeItem('system_token')
+                context.commit('destroySystemToken')
+                reject(error)
+              })
+          })
+        }
+      } catch (error) {
+        localStorage.removeItem('system_token')
+      }
+    },
     // -- logout
     async destroyToken (context) {
       try {
@@ -1026,11 +1060,34 @@ export default new Vuex.Store({
         localStorage.removeItem('access_token')
       }
     },
-    // -- login
+    // -- system login
+    async requestSystemToken (context, credentials) {
+      try {
+        await new Promise((resolve, reject) => {
+          axios.post('s/login', {
+            username: credentials.username,
+            password: credentials.password
+          })
+            .then(response => {
+              this.systemToken = response.data.access_token
+              localStorage.setItem('system_token', this.systemToken)
+              context.commit('requestSystemToken', this.systemToken)
+              resolve(response)
+            })
+            .catch(error => {
+              localStorage.removeItem('system_token')
+              reject(error)
+            })
+        })
+      } catch (error) {
+        localStorage.removeItem('system_token')
+      }
+    },
+    // -- login corporate
     async retrieveToken (context, credentials) {
       try {
         await new Promise((resolve, reject) => {
-          axios.post('u/login', {
+          axios.post('c/login', {
             username: credentials.username,
             password: credentials.password
           })

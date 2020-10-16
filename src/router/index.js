@@ -1,12 +1,17 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
+import store from '../store'
 import Home from '../views/Home.vue'
 import About from '../views/About.vue'
-import UserLogin from '../components/auth/Login.vue'
+// import SystemLogin from '../views/system/auth/Login'
+import UserLogin from '../views/auth/Login.vue'
 import UserAssignedCompany from '../components/auth/Companies.vue'
 import Logout from '../components/auth/Logout.vue'
 import Dashboard from '../components/dashboard/Dashboard.vue'
-import ClientRegister from '../components/client/Register.vue'
+import SystemDashboard from '../components/system/Dashboard.vue'
+import ClientRegister from '../views/auth/register/ClientRegister.vue'
+import ClientRequest from '../views/system/clients/Clients.vue'
+import ClientProfile from '../views/system/clients/ClientView.vue'
 import Directory from '../views/personnel/Directory.vue'
 import Folder from '../components/personnel/Folder.vue'
 import FolderEmployees from '../components/personnel/Employees.vue'
@@ -19,8 +24,7 @@ import Reference from '../views/maintenance/Reference.vue'
 import BioDevice from '../components/biometrics/Device.vue'
 import BioOnline from '../views/biometrics/Online.vue'
 import UserMasterfile from '../views/maintenance/Masterfile.vue'
-// import NewEmployee from '../components/maintenance/NewEmployee.vue'
-// import EasyCreateEmployee from '../components/controller/dialog/CreateEmployee.vue'
+import Discord from '../components/layouts/Plain.vue'
 
 Vue.use(VueRouter)
 
@@ -30,6 +34,23 @@ const routes = [
     name: 'home',
     component: Home,
     meta: { layout: 'default' }
+  },
+  {
+    path: '/discord',
+    name: 'discord',
+    component: Discord,
+    meta: {
+      layout: 'plain'
+    }
+  },
+  {
+    path: '/syspanel',
+    name: 'systemHome',
+    meta: { layout: 'systemDefault' },
+    beforeEnter: (to, from, next) => {
+      if (store.getters.systemLoggedIn) next({ name: 'systemDashboard' })
+      else next()
+    }
   },
   {
     path: '/about',
@@ -67,10 +88,6 @@ const routes = [
     meta: { layout: 'default' }
   },
   {
-    path: '/system/admin',
-    name: 'systemAdmin'
-  },
-  {
     path: '/user/dashboard',
     name: 'userDashboard',
     component: Dashboard,
@@ -79,6 +96,42 @@ const routes = [
       requiresPrimekey: true,
       layout: 'dashboard'
     }
+  },
+  {
+    path: '/syspanel/dashboard',
+    name: 'systemDashboard',
+    component: SystemDashboard,
+    meta: { layout: 'systemDashboard' },
+    beforeEnter: (to, from, next) => {
+      if (store.getters.systemLoggedIn) next()
+      else next({ name: 'systemHome' })
+    }
+  },
+  {
+    path: '/syspanel/client',
+    name: 'systemClients',
+    component: ClientRequest,
+    meta: {
+      layout: 'systemDashboard'
+    },
+    beforeEnter: (to, from, next) => {
+      if (store.getters.systemLoggedIn) next()
+      else next({ name: 'systemHome' })
+    }
+
+  },
+  {
+    path: '/syspanel/client/:cntrl_no',
+    name: 'systemClientProfile',
+    component: ClientProfile,
+    meta: {
+      layout: 'systemDashboard'
+    },
+    beforeEnter: (to, from, next) => {
+      if (store.getters.systemLoggedIn) next()
+      else next({ name: 'systemHome' })
+    }
+
   },
   {
     path: '/personnel/directory',
@@ -152,15 +205,6 @@ const routes = [
       layout: 'dashboard'
     }
   },
-  // {
-  //   path: '/maintenance/masterfile/new/',
-  //   name: 'UserNewEmployee',
-  //   component: NewEmployee,
-  //   meta: {
-  //     requiresAuth: true,
-  //     layout: 'dashboard'
-  //   }
-  // },
   {
     path: '/maintenance/masterfile',
     name: 'UserMasterfile',
