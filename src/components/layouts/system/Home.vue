@@ -15,58 +15,8 @@
       <v-toolbar-items>
 
         <v-btn
-          to="/"
-          text
-        >
-          About Us
-        </v-btn>
-
-        <v-btn
-          to="/"
-          text
-        >
-          Product
-        </v-btn>
-
-        <v-btn
-          to="/about"
-          text
-        >
-          Support
-        </v-btn>
-
-        <v-btn
-          to="/about"
-          text
-        >
-          Pricing
-        </v-btn>
-
-        <v-btn
-          to="/about"
-          text
-        >
-          Documentaion
-        </v-btn>
-
-        <v-btn
-          v-if="!loggedIn"
-          :to="{ name: 'userLogin' }"
-          text
-        >
-          Login
-        </v-btn>
-
-        <v-btn
           v-if="loggedIn"
-          :to="{ name: 'UserAssignedCompany' }"
-        >
-          Dashboard
-        </v-btn>
-
-        <v-btn
-          v-if="loggedIn"
-          :to="{ name: 'userLogout' }"
+          @click="logout"
           text
         >
           Logout
@@ -76,14 +26,14 @@
 
     </v-app-bar>
 
-    <!-- Sizes your content based upon application components -->
+        <!-- Sizes your content based upon application components -->
     <v-main>
 
       <!-- Provides the application the proper gutter -->
       <v-container fluid>
 
         <!-- If using vue-router -->
-        <router-view></router-view>
+        <systemLogin></systemLogin>
 
       </v-container>
 
@@ -94,7 +44,13 @@
 </template>
 
 <script>
+import systemLogin from '@/views/system/auth/Login.vue'
+
 export default {
+  name: 'SystemHome',
+  components: {
+    systemLogin
+  },
   data: () => ({
     drawers: ['Default (no property)', 'Permanent', 'Temporary'],
     primaryDrawer: {
@@ -113,7 +69,15 @@ export default {
   }),
   computed: {
     loggedIn () {
-      return this.$store.getters.loggedIn
+      return this.$store.getters.systemLoggedIn
+    }
+  },
+  methods: {
+    logout () {
+      this.$store.dispatch('destroySystemToken')
+        .then(response => {
+          // this.$router.push({ name: 'home' })
+        })
     }
   }
 }

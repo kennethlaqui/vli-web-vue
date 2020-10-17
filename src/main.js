@@ -2,8 +2,11 @@
 // import 'typeface-roboto/index.css'
 import Vue from 'vue'
 import App from './App.vue'
-import HomepPage from './components/layouts/Home.vue'
+import PlainHomePage from './components/layouts/Plain.vue'
+import HomePage from './components/layouts/Home.vue'
 import Dashboard from './components/layouts/Dashboard.vue'
+import SystemHomePage from './components/layouts/system/Home'
+import SystemDashboard from './components/layouts/system/Dashboard'
 import './registerServiceWorker'
 import router from './router'
 import store from './store'
@@ -24,20 +27,31 @@ Vue.use(Vuebar)
 Vue.config.productionTip = false
 export const bus = new Vue()
 
-// if (process.env.NODE_ENV === 'development') {
-//   makeServer()
-// }
-
 router.beforeEach((to, from, next) => {
   if (to.matched.some(record => record.meta.requiresAuth)) {
     // this route requires auth, check if logged in
     // if not, redirect to login page.
-    if (!store.getters.loggedIn) {
-      next({
-        name: 'userLogin'
-      })
-    } else {
-      next()
+
+    // system login guard
+    // if (to.name === 'systemDashboard' && !store.getters.systemLoggedIn) {
+    //   if (!store.getters.systemLoggedIn) {
+    //     next({
+    //       name: 'systemHome'
+    //     })
+    //   } else {
+    //     next()
+    //   }
+    // }
+
+    // user login
+    if (to.name === 'userLogin' && !store.getters.loggedIn) {
+      if (!store.getters.loggedIn) {
+        next({
+          name: 'userLogin'
+        })
+      } else {
+        next()
+      }
     }
   } else if (to.matched.some(record => record.meta.requiresVisitor)) {
     // this route requires auth, check if logged in
@@ -52,7 +66,6 @@ router.beforeEach((to, from, next) => {
   } else if (to.matched.some(record => record.meta.requiresPrimekey)) {
     // this route requires primekey, check if not exist
     if (localStorage.getItem('primekey') === null) {
-      // console.log(localStorage.getItem('primekey'))
       next({
         name: 'userLogout'
       })
@@ -60,15 +73,17 @@ router.beforeEach((to, from, next) => {
       next({
         name: 'userLogout'
       })
-      // console.log(localStorage.getItem('primekey'))
     }
   } else {
-    next() // make sure to always call next()!
+    next()
   }
 })
 
-Vue.component('default-layout', HomepPage)
+Vue.component('plain-layout', PlainHomePage)
+Vue.component('default-layout', HomePage)
 Vue.component('dashboard-layout', Dashboard)
+Vue.component('systemDefault-layout', SystemHomePage)
+Vue.component('systemDashboard-layout', SystemDashboard)
 
 new Vue({
   router,
