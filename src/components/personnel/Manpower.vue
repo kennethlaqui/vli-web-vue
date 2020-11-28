@@ -726,7 +726,6 @@ export default {
       this.dprtSlct.length > 0 && this.retrieveEmployees()
     },
     payGroup (value) {
-      console.log(value)
       if (this.dprtSlct.length > 0) {
         value && this.retrieveEmployees()
       }

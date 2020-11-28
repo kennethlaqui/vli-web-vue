@@ -505,7 +505,6 @@ export default {
       return timeFrmt.substr(0, 2) + ':' + timeFrmt.substr(2, 2)
     },
     getEmployeeCode (item) {
-      console.log(item)
       // this.selectRow = item.empl_cde
       // this.$set(item, 'selected', true)
       // this.employeeInfo = item

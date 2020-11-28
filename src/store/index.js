@@ -2,6 +2,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import axios from 'axios'
+// import { resolve } from 'core-js/fn/promise'
 
 Vue.use(Vuex)
 
@@ -280,6 +281,22 @@ export default new Vuex.Store({
     }
   },
   actions: {
+    async retrieveRegions (context, payload) {
+      try {
+        await new Promise((resolve, reject) => {
+          axios.get('http://bkintanar.site/api/regions')
+            .then(response => {
+              this.regions = response.data
+              context.commit('retrieveRegions', this.regions)
+              resolve(response)
+            })
+            .catch(error => {
+              reject(error)
+            })
+        })
+      } catch (error) {
+      }
+    },
     async retrieveParameters (context, payload) {
       try {
         axios.defaults.headers.common['Authorization'] = 'Bearer ' + context.state.token

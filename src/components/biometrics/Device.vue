@@ -108,10 +108,9 @@ export default {
           return el.split(/\s+/)
         })
         // var headings = this.allNames.shift()
-        let filtered = this.allNames.filter(el => {
+        this.allNames.filter(el => {
           return (el[2] >= this.strtDate && el[2] <= this.endDate_)
         })
-        console.log(filtered)
         let obj = this.allNames.map(el => {
           obj = {}
           for (var i = 0, l = el.length; i < l; i++) {

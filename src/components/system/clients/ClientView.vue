@@ -2,169 +2,290 @@
 
   <div>
 
-    <v-card
-      height="500px"
-      elevation="1"
-    >
+    <v-stepper non-linear v-model="e1">
 
-      <v-app-bar
-        color="blue"
-        dense
-        dark
-        elevation="1"
-      >
+      <v-stepper-header>
 
-        <v-btn v-if="$routerHistory.hasPrevious()" :to="{ path: $routerHistory.previous().path }" icon exact>
+        <v-stepper-step
+          editable
+          :complete="e1 > 1"
+          step="1"
+        >
 
-          <v-icon>mdi-arrow-left</v-icon>
+          Basic Information
 
-        </v-btn>
-
-        <v-toolbar-title>Client Profile</v-toolbar-title>
-
-      </v-app-bar>
-
-      <v-container fluid>
-
-        <v-row>
-
-          <v-col md="6">
-
-            <!-- company name -->
-            <v-text-field
-              v-model="profile.com_name"
-              label="Company Name"
-              dense
-              outlined
-            />
-
-          </v-col>
-
-          <!-- company shortname -->
-          <v-col md="3">
-
-            <v-text-field
-              v-model="shortName"
-              label="Company Short Name"
-              dense
-              outlined
-            />
-
-          </v-col>
-
-          <!-- prefix -->
-          <v-col md="3">
-
-            <v-text-field
-              v-model="prefix"
-              append-icon="mdi-sync"
-              label="Prefix Name"
-              hint="Manually Assign Prefix Name or Generate"
-              persistent-hint
-              dense
-              outlined
-              @click:append="generatePrefix"
-            />
-
-          </v-col>
-
-        </v-row>
-
-        <v-row class="mt-n4">
-
-          <v-col md="4">
-
-            <!-- address -->
-            <v-text-field
-              v-model="profile.address_"
-              label="Address  "
-              dense
-              outlined
-            />
-
-          </v-col>
-
-          <v-col md="3">
-
-            <!-- states -->
-            <v-text-field
-              v-model="profile.state___"
-              label="State"
-              dense
-              outlined
-            />
-
-          </v-col>
-
-          <v-col md="3">
-
-            <!-- city -->
-            <v-text-field
-              v-model="profile.city____"
-              label="City"
-              dense
-              outlined
-            />
-
-          </v-col>
-
-          <v-col md="2">
-
-            <!-- city -->
-            <v-text-field
-              v-model="profile.zip_code"
-              label="Zip Code"
-              dense
-              outlined
-            />
-
-          </v-col>
-
-        </v-row>
+        </v-stepper-step>
 
         <v-divider></v-divider>
 
-        <v-row>
+        <v-stepper-step
+          editable
+          :complete="e1 > 2"
+          step="2"
+        >
 
-          <v-col md="4">
+          Owner's Information
 
-            <!-- first name -->
-            <v-text-field
-              v-model="profile.frst_nme"
-              label="First Name"
-              dense
-              outlined
-            />
+        </v-stepper-step>
 
-          </v-col>
+        <v-divider></v-divider>
 
-          <v-col md="4">
+        <v-stepper-step
+          editable
+          step="3"
+        >
 
-            <!-- last name -->
-            <v-text-field
-              v-model="profile.last_nme"
-              label="Last Name"
-              dense
-              outlined
-            />
+          Parameters
 
-          </v-col>
+        </v-stepper-step>
 
-          <v-col md="4">
+        <v-divider></v-divider>
 
-            <!-- city -->
-            <v-text-field
-              v-model="profile.position"
-              label="Position"
-              dense
-              outlined
-            />
+        <v-stepper-step
+          editable
+          step="4"
+        >
 
-          </v-col>
+          Subscription
 
-        </v-row>
+        </v-stepper-step>
 
-      </v-container>
+      </v-stepper-header>
+
+      <v-stepper-items>
+
+        <v-stepper-content step="1">
+
+          <v-row>
+
+            <v-col md="6">
+
+              <!-- company name -->
+              <v-text-field
+                v-model="profile.com_name"
+                label="Company Name"
+                dense
+                outlined
+              />
+
+            </v-col>
+
+            <!-- company shortname -->
+            <v-col md="3">
+
+              <v-text-field
+                v-model="shortName"
+                label="Company Short Name"
+                dense
+                outlined
+              />
+
+            </v-col>
+
+            <!-- prefix -->
+            <v-col md="3">
+
+              <v-text-field
+                v-model="prefix"
+                append-icon="mdi-sync"
+                label="Company Prefix Name"
+                dense
+                outlined
+                @click:append="generatePrefix"
+              />
+
+            </v-col>
+
+          </v-row>
+
+          <v-row class="mt-n4">
+
+            <v-col md="4">
+
+              <!-- address -->
+              <v-text-field
+                v-model="profile.address_"
+                label="Address"
+                dense
+                outlined
+              />
+
+            </v-col>
+
+            <v-col md="3">
+
+              <!-- states -->
+              <v-text-field
+                v-model="profile.state___"
+                label="State"
+                dense
+                outlined
+              />
+
+            </v-col>
+
+            <v-col md="3">
+
+              <!-- city -->
+              <v-text-field
+                v-model="profile.city____"
+                label="City"
+                dense
+                outlined
+              />
+
+            </v-col>
+
+            <v-col md="2">
+
+              <!-- city -->
+              <v-text-field
+                v-model="profile.zip_code"
+                label="Zip Code"
+                dense
+                outlined
+              />
+
+            </v-col>
+
+          </v-row>
+
+          <v-row class="mt-n4">
+
+            <!-- industry -->
+            <v-col md="4">
+
+              <v-select
+                v-model="profile.vli_industry"
+                :items="industries"
+                label="Industry"
+                item-text="descript"
+                item-value="cntrl_no"
+                dense
+                outlined
+              ></v-select>
+
+            </v-col>
+
+          </v-row>
+
+          <v-btn
+            color="primary"
+            @click="e1 = 2"
+          >
+            Continue
+          </v-btn>
+
+          <v-btn text>
+            Cancel
+          </v-btn>
+
+        </v-stepper-content>
+
+          <v-stepper-content step="2">
+            <v-row>
+
+              <v-col md="4">
+
+                <!-- first name -->
+                <v-text-field
+                  v-model="profile.frst_nme"
+                  label="First Name"
+                  dense
+                  outlined
+                />
+
+              </v-col>
+
+              <v-col md="4">
+
+                <!-- last name -->
+                <v-text-field
+                  v-model="profile.last_nme"
+                  label="Last Name"
+                  dense
+                  outlined
+                />
+
+              </v-col>
+
+              <v-col md="4">
+
+                <!-- city -->
+                <v-text-field
+                  v-model="profile.position"
+                  label="Position"
+                  dense
+                  outlined
+                />
+
+              </v-col>
+
+            </v-row>
+
+            <v-row class="mt-n4">
+
+              <v-col md="4">
+
+                <!-- email address -->
+                <v-text-field
+                  v-model="profile.email___"
+                  label="Email"
+                  dense
+                  outlined
+                />
+
+              </v-col>
+
+              <v-col md="4">
+
+                <!-- mobile -->
+                <v-text-field
+                  v-model="profile.mobile__"
+                  label="Mobile"
+                  dense
+                  outlined
+                />
+
+              </v-col>
+
+            </v-row>
+
+            <v-btn
+              color="primary"
+              @click="e1 = 3"
+            >
+              Continue
+            </v-btn>
+
+            <v-btn text>
+              Cancel
+            </v-btn>
+          </v-stepper-content>
+
+          <v-stepper-content step="3">
+            <!-- <v-card
+              class="mb-12"
+              color="grey lighten-1"
+              height="200px"
+            ></v-card> -->
+
+            <v-btn
+              color="primary"
+              @click="e1 = 1"
+            >
+              Continue
+            </v-btn>
+
+            <v-btn text>
+              Cancel
+            </v-btn>
+          </v-stepper-content>
+        </v-stepper-items>
+
+    </v-stepper>
+
+      <!-- </v-container> -->
 
       <!-- <v-tabs
         v-model="tab"
@@ -181,7 +302,7 @@
 
     </v-tabs> -->
 
-    </v-card>
+    <!-- </v-card> -->
 
   </div>
 
@@ -204,7 +325,9 @@ export default {
       cntrl_no: '',
       prefix: '',
       tab: null,
+      e1: 1,
       loading: true,
+      industries: [],
       profile: [],
       tabHeaders: [
         'Personal', 'General', 'Government', 'Payroll', 'Salary'
@@ -221,6 +344,21 @@ export default {
       }
       this.getPrefix(result)
       this.prefix = result
+    },
+    async getIndustries () {
+      try {
+        await new Promise((resolve, reject) => {
+          axios.get('l/helper/common/industry')
+            .then(response => {
+              this.industries = response.data
+              resolve(response)
+            })
+            .catch(errors => {
+              reject(errors)
+            })
+        })
+      } catch (error) {
+      }
     },
     async getPrefix (prefixValue) {
       try {
@@ -264,6 +402,7 @@ export default {
   },
   created () {
     this.clientProfile()
+    this.getIndustries()
   }
 }
 </script>

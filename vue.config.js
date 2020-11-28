@@ -14,9 +14,9 @@ module.exports = {
         logLevel: 'debug'
       }
     }
+  }
+}
     // useLocalIp: false,
     // proxy: 'http://localhost:8081',
     // port: 8081,
     // disableHostCheck: true
-  }
-}

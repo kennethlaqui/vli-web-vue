@@ -6,7 +6,7 @@
 
     <v-card>
 
-      <v-app-bar
+      <!-- <v-app-bar
         color="primary"
         dense
         dark
@@ -85,7 +85,7 @@
 
         </v-menu>
 
-      </v-app-bar>
+      </v-app-bar> -->
 
       <v-data-table
         v-model="selectedClient"
