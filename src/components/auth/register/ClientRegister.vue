@@ -375,6 +375,7 @@ export default {
       mobile__: ''
     },
     errors: [],
+    regions: [],
     states: [
       {
         id: 1,
@@ -480,6 +481,22 @@ export default {
       this.email___ = ''
       this.mobile__ = ''
     },
+    async retrieveRegions () {
+      try {
+        // axios.defaults.headers.common['Access-Control-Allow-Origin'] = '*'
+        await new Promise((resolve, reject) => {
+          axios.get('/api/regions')
+            .then(response => {
+              this.regions = response.data
+              resolve(response)
+            })
+            .catch(error => {
+              reject(error)
+            })
+        })
+      } catch (error) {
+      }
+    },
     clientRegister () {
       try {
         return new Promise((resolve, reject) => {
@@ -497,6 +514,9 @@ export default {
       } catch (error) {
       }
     }
+  },
+  created () {
+    this.retrieveRegions()
   }
 }
 </script>

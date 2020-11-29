@@ -108,7 +108,7 @@ const routes = [
     }
   },
   {
-    path: '/syspanel/client',
+    path: '/syspanel/clients',
     name: 'systemClients',
     component: ClientRequest,
     meta: {
