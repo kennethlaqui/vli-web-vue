@@ -3,7 +3,7 @@ module.exports = {
     'vuetify'
   ],
   devServer: {
-    public: 'vli-web.test:8081',
+    // public: 'vli-web.test:8081',
     port: 8081,
     proxy: {
       '^/api': {

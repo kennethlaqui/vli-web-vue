@@ -16,6 +16,7 @@ import VueCookies from 'vue-cookies'
 import VueTheMask from 'vue-the-mask'
 import VueRouterBackButton from 'vue-router-back-button'
 import Vuebar from 'vuebar'
+import axios from 'axios'
 // import { makeServer } from './server'
 
 Vue.use(Vuelidate)
@@ -23,6 +24,7 @@ Vue.use(VueCookies)
 Vue.use(VueTheMask)
 Vue.use(VueRouterBackButton, { router })
 Vue.use(Vuebar)
+axios.defaults.baseURL = '192.168.1.9/api'
 
 Vue.config.productionTip = false
 export const bus = new Vue()

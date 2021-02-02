@@ -122,7 +122,7 @@ export default {
 }
 </script>
 <style scoped>
-  .loading-dialog {
+  /* .loading-dialog {
     background-color: #303030
-  }
+  } */
 </style>

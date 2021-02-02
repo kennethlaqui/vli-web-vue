@@ -17,9 +17,9 @@
 
           <v-card
             class="elevation-3"
-            height="500px"
             width="360"
             outlined
+            :loading="loading"
           >
             <v-tabs
             >
@@ -71,6 +71,7 @@ export default {
     return {
       username: '',
       password: '',
+      loading: false,
       disabled: false,
       images: {
         company: require('@/assets/android-chrome-192x192.png'),
@@ -78,6 +79,11 @@ export default {
         logo: require('@/assets/vli.png')
       }
     }
+  },
+  created () {
+    this.$root.$on('loginLoading', (value) => {
+      this.loading = value
+    })
   }
 }
 </script>

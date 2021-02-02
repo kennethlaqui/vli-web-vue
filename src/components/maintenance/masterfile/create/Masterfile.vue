@@ -1201,7 +1201,7 @@ export default {
       axios.defaults.headers.common['Authorization'] = 'Bearer ' + localStorage.getItem('access_token')
       if (this.$store.getters.loggedIn) {
         return new Promise((resolve, reject) => {
-          this.form.post('u/maintenance/masterfile/create')
+          this.form.post('http://host.docker.internal:8080/api/u/maintenance/masterfile/create')
             .then(response => {
               resolve(response)
               this.snack = true

@@ -25,6 +25,7 @@ export default new Vuex.Store({
     defaultMasterfileReference,
     token: localStorage.getItem('access_token') || null,
     systemToken: localStorage.getItem('system_token') || null,
+    authenticatedUser: '',
     user: '',
     primekey: [],
     vli_subs: [], // no getters
@@ -70,8 +71,13 @@ export default new Vuex.Store({
     UserID (state) {
       return state.username
     },
+    // v1
     retrieveUser (state) {
       return state.user
+    },
+    // v2
+    authenticatedUser (state) {
+      return state.authenticatedUser
     },
     retrievePrimekey (state) {
       return state.primekey
@@ -180,8 +186,13 @@ export default new Vuex.Store({
     UserID (state, username) {
       state.username = username
     },
+    // v1
     retrieveUser (state, payload) {
       state.user = payload
+    },
+    // v2
+    authenticatedUser (state, payload) {
+      state.authenticatedUser = payload
     },
     retrievePrimekey (state, payload) {
       state.primekey = payload
@@ -1010,6 +1021,27 @@ export default new Vuex.Store({
       } catch (error) {
       }
     },
+    // Corporate v2
+    async authenticatedUser (context) {
+      try {
+        axios.defaults.headers.common['Authorization'] = 'Bearer ' + context.state.token
+        if (context.getters.loggedIn) {
+          await new Promise((resolve, reject) => {
+            axios.get('c/auth/user')
+              .then(response => {
+                this.authenticatedUser = response.data
+                context.commit('authenticatedUser', this.authenticatedUser)
+                resolve(response)
+              })
+              .catch(error => {
+                reject(error)
+              })
+          })
+        }
+      } catch (error) {
+      }
+    },
+    // v1
     async retrieveUser (context) {
       try {
         axios.defaults.headers.common['Authorization'] = 'Bearer ' + context.state.token
@@ -1059,7 +1091,7 @@ export default new Vuex.Store({
         axios.defaults.headers.common['Authorization'] = 'Bearer ' + context.state.token
         if (context.getters.loggedIn) {
           await new Promise((resolve, reject) => {
-            axios.post('u/logout')
+            axios.post('c/logout')
               .then(response => {
                 localStorage.removeItem('access_token')
                 localStorage.removeItem('primekey')

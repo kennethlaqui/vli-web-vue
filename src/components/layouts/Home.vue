@@ -2,79 +2,100 @@
 
   <v-app>
 
-    <v-app-bar
-      :clipped-left="primaryDrawer.clipped"
-      color="primary"
-      dark
-      app>
+    <v-toolbar
+      color="white"
+      dense
+    >
 
-      <v-toolbar-title>Virtual Logic Inc.</v-toolbar-title>
+      <v-toolbar-title class="grey--text">Virtual Logic Inc</v-toolbar-title>
 
       <v-spacer></v-spacer>
 
-      <v-toolbar-items>
+      <v-btn
+        class="grey--text"
+        to="/about"
+        text
+      >
 
-        <v-btn
-          to="/"
-          text
-        >
-          About Us
-        </v-btn>
+        About Us
 
-        <v-btn
-          to="/"
-          text
-        >
-          Product
-        </v-btn>
+      </v-btn>
 
-        <v-btn
-          to="/about"
-          text
-        >
-          Support
-        </v-btn>
+      <v-btn
+        class="grey--text"
+        to="/product"
+        text
+        plain
+      >
 
-        <v-btn
-          to="/about"
-          text
-        >
-          Pricing
-        </v-btn>
+        Product
 
-        <v-btn
-          to="/about"
-          text
-        >
-          Documentaion
-        </v-btn>
+      </v-btn>
 
-        <v-btn
-          v-if="!loggedIn"
-          :to="{ name: 'userLogin' }"
-          text
-        >
-          Login
-        </v-btn>
+      <v-btn
+        class="grey--text"
+        to="/about"
+        text
+      >
 
-        <v-btn
-          v-if="loggedIn"
-          :to="{ name: 'UserAssignedCompany' }"
-        >
-          Dashboard
-        </v-btn>
+        Support
 
-        <v-btn
-          v-if="loggedIn"
-          :to="{ name: 'userLogout' }"
-          text
-        >
-          Logout
-        </v-btn>
+      </v-btn>
 
-      </v-toolbar-items>
+      <v-btn
+        class="grey--text"
+        to="/about"
+        text
+      >
 
-    </v-app-bar>
+        Pricing
+
+      </v-btn>
+
+      <v-btn
+        class="grey--text"
+        to="/about"
+        text
+      >
+
+        Documentaion
+
+      </v-btn>
+
+      <v-btn
+        class="grey--text"
+        v-if="!loggedIn"
+        :to="{ name: 'userLogin' }"
+        text
+      >
+
+        Login
+
+      </v-btn>
+
+      <v-btn
+        class="grey--text"
+        v-if="loggedIn"
+        :to="{ name: 'UserAssignedCompany' }"
+        text
+      >
+
+        Dashboard
+
+      </v-btn>
+
+      <v-btn
+        class="grey--text"
+        v-if="loggedIn"
+        :to="{ name: 'userLogout' }"
+        text
+      >
+
+        Logout
+
+      </v-btn>
+
+    </v-toolbar>
 
     <!-- Sizes your content based upon application components -->
     <v-main>
